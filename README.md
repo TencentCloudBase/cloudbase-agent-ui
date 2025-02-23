@@ -5,10 +5,10 @@
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/TencentCloudBase/cloudbase-agent-ui/blob/main/LICENSE)
 [![GitHub Stars](https://img.shields.io/github/stars/TencentCloudBase/cloudbase-agent-ui?style=social)](https://github.com/TencentCloudBase/cloudbase-agent-ui)
 
-cloudbase-agent-ui 是由腾讯云开发团队推出的 AI 智能对话 UI 组件，配置简单开箱即用，助力微信小程序开发者快速集成大模型能力，打造企业级LLM应用。现已支持接入`<span style="font-size: 1.2em;background: #fff3d4;padding: 3px 8px;border-radius: 4px;">`
-DeepSeek 满血版（DeepSeek-R1-671B 与 DeepSeek-V3-671B）🔥🔥🔥, 腾讯混元大模型。
+cloudbase-agent-ui 是由腾讯云开发团队推出的 AI 智能对话 UI 组件，配置简单开箱即用，助力微信小程序开发者快速集成大模型能力，打造企业级LLM应用。现已支持接入
+***DeepSeek 满血版（DeepSeek-R1-671B 与 DeepSeek-V3-671B）🔥🔥🔥, 腾讯混元大模型***。
 
-![Agent UI 演示效果图](https://6c75-luke-agent-dev-7g1nc8tqc2ab76af-1259218801.tcb.qcloud.la/1740312823891.gif 390*)
+![Agent UI 演示效果图](https://6c75-luke-agent-dev-7g1nc8tqc2ab76af-1259218801.tcb.qcloud.la/1740312823891.gif)
 
 ## 🌟 特性亮点
 
