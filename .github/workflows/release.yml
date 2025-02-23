@@ -1,0 +1,71 @@
+name: CD
+on:
+  # 以主干的push事件作为触发条件
+  push:
+    branches: dev # 临时测试，后续改为 main
+jobs:
+  CD:
+    runs-on: ubuntu-latest
+    steps:
+      # 拉取代码
+      - name: Checkout repository
+        uses: actions/checkout@v2
+      # 下载Node
+      - name: Use Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "18.20.4"
+      # 添加缓存，逻辑和CI Workflow里的一样
+      - name: Cache
+        id: cache-dependencies
+        uses: actions/cache@v3
+        with:
+          path: |
+            **/node_modules
+          key: ${{runner.OS}}-${{hashFiles('**/package-lock.json')}}
+      # 安装依赖。命中缓存则跳过此步
+      - name: Installing Dependencies
+      # if: steps.cache-dependencies.outputs.cache-hit != 'true'
+        run: |
+          rm -rf node_modules/
+          npm install
+      # 从package.json里获取version属性的值
+      # 在CD Workflow中会给每个生成的制品打上标签，而标签取值于version值
+      - name: Read Version
+        # 读取出来的值会放在steps.[id].outputs.value供其他步骤step读取
+        id: version
+        uses: ashley-taylor/read-json-property-action@v1.0
+        with:
+          path: ./package.json
+          property: version
+      # 打包生成制品，且把制品压缩到assets.zip压缩包里
+      - name: Building
+        run: |
+          mkdir -p build
+          cd components/agent-ui
+          zip -r ../build/agent-ui.zip .  # 压缩源码文件夹
+          cd ../..  # 返回项目根目录
+      # 基于当前commit进行版本发布(Create a release)，tag_name是v前缀加上package.json的version值
+      - name: Create GitHub Release
+        # 此步骤中，版本发布后会返回对应的url，以供下面上传制品的步骤中读取使用
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          # GITHUB_TOKEN是准备工作步骤三申请的Personal Access Token
+          GITHUB_TOKEN: ${{ secrets.PROJECT_ACCESS_TOKEN }}
+        with:
+          tag_name: v${{steps.version.outputs.value}}
+          release_name: v${{steps.version.outputs.value}}
+          draft: false
+          prerelease: false
+      # 把assets.zip上传到仓库对应的发布版本Release上
+      - name: Update Release Asset
+        id: upload-release-asset
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.PROJECT_ACCESS_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: build/agent-ui.zip
+          asset_name: agent-ui-${{ github.ref_name }}.zip
+          asset_content_type: application/zip
