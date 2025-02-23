@@ -1,0 +1,23 @@
+{
+	"name": "cloudbase-agent-ui",
+	"version": "1.0.0",
+	"description": "微信小程序 Agent UI组件",
+	"main": "index.js",
+	"directories": {
+		"doc": "docs",
+		"example": "example"
+	},
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/TencentCloudBase/cloudbase-agent-ui.git"
+	},
+	"author": "cloudbase",
+	"license": "MIT",
+	"bugs": {
+		"url": "https://github.com/TencentCloudBase/cloudbase-agent-ui/issues"
+	},
+	"homepage": "https://github.com/TencentCloudBase/cloudbase-agent-ui#readme"
+}
