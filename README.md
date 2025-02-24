@@ -197,11 +197,11 @@ Page({
 
 ### ✅ 已完成功能
 
-✅ 大模型调用配置化 （DeepSeek/Hunyuan）
-✅ Agent调用配置化 (云开发平台配置)
-✅ 流式输出
-✅ 图片理解（暂只支持Hunyuan vision模型）
-✅ 联网搜索 （Agent模式）
+- ✅ 大模型调用配置化 （DeepSeek/Hunyuan）
+- ✅ Agent调用配置化 (云开发平台配置)
+- ✅ 流式输出
+- ✅ 图片理解（暂只支持Hunyuan vision模型）
+- ✅ 联网搜索 （Agent模式）
 
 ### 🚧 进行中开发
 - 多模型切换调用配置化
