@@ -8,7 +8,9 @@
 cloudbase-agent-ui 是由腾讯云开发团队推出的 AI 智能对话 UI 组件，配置简单开箱即用，助力微信小程序开发者快速集成大模型能力，打造企业级LLM应用。现已支持接入
 ***DeepSeek 满血版（DeepSeek-R1-671B 与 DeepSeek-V3-671B）🔥🔥🔥, 腾讯混元大模型***。
 
-![Agent UI 演示效果图](https://6c75-luke-agent-dev-7g1nc8tqc2ab76af-1259218801.tcb.qcloud.la/1740312823891.gif)
+Agent UI 演示效果图
+<img src="https://github.com/TencentCloudBase/cloudbase-agent-ui/blob/luke--migrate-repo/docs/modelExample.gif" width="375px">
+<img src="https://github.com/TencentCloudBase/cloudbase-agent-ui/blob/luke--migrate-repo/docs/botExample.gif" width="375px">
 
 ## 🌟 特性亮点
 
