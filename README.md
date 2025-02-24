@@ -31,7 +31,7 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
 
 ![](https://qcloudimg.tencent-cloud.cn/raw/f06ca4761f54ecc8ed8d9644229c92f9.png)
 
-如已开通微信云开发服务，请跳转至云开发平台(\`https://tcb.cloud.tencent.com/dev\`)创建AI服务。
+如已开通微信云开发服务，请跳转至[云开发平台](https://tcb.cloud.tencent.com/dev)创建AI服务。
 
 #### 1.2、创建AI服务
 
