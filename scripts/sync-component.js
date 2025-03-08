@@ -13,15 +13,10 @@ async function syncComponent() {
     // Git操作
     const { execSync } = require("child_process");
     execSync("git add .");
-    execSync('git commit -m "chore: sync agent-ui component before release"', {
-      stdio: "pipe",
-      encoding: "utf-8",
-    });
+    execSync('git commit -m "chore: sync agent-ui component before release"', { stdio: "inherit" });
 
     console.log("✅ 组件同步完成");
-  } catch (error) {
-    const errorOutput = error.stderr ? error.stderr.toString() : error.message;
-    console.error("❌ 同步失败:", errorOutput);
+  } catch (err) {
     console.error("❌ 同步失败:", err);
     process.exit(1);
   }

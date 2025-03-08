@@ -9,7 +9,7 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "prerelease": "node scripts/sync-component.js",
+    "sync": "node scripts/sync-component.js",
     "release": "standard-version",
     "postrelease": "git push --follow-tags origin dev"
   },
