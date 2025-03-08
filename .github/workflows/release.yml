@@ -89,7 +89,7 @@ jobs:
             # 上传示例小程序到 COS
       - name: Upload miniprogram example to COS
         run: |
-          cd apps/minprogram-agent-ui
-          zip -r minprogram-agent-ui.zip .
-          coscmd upload minprogram-agent-ui.zip /release/minprogram-agent-ui.zip
+          cd apps/miniprogram-agent-ui
+          zip -r miniprogram-agent-ui.zip .
+          coscmd upload miniprogram-agent-ui.zip /release/miniprogram-agent-ui.zip
 
