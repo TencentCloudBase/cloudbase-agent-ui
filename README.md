@@ -129,16 +129,32 @@ Page({
 
 ## ⚙️ 配置详解
 
-### agentConfig 属性表
+### 配置属性表
+| 参数               | 类型       | 必填  | 说明   |
+| ------------------ | ---------- | ---- | ----- |
+| `chatMode`           | `String` | 是    | 对话模式：`bot` - 使用Agent `model` - 直连大模型      |
+| `showBotAvatar`          | `Boolean` | 否 | 是否展示Bot的logo头像    |
+| `agentConfig` | [AgentConfig](#Agentconfig) | 是| Agent 调用配置 |
+| `modelConfig` | [ModelConfig](#Modelconfig) | 是| Model 调用配置 |
 
-| 参数               | 类型       | 必填 | 生效模式       | 说明                                                                                                                                                                                                                                                                                                  |
-| ------------------ | ---------- | ---- | -------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `type`           | `String` | 是   | 全局生效       | 对话模式：`bot` - 使用Agent `model` - 直连大模型                                                                                                                                                                                                                                                  |
-| `botId`          | `String` | 条件 | `type=bot`   | 配置Agent的唯一标识符（需先在[腾讯云开发平台上创建Agent](https://docs.cloudbase.net/ai/agent/)）                                                                                                                                                                                                         |
-| `modelName`      | `String` | 条件 | `type=model` | 大模型服务标识：`deepseek`/`hunyuan-open`                                                                                                                                                                                                                                                         |
-| `model`          | `String` | 条件 | `type=model` | 模型版本标识：modelName 为 deepseek时，支持  deepseek-r1/deepseek-v3; modelName为 hunyuan-exp （混元体验版）/ hunyuan-open（混元正式版,使用需先[配置API Key](https://tcb.cloud.tencent.com/dev?envId=luke-agent-dev-7g1nc8tqc2ab76af#/ai?tab=ai-model&model=hunyuan-open)）时，model可配置为hunyuan-lite |
-| `logo`           | `String` | 否   | `type=model` | 自定义LOGO URL                                                                                                                                                                                                                                                                                        |
-| `welcomeMessage` | `String` | 否   | `type=model` |                                                                                                                                                                                                                                                                                                       |
+#### AgentConfig  
+| 参数               | 类型       | 必填  | 说明                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ---------- | ----| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `botId`           | `String` | 是     | Agent的唯一标识ID                                                  |
+| `allowWebSearch`           | `Boolean` | 否     |     是否允许客户端启用联网搜索                                            |
+| `allowUploadFile`           | `Boolean` | 否       |     是否允许客户端启用文件上传                                           |
+| `allowPullRefresh`           | `Boolean` | 否       |     是否允许客户端启用下拉获取历史记录                                           |
+
+
+#### ModelConfig
+| 参数               | 类型       | 必填    | 说明                                                                                                                                                                                                                                                                                                  |
+| ------------------ | ---------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `modelProvider`           | `String` | 是      | 大模型服务厂商名称                                                  |
+| `quickResponseModel`           | `String` | 是     |     modelProvider 为 deepseek时，支持  deepseek-r1/deepseek-v3; modelProvider 为 hunyuan-exp （混元体验版）/ hunyuan-open（混元正式版,使用需先[配置API Key](https://tcb.cloud.tencent.com/dev?envId=luke-agent-dev-7g1nc8tqc2ab76af#/ai?tab=ai-model&model=hunyuan-open)）时，quickResponseModel 可配置为hunyuan-lite                                            |
+| `logo`           | `String` | 否    |     模型的头像URL                                           |
+| `welcomeMsg`           | `String` | 否    |     欢迎语                                           |
+
+
 
 #### 配置示例
 
@@ -159,13 +175,12 @@ wx.cloud.init({
 Page({
   //...
   data: {
-    agentConfig: {
-      type: "model", 
-      botId: "", 
-      modelName: "deepseek", 
-      model: "deepseek-r1", // 值为 “deepseek-r1” 或者 “deepseek-v3”
+    chatMode: 'model',
+    modelConfig: {
+      modelProvider: "deepseek",
+      quickResponseModel: "deepseek-v3" // or deepseek-r1
       logo: "",
-      welcomeMessage: ""
+      welcomeMsg: ""
     }
   }
   //...
@@ -188,14 +203,13 @@ wx.cloud.init({
 ```javascript
 Page({
   //...
-  data: {
-    agentConfig: {
-      type: "model", 
-      botId: "", 
-      modelName: "hunyuan-exp", // 值可以 "hunyuan-exp" 或者 "hunyuan-open"
-      model: "hunyuan-lite", // 值为 "hunyuan-lite"
+  data:{
+    chatMode: 'model',
+    modelConfig: {
+      modelProvider: "hunyuan-open",
+      quickResponseModel: "hunyuan-lite"
       logo: "",
-      welcomeMessage: ""
+      welcomeMsg: ""
     }
   }
   //...
@@ -219,13 +233,10 @@ wx.cloud.init({
 Page({
   //...
   data: {
+    chatMode: 'bot',
     agentConfig: {
-      type: "bot", 
-      botId: "bot-xxxxxx", 
-      modelName: "", 
-      model: "", 
-      logo: "",
-      welcomeMessage: ""
+      botId: 'bot-xxx',
+      allowWebSearch: true
     }
   }
   //...
@@ -252,11 +263,14 @@ Page({
 
 ### 📅 未来计划
 
-- UI 配置化，提供主题色配置与插槽系统，完美融入品牌风格
+- UI 高度配置化，提供主题色配置与插槽系统，完美融入品牌风格
 - 支持用户语音输入转文字
 - 支持文字转语音播放
 - 支持语音音色配置
-- AI生图
+- 文生图
+- 文生视频
+- 文生3D
+- 图生视频
 - 待补充...
 
 ## 🌍 社区支持

@@ -1,106 +1,157 @@
 <!-- agent ui 组件根容器 -->
 <view class="agent-ui">
+  <view class="navBar" wx:if="{{chatMode === 'bot'}}">
+    <view class="nav-content">
+      <!-- <image src="{{bot.avatar}}" mode="aspectFill" class="bot-avatar"/> -->
+      <text class="bot-name">{{bot.name}}</text>
+    </view>
+  </view>
   <!-- 聊天对话区 -->
-  <scroll-view class="main" style="height: {{windowInfo.windowHeight-80}}px;" scroll-y="{{true}}" scroll-top="{{scrollTop}}">
-    <view class="nav">
-      <image src="{{bot.avatar||agentConfig.logo}}" mode="aspectFill" class="avatar" />
-      <view style="line-height: 47px;">{{agentConfig.type==='bot'?bot.name:agentConfig.modelName}}</view>
-      <view style="line-height: 26px;padding: 0px 16px;">{{agentConfig.type==='bot'?"":agentConfig.welcomeMessage}}</view>
+  <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: {{windowInfo.windowHeight-footerHeight-(chatMode === 'bot' ? 40 : 0)}}px;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh}}" refresher-threshold="{{80}}" bindrefresherrefresh="handelRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
+    <view wx:if="{{chatMode === 'bot' && showPullRefresh}}" class="tips">
+      {{refreshText}}
     </view>
-    <view class="system" wx:if="{{showGuide}}">
-      <markdownPreview markdown="{{guide}}"></markdownPreview>
-    </view>
-    <view class="system" wx:if="{{agentConfig.type==='bot'}}">
-      <markdownPreview markdown="{{bot.introduction||''}}"></markdownPreview>
+    <view wx:if="{{chatMode === 'model'}}" class="nav">
+      <image src="{{bot.avatar||modelConfig.logo}}" mode="aspectFill" class="avatar" />
+      <view style="line-height: 47px; font-size: 20px; font-weight: 500;">{{chatMode==='bot'?bot.name:modelConfig.modelProvider}}</view>
+      <view style="line-height: 26px;padding: 0px 16px; font-size: 32rpx;">{{chatMode==='bot'?"":modelConfig.welcomeMsg}}</view>
     </view>
     <block wx:for="{{chatRecords}}" wx:key="record_id">
-      <view class="system" wx:if="{{item.role==='assistant'}}">
-        <!-- 联网搜索 -->
-        <FoldedCard wx:if="{{item.search_info}}" initStatus="{{false}}">
-          <view slot="title" style="opacity: 0.7;font-size: 16px;">已搜索到 {{item.search_info.search_results.length}} 个网页</view>
-          <view slot="content">
-            <block wx:for="{{item.search_info.search_results}}" wx:key="index">
-              <view bind:tap="copyUrl" data-url="{{item.url}}" style="font-size: 14px;color: #2c56f0; line-height: 24px;margin-bottom: 4px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;">{{index+1}}. {{item.title}}</view>
-            </block>
-          </view>
-        </FoldedCard>
-        <!-- 知识库 -->
-        <!-- 推理过程 -->
-        <FoldedCard wx:if="{{!!item.reasoning_content}}" initStatus="{{true}}">
-          <view slot="title" style="opacity: 0.7;font-size: 16px;">{{item.reasoning_content&&!item.content?"思考中...":"已深度思考"}}</view>
-          <view style="padding-left: 30rpx;border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7; font-size: 12px !important;" slot="content">
-            <markdownPreview markdown="{{item.reasoning_content||''}}"></markdownPreview>
-          </view>
-        </FoldedCard>
-        <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
-        <view style="display: flex; gap: 10px;justify-content: flex-end;" wx:if="{{!streamStatus}}">
-          <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
-          <button class="share_btn" open-type="share">
-            <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
-          </button>
+      <!-- 系统聊天 -->
+      <view class="system" style="padding-left: {{showBotAvatar?80:0}}rpx;" wx:if="{{item.role==='assistant'}}">
+        <view class="avatar-left" wx:if="{{showBotAvatar}}">
+          <image src="{{chatMode==='bot'?bot.avatar:modelConfig.logo}}" mode="aspectFill" style="width: 56rpx;height: 56rpx; border-radius: 28rpx;" />
+        </view>
+        <view>
+          <!-- 最后一条消息，并且是发送状态显示发送中 -->
+          <block wx:if="{{(chatRecords.length-1)===index&&chatStatus===1}}">
+            <view style="display: flex;align-items: center; gap: 4px; font-size: 32rpx;line-height: 1.8;">
+              <image src="./imgs/loading.svg" mode="aspectFill" style="width: 14px;height: 14px;" /> 请稍等，正在卖力思考中 🤔
+            </view>
+          </block>
+          <block wx:else>
+            <!-- 联网搜索 -->
+            <FoldedCard wx:if="{{item.search_info}}" initStatus="{{false}}" showBgColor="{{true}}">
+              <view slot="title" style="opacity: 0.7;font-size: 14px;display: flex; align-items: center; gap: 8px;">
+                <image src="./imgs/search.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
+                <text>已参考 {{item.search_info.search_results.length}} 个网页</text>
+              </view>
+              <view slot="content" class="link-box">
+                <block wx:for="{{item.search_info.search_results}}" wx:key="index">
+                  <view bind:tap="copyUrl" data-url="{{item.url}}" style="margin-bottom: 3px; font-size: 14px;color: rgb(0, 82, 217); line-height: 24px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"> {{index+1}}.{{item.title}}</view>
+                </block>
+              </view>
+            </FoldedCard>
+            <!-- 知识库 -->
+            <view wx:if="{{item.knowledge_base&&item.knowledge_base.length}}" style="border-radius: 8px;margin-bottom: 12px;background-color: #f5f5f5;padding: 18rpx 26rpx;display: inline-block;opacity: 0.7;font-size: 14px;">
+              已参考 {{item.knowledge_base.length}} 个知识库
+            </view>
+            <!-- 推理过程 -->
+            <FoldedCard wx:if="{{!!item.reasoning_content}}" initStatus="{{true}}" showBgColor="{{false}}">
+              <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                <image src="./imgs/system-sum.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
+                <block wx:if="{{item.pauseThinking}}">
+                  已停止思考
+                </block>
+                <block wx:else>
+                  <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
+                </block>
+              </view>
+              <view style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
+                <markdownPreview markdown="{{item.reasoning_content||''}}" fontSize="{{28}}"></markdownPreview>
+              </view>
+            </FoldedCard>
+            <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
+            <!-- 下面的按钮 -->
+            <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
+              <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
+              <button class="share_btn" open-type="share">
+                <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+              </button>
+              <block wx:if="{{chatMode=== 'bot'}}">
+                <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
+                <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
+              </block>
+            </view>
+          </block>
         </view>
       </view>
-      <view wx:if="{{item.role==='user'}}">
-        <view class="user">
-          <view>
+      <!-- 用户输入 -->
+      <view class="userContent" wx:if="{{item.role==='user'}}">
+        <view class="user" style="padding-left: {{showBotAvatar?80:0}}rpx;">
+          <view class="user_content">
             {{item.content}}
           </view>
         </view>
-        <view style="display: flex;flex-direction: row-reverse; overflow-x: auto;white-space: nowrap;margin:0px 16px 0px 100rpx ">
-          <block wx:for="{{item.imageList}}" wx:key="tempFilePath" wx:for-item="item1">
-            <image src="{{item1.tempFilePath}}" alt="" model='aspectFill' style="width: 80px; height: 80px;margin-left: 8px;flex-shrink: 0; border-radius: 10px;" />
-          </block>
+        <view class="fileBar">
+          <chatFile enableDel="{{false}}" wx:for="{{item.fileList}}" wx:for-item="innerItem" wx:key="tempPath" fileData="{{innerItem}}" bind:removeChild="handleRemoveChild" bind:changeChild="handleChangeChild"></chatFile>
         </view>
       </view>
     </block>
     <!-- 推荐问题 -->
     <block wx:for="{{questions}}" wx:key="item">
-      <view class="questions">
-        <view class="question_content" bind:tap="sendMessage" data-message="{{item}}">{{item}}</view>
+      <view class="questions" style="padding-left: {{showBotAvatar?80:0}}rpx;">
+        <view class="question_content" bind:tap="handleSendMessage" data-message="{{item}}">{{item}}</view>
       </view>
     </block>
-    <view style="width: 100%;height: 20px;"></view>
+    <view id="scroll-bottom" style="width: 100%;height: 20px;"></view>
   </scroll-view>
   <!-- 底部输入区 -->
   <view class="footer">
-    <view class="foot-function">
-      <scroll-view class="img-box" scroll-x="true" wx:if="{{!!imageList.length}}">
+    <view class="feature_list" wx:if="{{showFeatureList}}">
+      <view bind:tap="handleClickWebSearch" class="{{'webSearchSwitch ' + (useWebSearch ? 'feature_enable' : '')}}">
+        <image src="{{ useWebSearch ? './imgs/internetUse.svg' : './imgs/internet.svg'}}" mode="" style="width: 40rpx;height:30px;margin-right: 10rpx" />
+        <text>联网搜索</text>
+      </view>
+    </view>
+    <view class="file_list" wx:if="{{showFileList}}">
+      <chatFile enableDel="{{true}}" wx:for="{{sendFileList}}" wx:key="tempId" fileData="{{item}}" bind:removeChild="handleRemoveChild" bind:changeChild="handleChangeChild"></chatFile>
+    </view>
+    <view class="foot_function">
+      <!-- <scroll-view class="img-box" scroll-x="true" wx:if="{{!!imageList.length}}">
         <block wx:for="{{imageList}}" wx:key="tempFilePath">
           <view class="img-preview">
             <image src="{{item.tempFilePath}}" alt="" model='aspectFill' class="img-preview-image" />
-            <!-- 蒙层 -->
             <view class="img-preview-loading" wx:if="{{!!!item.base64Url}}"></view>
-            <!-- 删除按钮 -->
             <image src="./imgs/close.svg" mode="aspectFill" class="img-preview-close" bind:tap="deleteImg" data-index="{{index}}" />
           </view>
         </block>
-      </scroll-view>
+      </scroll-view> -->
+
       <view class="input_box">
-        <input class="input" value="{{inputValue}}" type="text" maxlength="1024" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="sendMessage" confirm-type="send" adjust-position cursor-spacing="20" />
-        <!-- 加号 -->
-        <image src="./imgs/set.svg" class="set" mode="widthFix" bind:tap="openSetPanel" />
-        <!-- 发送按钮 -->
-        <image src="./imgs/send.svg" class="set" mode="widthFix" wx:if="{{!!inputValue&&!streamStatus}}" bind:tap="sendMessage"  style="transform: rotate(-40deg);transform-origin: 8px 8px"/>
-        <!-- 暂停按钮 -->
-        <image src="./imgs/stop.svg" class="set" mode="widthFix" wx:if="{{!!streamStatus}}" bind:tap="stop" />
+        <view class="input_inner_box">
+        <textarea class="input" value="{{inputValue}}" maxlength="1024" bindfocus="bindInputFocus" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="handleSendMessage" confirm-type="send" adjust-position cursor-spacing="40" auto-height="{{true}}" show-confirm-bar="{{false}}" bindlinechange="handleLineChange"/>
+        </view>
+        <view class="right_btns">
+          <!-- 加号 -->
+          <image src="./imgs/set.svg" class="set" mode="widthFix" bind:tap="handleClickTools" />
+          <!-- 发送按钮 -->
+          <image src="./imgs/send.svg" class="set" mode="widthFix" wx:if="{{!!inputValue&&chatStatus===0}}" bind:tap="handleSendMessage" style="transform: rotate(-40deg);transform-origin: 8px 8px" />
+          <!-- 暂停按钮 -->
+          <image src="./imgs/stop.svg" class="set" mode="widthFix" wx:if="{{!(chatStatus===0)}}" bind:tap="stop" />
+        </view>
       </view>
     </view>
-
-    <!-- 设置面板 -->
-    <view class="set_panel_modal" wx:if="{{setPanelVisibility}}" bind:tap="closeSetPanel">
-      <view class="set_panel">
-        <view class="set_panel_funtion">
-          <view class="function" bind:tap="clearChatRecords">
-            <image src="./imgs/clear.svg" alt="widthFix" class="icon" />
-            <text class="text_desc">清除对话</text>
-          </view>
-          <view class="function" bind:tap="uploadImgs" wx:if="{{agentConfig.model==='hunyuan-vision'&&agentConfig.type==='model'}}">
-            <image src="./imgs/uploadImg.svg" alt="widthFix" class="icon" />
-            <text class="text_desc">添加图片</text>
-          </view>
-        </view>
-        <view class="set_panel_cancel" bind:tap="closeSetPanel">取消</view>
+    <!-- 底部工具栏 -->
+    <view class="tool_box" wx:if="{{showTools}}">
+      <view class="function" bind:tap="clearChatRecords">
+        <image src="./imgs/clear.svg" alt="widthFix" class="icon" />
+        <text class="text_desc">清除</text>
+      </view>
+      <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleAlbum">
+        <image src="./imgs/uploadImg.svg" alt="widthFix" class="icon" />
+        <text class="text_desc">图片</text>
+      </view>
+      <view wx:if="{{showUploadFile && chatMode === 'bot'}}" class="function" bind:tap="handleUploadMessageFile">
+        <image src="./imgs/wechat.svg" alt="widthFix" class="icon" />
+        <text class="text_desc">微信文件</text>
+      </view>
+      <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleCamera">
+        <image src="./imgs/camera.svg" alt="widthFix" class="icon" />
+        <text class="text_desc">相机</text>
       </view>
     </view>
   </view>
+  <image bind:tap="autoToBottom" wx:if="{{manualScroll}}" style="width:35px;height:35px;border-radius: 50px;position: absolute;bottom:150px;right: 20px;padding: 5px;background-color: white;" src="./imgs/toBottom.svg" mode="aspectFit" binderror="" bindload="" />
+  <feedback input="{{input}}" aiAnswer="{{aiAnswer}}" isShowFeedback="{{isShowFeedback}}" bind:close="closefeedback" feedbackRecordId="{{feedbackRecordId}}" feedbackType="{{feedbackType}}" botId="{{bot.botId}}"></feedback>
 </view>
