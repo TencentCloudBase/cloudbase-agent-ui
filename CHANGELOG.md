@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.1.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.1.0...v1.1.1) (2025-03-08)
+
+
+### 🐛 Bug Fixes | Bug 修复
+
+* 优化发布流程 ([bbc1712](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/bbc17121c9210a107b987aa4b7657de12e3a66a0))
+
+
+### 📦 Chores | 其他更新
+
+* sync agent-ui component before release ([f175767](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/f175767b844ba4ff907d216c76a1392ce3dc64f8))
+
 ## [1.1.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.0.1-dev...v1.1.0) (2025-03-08)
 
 
