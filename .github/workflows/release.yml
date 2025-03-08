@@ -43,7 +43,7 @@ jobs:
         run: |
           mkdir -p build
           cd components/agent-ui
-          zip -r ../build/agent-ui.zip .  # 压缩源码文件夹
+          zip -r ../../build/agent-ui.zip .  # 压缩源码文件夹
           cd ../..  # 返回项目根目录
       # 基于当前commit进行版本发布(Create a release)，tag_name是v前缀加上package.json的version值
       - name: Create GitHub Release
