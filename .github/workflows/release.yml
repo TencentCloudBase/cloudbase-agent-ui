@@ -54,8 +54,8 @@ jobs:
           # GITHUB_TOKEN是准备工作步骤三申请的Personal Access Token
           GITHUB_TOKEN: ${{ secrets.PROJECT_ACCESS_TOKEN }}
         with:
-          tag_name: v${{steps.version.outputs.value}}
-          release_name: v${{steps.version.outputs.value}}
+          tag_name: v${{steps.version.outputs.value}}-dev
+          release_name: v${{steps.version.outputs.value}}-dev
           draft: false
           prerelease: false
       # 把assets.zip上传到仓库对应的发布版本Release上
