@@ -85,7 +85,7 @@ jobs:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
         run: |
-          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b 6c75-luke-agent-dev-7g1nc8tqc2ab76af -r ap-shanghai
+          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b 6161-aaa-7246aa-1259218801 -r ap-shanghai
             # 上传示例小程序到 COS
       - name: Upload miniprogram example to COS
         run: |
