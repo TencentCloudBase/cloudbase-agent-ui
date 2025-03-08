@@ -69,6 +69,11 @@ jobs:
           asset_path: build/agent-ui.zip
           asset_name: agent-ui-${{ github.ref_name }}.zip
           asset_content_type: application/zip
+      # 设置 Python 环境
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
       # 安装腾讯云 COSCMD 工具
       - name: Install COSCMD
         run: |
