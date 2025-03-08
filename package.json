@@ -9,7 +9,9 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "release": "standard-version"
+    "prerelease": "node scripts/sync-component.js",
+    "release": "standard-version",
+    "postrelease": "git push --follow-tags origin dev"
   },
   "repository": {
     "type": "git",
@@ -23,5 +25,8 @@
   "homepage": "https://github.com/TencentCloudBase/cloudbase-agent-ui#readme",
   "dependencies": {
     "standard-version": "^9.5.0"
+  },
+  "devDependencies": {
+    "fs-extra": "^11.3.0"
   }
 }
