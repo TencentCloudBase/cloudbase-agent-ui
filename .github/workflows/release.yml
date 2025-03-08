@@ -69,3 +69,22 @@ jobs:
           asset_path: build/agent-ui.zip
           asset_name: agent-ui-${{ github.ref_name }}.zip
           asset_content_type: application/zip
+      # 安装腾讯云 COSCMD 工具
+      - name: Install COSCMD
+        run: |
+          pip install coscmd
+            # 配置腾讯云 COS 认证信息
+
+      - name: Setup COS credentials
+        env:
+          TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
+          TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+        run: |
+          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b 6c75-luke-agent-dev-7g1nc8tqc2ab76af -r ap-shanghai
+            # 上传示例小程序到 COS
+      - name: Upload miniprogram example to COS
+        run: |
+          cd apps/minprogram-agent-ui
+          zip -r minprogram-agent-ui.zip .
+          coscmd upload minprogram-agent-ui.zip /release/minprogram-agent-ui.zip
+
