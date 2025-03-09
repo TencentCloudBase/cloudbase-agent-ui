@@ -166,7 +166,7 @@ Page({
 > 大小限制：单文件不超过10M
 > 数量限制：单次最多支持 5 个文件
 > 文件类型：pdf、txt、doc、docx、ppt、pptx、xls、xlsx、csv
-> **request合法域名配置**：微信小程序上传文件需要添加“文件上传接口”到request合法域名列表，文件上传域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往微信公众平台（https://mp.weixin.qq.com）配置合法域名
+> **request合法域名配置**：微信小程序上传文件需要添加“文件上传接口”到request合法域名列表，文件上传域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置合法域名
 
 配置示例
 
