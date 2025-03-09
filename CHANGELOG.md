@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## 1.2.0 (2025-03-09)
+
+### ✨ Features | 新功能
+
+* 优化工作流 ([ee33c15](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/ee33c155fe013b7e8342fd42785aa1920da58dd5))
+
 ### [1.1.3](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.1.2...v1.1.3) (2025-03-08)
 
 ### 📦 Chores | 其他更新
