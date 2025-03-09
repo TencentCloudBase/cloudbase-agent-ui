@@ -1,10 +1,13 @@
 name: CD
 on:
-  # 以主干的push事件作为触发条件
-  push:
-    branches: main # 临时测试，后续改为 main
+  # 以主干的 pull_request 事件作为触发条件
+  pull_request:
+    types: [closed]
+    branches: [main]
 jobs:
   CD:
+    # 只在 PR 被合并时运行，而不是在 PR 被关闭时运行
+    if: github.event.pull_request.merged == true
     runs-on: ubuntu-latest
     steps:
       # 拉取代码

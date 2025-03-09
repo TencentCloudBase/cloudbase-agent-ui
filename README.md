@@ -42,12 +42,12 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
 
 ### 2. 获取组件
 
-可通过以下两种方式获取组件代码
+可通过以下两种方式获取组件包代码
 
-1. **克隆仓库到本地，提取其中components/agent-ui 目录**
+1. **克隆仓库到本地，提取其中components/agent-ui 目录使用**
 2. **下载GitHub Release 包，直接使用**
 
-### 3. 引入组件
+### 3. 微信小程序项目引入组件
 
 1. **配置云开发环境ID**
    打开 miniprogram/app.js 文件，配置云开发环境ID。
@@ -59,7 +59,7 @@ App({
       console.error("请使用 2.2.3 或以上的基础库以使用云能力");
     } else {
       wx.cloud.init({
-        env: "",// 环境id
+        env: "your envId",// 环境id
         traceUser: true,
       });
     }
@@ -85,7 +85,7 @@ App({
 
 ```wxml
 <view>
-  <agent-ui agentConfig="{{agentConfig}}"></agent-ui>
+  <agent-ui agentConfig="{{agentConfig}}" showBotAvatar="{{showBotAvatar}}" chatMode="{{chatMode}}" modelConfig="{{modelConfig}}></agent-ui>
 </view>
 ```
 
@@ -95,14 +95,20 @@ App({
 Page({
   // ...
   data: {
-      agentConfig: {
-        type: "bot", // 值为'bot'或'model'。当type='bot'时，botId必填；当type='model'时，modelName和model必填
-        botId: "bot-db3cab4a", // agent id
-        modelName: "deepseek", // 大模型服务商
-        model: "deepseek-v3", // 具体的模型版本
-        logo: "https://docs.cloudbase.net/img/logo.svg",// 图标(只在model模式下生效)
-        welcomeMessage: "欢迎语!"// 欢迎语(只在model模式下生效)
-      }
+    chatMode: "bot", // bot 表示使用agent，model 表示使用大模型，两种选一种配置即可
+    showBotAvatar: true, // 是否在对话框左侧显示头像
+    agentConfig: {
+      botId: "bot-e7d1e736", // agent id,
+      allowWebSearch: true, // 允许客户端选择启用联网搜索
+      allowUploadFile: true, // 允许上传文件
+      allowPullRefresh: true // 允许下拉刷新
+    },
+    modelConfig: {
+      modelProvider: "hunyuan-open", // 大模型服务厂商
+      quickResponseModel: "hunyuan-lite", // 大模型名称
+      logo: "", // model 头像
+      welcomeMsg: "欢迎语", // model 欢迎语
+    },
   }
   // ...
 })
@@ -115,14 +121,14 @@ Page({
 ├── 📂 components       # 组件集合
 │   └── agent-ui        # 你要使用的小程序 Agent UI 组件（拷贝这个！！！）
 ├── 📂 docs             # 文档
-└── 📂 examples         # 示例项目
-│   └── miniprogram-agent-ui     # 集成 agent-ui 组件的示例项目，可直接导入微信开发者工具体验
+└── 📂 apps         # 应用列表
+│   └── miniprogram-agent-ui     # 集成 agent-ui 组件的示例应用，可直接导入微信开发者工具体验
 ├── CHANGELOG.md           # 版本变更记录（语义化版本规范）
 ├── LICENSE                # 开源协议
 ├── package.json           # 版本管理
 └── .github/               # GitHub自动化配置
     ├── workflows/
-    │   └── release.yml    # 自动打包发布
+    │   └── release-main.yml    # 自动打包发布
     └── ISSUE_TEMPLATE/    # Issue模板
 
 ```
@@ -130,33 +136,39 @@ Page({
 ## ⚙️ 配置详解
 
 ### 配置属性表
-| 参数               | 类型       | 必填  | 说明   |
-| ------------------ | ---------- | ---- | ----- |
-| `chatMode`           | `String` | 是    | 对话模式：`bot` - 使用Agent `model` - 直连大模型      |
-| `showBotAvatar`          | `Boolean` | 否 | 是否展示Bot的logo头像    |
-| `agentConfig` | [AgentConfig](#Agentconfig) | 是| Agent 调用配置 |
-| `modelConfig` | [ModelConfig](#Modelconfig) | 是| Model 调用配置 |
 
-#### AgentConfig  
-| 参数               | 类型       | 必填  | 说明                                                                                                                                                                                                                                                                                                  |
-| ------------------ | ---------- | ----| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `botId`           | `String` | 是     | Agent的唯一标识ID                                                  |
-| `allowWebSearch`           | `Boolean` | 否     |     是否允许客户端启用联网搜索                                            |
-| `allowUploadFile`           | `Boolean` | 否       |     是否允许客户端启用文件上传                                           |
-| `allowPullRefresh`           | `Boolean` | 否       |     是否允许客户端启用下拉获取历史记录                                           |
+| 参数              | 类型                     | 必填 | 说明                                                                                                   |
+| ----------------- | ------------------------ | ---- | ------------------------------------------------------------------------------------------------------ |
+| `chatMode`      | `String`               | 是   | 组件对接的AI类型，值为 'bot' 或者 'model'，为 'bot' 时，对接 agent 能力；为 'model' 时，对接大模型能力 |
+| `showBotAvatar` | `Boolean`              | 否   | 是否展示Bot的logo头像                                                                                  |
+| `agentConfig`   | [AgentConfig](#Agentconfig) | 是   | Agent 调用配置                                                                                         |
+| `modelConfig`   | [ModelConfig](#Modelconfig) | 是   | Model 调用配置                                                                                         |
 
+#### AgentConfig
+
+| 参数                 | 类型        | 必填 | 说明                                          |
+| -------------------- | ----------- | ---- | --------------------------------------------- |
+| `botId`            | `String`  | 否   | Agent的唯一标识ID，当 chatMode = 'bot' 时必填 |
+| `allowWebSearch`   | `Boolean` | 否   | 是否允许客户端界面展示联网搜索                |
+| `allowUploadFile`  | `Boolean` | 否   | 是否允许客户端界面展示文件上传                |
+| `allowPullRefresh` | `Boolean` | 否   | 是否允许客户端界面展示下拉获取历史记录        |
 
 #### ModelConfig
-| 参数               | 类型       | 必填    | 说明                                                                                                                                                                                                                                                                                                  |
-| ------------------ | ---------- | ---- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `modelProvider`           | `String` | 是      | 大模型服务厂商名称                                                  |
-| `quickResponseModel`           | `String` | 是     |     modelProvider 为 deepseek时，支持  deepseek-r1/deepseek-v3; modelProvider 为 hunyuan-exp （混元体验版）/ hunyuan-open（混元正式版,使用需先[配置API Key](https://tcb.cloud.tencent.com/dev?envId=luke-agent-dev-7g1nc8tqc2ab76af#/ai?tab=ai-model&model=hunyuan-open)）时，quickResponseModel 可配置为hunyuan-lite                                            |
-| `logo`           | `String` | 否    |     模型的头像URL                                           |
-| `welcomeMsg`           | `String` | 否    |     欢迎语                                           |
 
+| 参数                   | 类型       | 必填 | 说明                                                                                                                                                                                                                                                                                                                                                            |
+| ---------------------- | ---------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `modelProvider`      | `String` | 是   | 大模型服务商，当 chatMode = 'model' 时，必填，值为 'hunyuan-open' 或 'deepseek'                                                                                                                                                                                                                                                                                 |
+| `quickResponseModel` | `String` | 是   | 具体使用的模型，当 chatMode = 'model' 时，必填； modelProvider 为 deepseek时，支持  deepseek-r1/deepseek-v3; modelProvider 为 hunyuan-exp （混元体验版）/ hunyuan-open（混元正式版,使用需先[配置API Key](https://tcb.cloud.tencent.com/dev?envId=luke-agent-dev-7g1nc8tqc2ab76af#/ai?tab=ai-model&model=hunyuan-open)）时，quickResponseModel 可配置为hunyuan-lite |
+| `logo`               | `String` | 否   | 页面 logo，当 chatMode = 'model' 时生效，选填                                                                                                                                                                                                                                                                                                                   |
+| `welcomeMsg`         | `String` | 否   | 欢迎语，当 chatMode = 'model' 时生效，选填                                                                                                                                                                                                                                                                                                                      |
 
+> [!IMPORTANT]
+> 大小限制：单文件不超过10M
+> 数量限制：单次最多支持 5 个文件
+> 文件类型：pdf、txt、doc、docx、ppt、pptx、xls、xlsx、csv
+> **request合法域名配置**：微信小程序上传文件需要添加“文件上传接口”到request合法域名列表，文件上传域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往微信公众平台（https://mp.weixin.qq.com）配置合法域名
 
-#### 配置示例
+配置示例
 
 - **对接 DeepSeek 大模型**
 
@@ -169,7 +181,7 @@ wx.cloud.init({
 });
 ```
 
-2. 修改组件配置，在引用 agent-ui 组件的页面配置 (也可参考examples/miniprogram-agent-ui项目 chatBot 页面配置案例)
+2. 修改组件配置，在引用 agent-ui 组件的页面配置 (也可参考apps/miniprogram-agent-ui项目 chatBot 页面配置案例)
 
 ```javascript
 Page({
@@ -198,7 +210,7 @@ wx.cloud.init({
 });
 ```
 
-2. 修改组件配置，在引用 agent-ui 组件的页面配置 (也可参考examples/miniprogram-agent-ui项目 chatBot 页面配置案例)
+2. 修改组件配置，在引用 agent-ui 组件的页面配置 (也可参考apps/miniprogram-agent-ui项目 chatBot 页面配置案例)
 
 ```javascript
 Page({
@@ -227,16 +239,19 @@ wx.cloud.init({
 });
 ```
 
-2. 修改组件配置，在引用 agent-ui 组件的页面配置 (也可参考examples/miniprogram-agent-ui项目 chatBot 页面配置案例)
+2. 修改组件配置，在引用 agent-ui 组件的页面配置 (也可参考apps/miniprogram-agent-ui项目 chatBot 页面配置案例)
 
 ```javascript
 Page({
   //...
   data: {
-    chatMode: 'bot',
+    chatMode: "bot", // bot 表示使用agent，model 表示使用大模型
+    showBotAvatar: true, // 是否在对话框左侧显示头像
     agentConfig: {
-      botId: 'bot-xxx',
-      allowWebSearch: true
+      botId: "bot-e7d1e736", // agent id,
+      allowWebSearch: true, // 允许客户端选择启用联网搜索
+      allowUploadFile: true, // 允许上传文件
+      allowPullRefresh: true // 允许下拉刷新
     }
   }
   //...
@@ -250,23 +265,21 @@ Page({
 - ✅ 大模型调用配置化 （DeepSeek/Hunyuan）
 - ✅ Agent调用配置化 (云开发平台配置)
 - ✅ 流式输出
-- ✅ 图片理解（暂只支持Hunyuan vision模型）
 - ✅ 联网搜索 （Agent模式）
+- ✅ 文档解析 （Agent模式）
 
 ### 🚧 进行中开发
 
-- 多模型切换调用配置化
-- 多Agent切换调用配置化
+- 多模型（快速响应/深度推理）切换调用配置化
 - 历史会话管理，多轮对话上下文记忆
-- 附件批量上传解析（文件/图片/拍照）
-- UI 样式及交互优化
+- 图片上传解析（拍照/图片）
+- 支持文字转语音播放
+- 支持用户语音输入转文字
+- 支持语音音色配置
 
 ### 📅 未来计划
 
-- UI 高度配置化，提供主题色配置与插槽系统，完美融入品牌风格
-- 支持用户语音输入转文字
-- 支持文字转语音播放
-- 支持语音音色配置
+- UI 高度配置化，提供页面结构配置化控制，CSS变量配置，完美融入品牌风格
 - 文生图
 - 文生视频
 - 文生3D
