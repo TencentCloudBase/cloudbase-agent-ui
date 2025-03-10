@@ -10,7 +10,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "sync": "node scripts/sync-component.js",
-    "release": "standard-version",
+    "prerelease": "git fetch --tags",
+    "release": "standard-version --no-verify",
     "postrelease": "git push --follow-tags origin dev"
   },
   "repository": {
