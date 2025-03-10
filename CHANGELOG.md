@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.4.8](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.7...v1.4.8) (2025-03-10)
+
+
+### Bug Fixes
+
+* change cos upload ([d5709df](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/d5709df55a37b203d82fca95a9388d2d896cd500))
+* fix ([8426428](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/842642857011872ed84a62c273182764c715aba3))
+* fix upload domain ([bcb7991](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/bcb799132e2d9a5f8c8f3d6d37ff39dc2d6fb27f))
+* remove cos step ([52bd8b0](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/52bd8b0aea37907f91dab67b04046e87577a5eec))
+
 ### [1.4.7](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.6...v1.4.7) (2025-03-10)
 
 
