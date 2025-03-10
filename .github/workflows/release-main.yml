@@ -87,9 +87,8 @@ jobs:
         env:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
-          BUCKET: ${{ secrets.BUCKET }}
         run: |
-          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b $BUCKET -r ap-shanghai
+          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b weda-cloud-1258344699 -r ap-shanghai
             # 上传示例小程序到 COS
       - name: Upload miniprogram example to COS
         run: |
