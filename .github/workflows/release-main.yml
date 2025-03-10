@@ -88,7 +88,7 @@ jobs:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
         run: |
-          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b weda-cloud-1258344699 -e cos-internal.ap-shanghai.tencentcos.cn
+          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b weda-cloud-1258344699 -e cos-internal.ap-shanghai.tencentcos.cn --do-not-use-ssl
             # 上传示例小程序到 COS
       - name: Upload miniprogram example to COS
         run: |
