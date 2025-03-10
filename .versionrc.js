@@ -12,7 +12,7 @@ module.exports = {
   ],
   // 新增配置
   gitRawCommitsOpts: {
-    from: "HEAD~1", // 只获取最近10次提交
+    from: "HEAD~10", // 只获取最近10次提交
     to: "HEAD",
   },
   // 其他有用的配置
