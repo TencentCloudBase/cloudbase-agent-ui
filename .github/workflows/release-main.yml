@@ -95,5 +95,5 @@ jobs:
         run: |
           cd apps/miniprogram-agent-ui
           zip -r miniprogram-agent-ui.zip .
-          coscmd upload miniprogram-agent-ui.zip /ai-resource/agent-ui/miniprogram-agent-ui.zip
+          coscmd upload miniprogram-agent-ui.zip /preview/miniprogram-agent-ui.zip
 
