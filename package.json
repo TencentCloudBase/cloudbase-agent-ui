@@ -12,7 +12,8 @@
     "sync": "node scripts/sync-component.js",
     "prerelease": "git fetch --tags",
     "release": "standard-version --no-verify",
-    "postrelease": "git push --follow-tags origin dev"
+    "postrelease": "git push --follow-tags origin dev",
+    "upload": "node scripts/upload-to-cos.js"
   },
   "repository": {
     "type": "git",
@@ -28,6 +29,8 @@
     "standard-version": "^9.5.0"
   },
   "devDependencies": {
+    "archiver": "^7.0.1",
+    "cos-nodejs-sdk-v5": "^2.14.6",
     "fs-extra": "^11.3.0"
   }
 }
