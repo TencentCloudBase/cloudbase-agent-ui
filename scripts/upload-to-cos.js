@@ -47,6 +47,7 @@ async function uploadFile(sourcePath, zipName, cosKey) {
         Key: cosKey,
         Body: fs.createReadStream(zipPath),
         ContentType: "application/zip",
+        Domain: "{Bucket}.cos-internal.{Region}.tencentcos.cn",
       },
       function (err, data) {
         // 清理临时文件
