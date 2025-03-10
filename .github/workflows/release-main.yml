@@ -87,12 +87,13 @@ jobs:
         env:
           TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
           TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
+          BUCKET: ${{ secrets.BUCKET }}
         run: |
-          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b 6161-aaa-7246aa-1259218801 -r ap-shanghai
+          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b $BUCKET -r ap-shanghai
             # 上传示例小程序到 COS
       - name: Upload miniprogram example to COS
         run: |
           cd apps/miniprogram-agent-ui
           zip -r miniprogram-agent-ui.zip .
-          coscmd upload miniprogram-agent-ui.zip /release/miniprogram-agent-ui.zip
+          coscmd upload miniprogram-agent-ui.zip /ai-resource/agent-ui/miniprogram-agent-ui.zip
 
