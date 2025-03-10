@@ -72,27 +72,4 @@ jobs:
           asset_path: build/agent-ui.zip
           asset_name: agent-ui.zip
           asset_content_type: application/zip
-      # 设置 Python 环境
-      - name: Set up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-      # 安装腾讯云 COSCMD 工具
-      - name: Install COSCMD
-        run: |
-          pip install coscmd
-            # 配置腾讯云 COS 认证信息
-
-      - name: Setup COS credentials
-        env:
-          TENCENT_SECRET_ID: ${{ secrets.TENCENT_SECRET_ID }}
-          TENCENT_SECRET_KEY: ${{ secrets.TENCENT_SECRET_KEY }}
-        run: |
-          coscmd config -a $TENCENT_SECRET_ID -s $TENCENT_SECRET_KEY -b weda-cloud-1258344699 -e service.cos.tencentcos.cn --do-not-use-ssl
-            # 上传示例小程序到 COS
-      - name: Upload miniprogram example to COS
-        run: |
-          cd apps/miniprogram-agent-ui
-          zip -r miniprogram-agent-ui.zip .
-          coscmd upload miniprogram-agent-ui.zip /preview/miniprogram-agent-ui.zip
 
