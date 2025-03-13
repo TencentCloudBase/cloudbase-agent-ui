@@ -169,7 +169,7 @@ Component({
         bot,
         questions,
         chatRecords: [...chatRecords, record],
-        showWebSearchSwitch: !!(bot.searchEnable && allowWebSearch),
+        showWebSearchSwitch: allowWebSearch,
         showUploadFile: allowUploadFile,
         showPullRefresh: allowPullRefresh,
       });
@@ -573,6 +573,14 @@ Component({
       });
     },
     handleUploadMessageFile: function () {
+      // 判断agent 配置是否打开上传文件
+      if(!this.data.bot.searchFileEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 文件上传功能",
+        });
+        return;
+      }
       if (this.data.useWebSearch) {
         wx.showModal({
           title: "提示",
@@ -1031,6 +1039,13 @@ Component({
       });
     },
     handleClickWebSearch: function () {
+      if(!this.data.useWebSearch && !this.data.bot.searchEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 联网搜索功能",
+        });
+        return;
+      }
       if (this.data.sendFileList.length) {
         wx.showModal({
           title: "提示",
