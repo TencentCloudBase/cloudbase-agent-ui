@@ -373,7 +373,21 @@ Component({
               const freshChatRecords = res.recordList
                 .reverse()
                 .slice(0, freshNum)
-                .map((item) => ({ ...item, record_id: item.recordId }));
+                .map((item) => {
+                  let transformItem =  {
+                    ...item, record_id: item.recordId
+                  }  
+                  if(item.role === "user" && item.fileInfos) {
+                    transformItem.fileList = item.fileInfos.map(item => ({
+                      parsed: true,
+                      rawFileName: item.fileName,
+                      rawType: item.type,
+                      fileId: item.cloudId,
+                      fileSize: item.bytes
+                    }))
+                  }
+                  return transformItem
+                });
               this.setData({
                 chatRecords: [...freshChatRecords, ...this.data.chatRecords],
               });
