@@ -4,7 +4,7 @@ Component({
     attached: function () {
       console.log('enableDel', this.data.enableDel)
       const { tempFileName, rawFileName, rawType, tempPath, fileId, botId, parsed } = this.data.fileData
-      const type = this.getFileType(tempFileName)
+      const type = this.getFileType(rawFileName || tempFileName)
       console.log('type', type)
       if (!fileId) {
         this.setData({
