@@ -762,6 +762,7 @@ Component({
               knowledge_meta,
               knowledge_base,
               finish_reason,
+              search_results
             } = dataJson;
             const newValue = [...this.data.chatRecords];
             // 取最后一条消息更新
@@ -830,6 +831,14 @@ Component({
                 [`chatRecords[${lastValueIndex}].knowledge_base`]: lastValue.knowledge_base,
                 chatStatus: 2,
               });
+            }
+            // 数据库，只更新一次
+            if(type === "db" && !lastValue.db_len) {
+              lastValue.db_len = search_results.relateTables || 0
+              this.setData({
+                [`chatRecords[${lastValueIndex}].db_len`]: lastValue.db_len,
+                chatStatus: 2,
+              })
             }
           } catch (e) {
             // console.log('err', event, e)
