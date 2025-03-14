@@ -45,7 +45,7 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
 可通过以下两种方式获取组件包代码
 
 1. **克隆仓库到本地，提取其中components/agent-ui 目录使用**
-2. **下载GitHub Release 包，直接使用**
+2. **下载GitHub Release 包 agent-ui.zip，直接使用**
 
 ### 3. 微信小程序项目引入组件
 
@@ -119,7 +119,7 @@ Page({
 ```bash
 📦 cloudbase-agent-ui
 ├── 📂 components       # 组件集合
-│   └── agent-ui        # 你要使用的小程序 Agent UI 组件（拷贝这个！！！）
+│   └── agent-ui        # 你要使用的小程序 Agent UI 组件（拷贝这个替换旧版本）
 ├── 📂 docs             # 文档
 └── 📂 apps         # 应用列表
 │   └── miniprogram-agent-ui     # 集成 agent-ui 组件的示例应用，可直接导入微信开发者工具体验
@@ -166,7 +166,7 @@ Page({
 > 大小限制：单文件不超过10M
 > 数量限制：单次最多支持 5 个文件
 > 文件类型：pdf、txt、doc、docx、ppt、pptx、xls、xlsx、csv
-> **request合法域名配置**：微信小程序上传文件需要添加“文件上传接口”到request合法域名列表，文件上传域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置合法域名
+> **request合法域名配置**：微信小程序上传文件需要添加“文件上传接口”到request合法域名列表，文件上传域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置request合法域名
 
 配置示例
 
