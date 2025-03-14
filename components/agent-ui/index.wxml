@@ -30,6 +30,10 @@
             </view>
           </block>
           <block wx:else>
+            <!-- 数据库检索 -->
+            <view wx:if="{{item.db_len}}" style="border-radius: 8px;margin-bottom: 12px;background-color: #f5f5f5;padding: 18rpx 26rpx;display: inline-block;opacity: 0.7;font-size: 14px;">
+              已匹配 {{item.db_len}} 张数据表
+            </view>
             <!-- 联网搜索 -->
             <FoldedCard wx:if="{{item.search_info}}" initStatus="{{false}}" showBgColor="{{true}}">
               <view slot="title" style="opacity: 0.7;font-size: 14px;display: flex; align-items: center; gap: 8px;">

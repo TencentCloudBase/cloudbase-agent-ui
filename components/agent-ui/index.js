@@ -169,7 +169,7 @@ Component({
         bot,
         questions,
         chatRecords: [...chatRecords, record],
-        showWebSearchSwitch: !!(bot.searchEnable && allowWebSearch),
+        showWebSearchSwitch: allowWebSearch,
         showUploadFile: allowUploadFile,
         showPullRefresh: allowPullRefresh,
       });
@@ -373,7 +373,21 @@ Component({
               const freshChatRecords = res.recordList
                 .reverse()
                 .slice(0, freshNum)
-                .map((item) => ({ ...item, record_id: item.recordId }));
+                .map((item) => {
+                  let transformItem =  {
+                    ...item, record_id: item.recordId
+                  }  
+                  if(item.role === "user" && item.fileInfos) {
+                    transformItem.fileList = item.fileInfos.map(item => ({
+                      parsed: true,
+                      rawFileName: item.fileName,
+                      rawType: item.type,
+                      fileId: item.cloudId,
+                      fileSize: item.bytes
+                    }))
+                  }
+                  return transformItem
+                });
               this.setData({
                 chatRecords: [...freshChatRecords, ...this.data.chatRecords],
               });
@@ -573,6 +587,14 @@ Component({
       });
     },
     handleUploadMessageFile: function () {
+      // 判断agent 配置是否打开上传文件
+      if(!this.data.bot.searchFileEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 文件上传功能",
+        });
+        return;
+      }
       if (this.data.useWebSearch) {
         wx.showModal({
           title: "提示",
@@ -740,6 +762,7 @@ Component({
               knowledge_meta,
               knowledge_base,
               finish_reason,
+              search_results
             } = dataJson;
             const newValue = [...this.data.chatRecords];
             // 取最后一条消息更新
@@ -808,6 +831,14 @@ Component({
                 [`chatRecords[${lastValueIndex}].knowledge_base`]: lastValue.knowledge_base,
                 chatStatus: 2,
               });
+            }
+            // 数据库，只更新一次
+            if(type === "db" && !lastValue.db_len) {
+              lastValue.db_len = search_results.relateTables || 0
+              this.setData({
+                [`chatRecords[${lastValueIndex}].db_len`]: lastValue.db_len,
+                chatStatus: 2,
+              })
             }
           } catch (e) {
             // console.log('err', event, e)
@@ -1031,6 +1062,13 @@ Component({
       });
     },
     handleClickWebSearch: function () {
+      if(!this.data.useWebSearch && !this.data.bot.searchEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 联网搜索功能",
+        });
+        return;
+      }
       if (this.data.sendFileList.length) {
         wx.showModal({
           title: "提示",
