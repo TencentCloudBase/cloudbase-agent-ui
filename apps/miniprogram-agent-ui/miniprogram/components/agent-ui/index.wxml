@@ -6,7 +6,7 @@
       <text class="bot-name">{{bot.name}}</text>
     </view>
   </view>
-  <view style="height: 100%;overflow: auto">
+  <view style="height: 100%;overflow: auto;">    
     <!-- 聊天对话区 -->
     <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: 100%;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh}}" refresher-threshold="{{80}}" bindrefresherrefresh="handelRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
       <view wx:if="{{chatMode === 'bot' && showPullRefresh}}" class="tips">
@@ -66,10 +66,37 @@
                   <markdownPreview markdown="{{item.reasoning_content||''}}" fontSize="{{28}}"></markdownPreview>
                 </view>
               </FoldedCard>
+              <!-- 工具调用 -->
+              
+              <view wx:if="{{item.toolCallList && item.toolCallList.length > 0}}">
+                <block wx:for="{{item.toolCallList}}" wx:for-item="subItem" wx:key="id">
+                  <markdownPreview markdown="{{subItem.content || ''}}"></markdownPreview>
+                  <FoldedCard initStatus="{{false}}" showBgColor="{{false}}">
+                    <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                      <block>
+                       调用工具 {{subItem.name}}
+                       <image wx:if="{{!subItem.callResult && !subItem.error}}" src="./imgs/loading.svg" mode="aspectFill" style="width: 14px;height: 14px;" />
+                       <image wx:if="{{subItem.callResult}}" mode="widthFix" src='./imgs/check.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                       <image wx:if="{{subItem.error}}" mode="widthFix" src='./imgs/close-red.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                      </block>
+                      <!-- <block wx:else>
+                        <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
+                      </block> -->
+                    </view>
+                    <view style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
+                      <view>参数：</view>
+                      <markdownPreview markdown="{{subItem.callParams||''}}" fontSize="{{28}}"></markdownPreview>
+                      <view>结果：</view>
+                      <markdownPreview markdown="{{subItem.callResult||''}}" fontSize="{{28}}"></markdownPreview>
+                    </view>
+                  </FoldedCard>
+                </block>
+              </view>
+              <!-- 正文 -->
               <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
               <!-- 下面的按钮 -->
               <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
-                <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" />
+                <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" data-reqid="{{item.reqId}}"/>
                 <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
                 <block wx:if="{{!item.error}}">                
                   <button class="share_btn" open-type="share">

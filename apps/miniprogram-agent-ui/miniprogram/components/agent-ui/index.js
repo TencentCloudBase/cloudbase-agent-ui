@@ -112,7 +112,7 @@ Component({
 
       // 初始化第一条记录为welcomeMessage
       const record = {
-        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
+        content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -145,12 +145,61 @@ Component({
   },
   methods: {
     showErrorMsg: function (e) {
-      const { content } = e.currentTarget.dataset;
+      const { content, reqid } = e.currentTarget.dataset;
       console.log("content", content);
+      const transformContent =
+        typeof content === "string"
+          ? reqid
+            ? `${content}|reqId:${reqid}`
+            : content
+          : JSON.stringify({ content, reqid });
       wx.showModal({
         title: "错误原因",
-        content: typeof content === "string" ? content : JSON.stringify({ content }),
+        content: transformContent,
+        success() {
+          wx.setClipboardData({
+            data: transformContent,
+            success: function (res) {
+              wx.showToast({
+                title: "复制错误完成",
+                icon: "success",
+              });
+            },
+          });
+        },
       });
+    },
+    transformToolCallHistoryList: function (toolCallList) {
+      const callParamsList = toolCallList.filter((item) => item.type === "tool-call");
+      // const callResultList = toolCallList.filter(item => item.type === 'tool-result')
+      const callContentList = toolCallList.filter((item) => item.type === "text");
+      const transformToolCallList = [];
+      for (let i = 0; i < callParamsList.length; i++) {
+        const curParam = callParamsList[i];
+        const curResult = toolCallList.find(
+          (item) => item.type === "tool-result" && item.toolCallId === curParam.tool_call.id
+        );
+        const curContent = callContentList[i];
+        const curError = toolCallList.find(
+          // (item) => item.finish_reason === "error" && item.error.message.toolCallId === curParam.tool_call.id
+          (item) => item.finish_reason === "error"
+        );
+        const transformToolCallObj = {
+          id: curParam.tool_call.id,
+          name: curParam.tool_call.function.name,
+          callParams: "```json\n\n" + JSON.stringify(curParam.tool_call.function.arguments, null, 2) + "\n```",
+          content: ((curContent && curContent.content) || "").replaceAll("\t", "").replaceAll("\n", "\n\n"),
+        };
+        if (curResult) {
+          transformToolCallObj.callResult = "```json\n\n" + JSON.stringify(curResult.result, null, 2) + "\n```";
+        }
+        if (curError) {
+          transformToolCallObj.error = curError;
+        }
+
+        transformToolCallList.push(transformToolCallObj);
+      }
+      return transformToolCallList;
     },
     handleLineChange: function (e) {
       console.log("linechange", e.detail.lineCount);
@@ -349,8 +398,26 @@ Component({
                   if (item.role === "assistant" && item.content === "") {
                     transformItem.content = this.data.defaultErrorMsg;
                   }
+                  if (item.role === "assistant" && item.origin_msg) {
+                    console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
+                    const origin_msg_obj = JSON.parse(item.origin_msg);
+                    if (origin_msg_obj.aiResHistory) {
+                      const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
+                      transformItem.toolCallList = transformToolCallList;
+                      const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
+                      console.log("toolCallErr", toolCallErr);
+                      if (toolCallErr?.error?.message) {
+                        transformItem.error = toolCallErr.error.message;
+                        transformItem.reqId = item.trace_id || "";
+                      }
+                    } else {
+                      // 之前异常的返回
+                      // return null
+                    }
+                  }
                   return transformItem;
-                });
+                })
+                .filter((item) => item);
               this.setData({
                 chatRecords: [...freshChatRecords, ...this.data.chatRecords],
               });
@@ -380,7 +447,7 @@ Component({
         return;
       }
       const record = {
-        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
+        content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -699,7 +766,6 @@ Component({
 
       // 新增一轮对话记录时 自动往下滚底
       this.autoToBottom();
-
       if (chatMode === "bot") {
         const ai = wx.cloud.extend.AI;
         const res = await ai.bot.sendMessage({
@@ -762,6 +828,23 @@ Component({
                 this.setData({
                   [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
                 });
+                if (lastValue.toolCallList && lastValue.toolCallList.length) {
+                  let errToolCallObj = null;
+                  if (typeof error.message === "string") {
+                    errToolCallObj = lastValue.toolCallList[lastValue.toolCallList.length - 1];
+                  } else {
+                    if (error.message?.toolCallId) {
+                      errToolCallObj = lastValue.toolCallList.find((item) => item.id === error.message.toolCallId);
+                    }
+                  }
+                  if (errToolCallObj && !errToolCallObj.callResult) {
+                    errToolCallObj.error = error;
+                    this.setData({
+                      [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                    });
+                    this.autoToBottom();
+                  }
+                }
               }
               this.setData({
                 [`chatRecords[${lastValueIndex}].search_info`]: lastValue.search_info,
@@ -770,6 +853,12 @@ Component({
                 [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
                 [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
               });
+              // if (error) {
+              //   lastValue.error = error;
+              //   this.setData({
+              //     [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
+              //   });
+              // }
               break;
             }
             // 下面根据type来确定输出的内容
@@ -802,13 +891,31 @@ Component({
             }
             // 内容
             if (type === "text") {
-              contentText += content;
-              lastValue.content = contentText;
-              this.setData({
-                [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
-                [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
-                chatStatus: 3,
-              }); // 聊天状态切换为输出content中
+              // 区分是 toolCall 的content 还是普通的 content
+              let isToolCallContent = false;
+              const toolCallList = lastValue.toolCallList;
+              if (toolCallList && toolCallList.length) {
+                const lastToolCallObj = toolCallList[toolCallList.length - 1];
+                if (lastToolCallObj.callParams && !lastToolCallObj.callResult) {
+                  isToolCallContent = true;
+                  lastToolCallObj.content += content.replaceAll("\t", "");
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                    chatStatus: 3,
+                  });
+                  this.autoToBottom();
+                }
+              }
+
+              if (!isToolCallContent) {
+                contentText += content;
+                lastValue.content = contentText;
+                this.setData({
+                  [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
+                  [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
+                  chatStatus: 3,
+                }); // 聊天状态切换为输出content中
+              }
             }
             // 知识库，只更新一次
             if (type === "knowledge" && !lastValue.knowledge_meta) {
@@ -826,6 +933,39 @@ Component({
                 [`chatRecords[${lastValueIndex}].db_len`]: lastValue.db_len,
                 chatStatus: 2,
               });
+            }
+            // tool_call 场景，调用请求
+            if (type === "tool-call") {
+              const { tool_call } = dataJson;
+              const callBody = {
+                id: tool_call.id,
+                name: tool_call.function.name,
+                callParams: "```json\n" + JSON.stringify(tool_call.function.arguments, null, 2) + "\n```",
+                content: "",
+              };
+              if (!lastValue.toolCallList) {
+                lastValue.toolCallList = [callBody];
+              } else {
+                lastValue.toolCallList.push(callBody);
+              }
+              this.setData({
+                [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+              });
+              this.autoToBottom();
+            }
+            // tool_call 场景，调用响应
+            if (type === "tool-result") {
+              const { toolCallId, result } = dataJson;
+              if (lastValue.toolCallList && lastValue.toolCallList.length) {
+                const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
+                if (lastToolCallObj && !lastToolCallObj.callResult) {
+                  lastToolCallObj.callResult = "```json\n" + JSON.stringify(result, null, 2) + "\n```";
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                  });
+                  this.autoToBottom();
+                }
+              }
             }
           } catch (e) {
             console.log("err", event, e);
