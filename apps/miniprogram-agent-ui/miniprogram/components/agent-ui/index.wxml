@@ -65,6 +65,29 @@
                 <markdownPreview markdown="{{item.reasoning_content||''}}" fontSize="{{28}}"></markdownPreview>
               </view>
             </FoldedCard>
+            <!-- 工具调用 -->
+            <view wx:if="{{item.toolCallList.length > 0}}">
+              <block wx:for="{{item.toolCallList}}" wx:for-item="subItem" wx:key="id">
+                <markdownPreview markdown="{{subItem.content || ''}}"></markdownPreview>
+                <FoldedCard initStatus="{{false}}" showBgColor="{{true}}">
+                  <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                    <block>
+                     调用工具 {{subItem.name}}
+                    </block>
+                    <!-- <block wx:else>
+                      <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
+                    </block> -->
+                  </view>
+                  <view style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
+                    <view>参数：</view>
+                    <markdownPreview markdown="{{subItem.callParams||''}}" fontSize="{{28}}"></markdownPreview>
+                    <view>结果：</view>
+                    <markdownPreview markdown="{{subItem.callResult||''}}" fontSize="{{28}}"></markdownPreview>
+                  </view>
+                </FoldedCard>
+              </block>
+            </view>
+            <!-- 正文 -->
             <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
             <!-- 下面的按钮 -->
             <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">

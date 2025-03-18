@@ -44,13 +44,13 @@ Component({
       });
     },
     showTools: function () {
-      wx.nextTick(() => this.calcScrollHeight())
+      wx.nextTick(() => this.calcScrollHeight());
     },
     showFileList: function () {
-      wx.nextTick(() => this.calcScrollHeight())
+      wx.nextTick(() => this.calcScrollHeight());
     },
     showFeatureList: function () {
-      wx.nextTick(() => this.calcScrollHeight())
+      wx.nextTick(() => this.calcScrollHeight());
     },
   },
 
@@ -93,7 +93,7 @@ Component({
     feedbackType: "",
     textareaHeight: 50,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
-    curScrollHeight: 0
+    curScrollHeight: 0,
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -121,7 +121,7 @@ Component({
 
       // 初始化第一条记录为welcomeMessage
       const record = {
-        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
+        content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -151,7 +151,7 @@ Component({
     this.setData({
       contentHeightInScrollViewTop: topHeight,
     });
-    this.calcScrollHeight()
+    this.calcScrollHeight();
   },
   methods: {
     calcScrollHeight: async function () {
@@ -172,8 +172,8 @@ Component({
       });
       // console.log('this.data.windowInfo.windowHeight - topAndFooterHeight', this.data.windowInfo.windowHeight - topAndFooterHeight)
       this.setData({
-        curScrollHeight: this.data.windowInfo.windowHeight - topAndFooterHeight
-      })
+        curScrollHeight: this.data.windowInfo.windowHeight - topAndFooterHeight,
+      });
     },
     showErrorMsg: function (e) {
       const { content } = e.currentTarget.dataset;
@@ -195,7 +195,7 @@ Component({
             self.setData({
               textareaHeight: res.height,
             });
-            self.calcScrollHeight()
+            self.calcScrollHeight();
           } else {
             console.log("未找到指定元素");
           }
@@ -412,7 +412,7 @@ Component({
         return;
       }
       const record = {
-        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
+        content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -749,6 +749,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
+          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -834,13 +835,29 @@ Component({
             }
             // 内容
             if (type === "text") {
-              contentText += content;
-              lastValue.content = contentText;
-              this.setData({
-                [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
-                [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
-                chatStatus: 3,
-              }); // 聊天状态切换为输出content中
+              // 区分是 toolCall 的content 还是普通的 content
+              let isToolCallContent = false;
+              const toolCallList = lastValue.toolCallList;
+              if (toolCallList.length) {
+                const lastToolCallObj = toolCallList[toolCallList.length - 1];
+                if (lastToolCallObj.callParams && !lastToolCallObj.callResult) {
+                  isToolCallContent = true;
+                  lastToolCallObj.content += content;
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                  });
+                }
+              }
+
+              if (!isToolCallContent) {
+                contentText += content;
+                lastValue.content = contentText;
+                this.setData({
+                  [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
+                  [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
+                  chatStatus: 3,
+                }); // 聊天状态切换为输出content中
+              }
             }
             // 知识库，只更新一次
             if (type === "knowledge" && !lastValue.knowledge_meta) {
@@ -858,6 +875,37 @@ Component({
                 [`chatRecords[${lastValueIndex}].db_len`]: lastValue.db_len,
                 chatStatus: 2,
               });
+            }
+            // tool_call 场景，调用请求
+            if (type === "tool-call") {
+              const { tool_call } = dataJson;
+              const callBody = {
+                id: tool_call.id,
+                name: tool_call.function.name,
+                callParams: JSON.stringify(tool_call.function.arguments),
+                content: "",
+              };
+              if (!lastValue.toolCallList) {
+                lastValue.toolCallList = [callBody];
+              } else {
+                lastValue.toolCallList.push(callBody);
+              }
+              this.setData({
+                [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+              });
+            }
+            // tool_call 场景，调用响应
+            if (type === "tool-result") {
+              const { toolCallId, result } = dataJson;
+              if (lastValue.toolCallList.length) {
+                const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
+                if (lastToolCallObj && !lastToolCallObj.callResult) {
+                  lastToolCallObj.callResult = JSON.stringify(result);
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                  });
+                }
+              }
             }
           } catch (e) {
             console.log("err", event, e);
@@ -1001,7 +1049,7 @@ Component({
       // 只有当内容高度接近scroll 区域视口高度时才开始增加 scrollTop
       // const clientHeight =
       //   this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
-      const clientHeight = this.data.curScrollHeight
+      const clientHeight = this.data.curScrollHeight;
       const contentHeight =
         (await this.calculateContentHeight()) +
         (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度

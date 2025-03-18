@@ -7,7 +7,7 @@ Page({
     chatMode: "bot", // bot 表示使用agent，model 表示使用大模型
     showBotAvatar: true, // 是否在对话框左侧显示头像
     agentConfig: {
-      botId: "bot-db3cab4a", // agent id,
+      botId: "ibot-test-a7UOoOQCF5", // agent id,
       allowWebSearch: true, // 允许客户端选择启用联网搜索
       allowUploadFile: true, // 允许上传文件
       allowPullRefresh: true, // 允许下拉刷新
