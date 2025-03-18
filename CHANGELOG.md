@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.8...v1.6.0) (2025-03-18)
+
+
+### Features
+
+* 修改参数 ([9e2a868](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/9e2a8683716958ba3c0f10d06d0482f854c514b1))
+* 支持数据模型检索 ([e2c6da6](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/e2c6da63cf1b4e51185bfdfa1f98f6f1807caab2))
+* support agent uploadfile config ([d7006a2](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/d7006a2827489938411ca6e5b5244c8019e85ae7))
+* support file in history ([bbe9810](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/bbe9810b6b3c8d68a6a7a7d6549bc7730530cd16))
+
+
+### Bug Fixes
+
+* 针对企业微信环境判断处理 ([cffabc4](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/cffabc4fccbcbf038eed8659d53920c9c04891a5))
+* fix readme ([eb52a49](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/eb52a495ebbeef603776809a443b4b5f10701952))
+
 ## [1.5.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.8...v1.5.0) (2025-03-14)
 
 
