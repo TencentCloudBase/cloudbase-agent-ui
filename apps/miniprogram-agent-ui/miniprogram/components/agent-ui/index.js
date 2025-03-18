@@ -151,7 +151,7 @@ Component({
 
       // 初始化第一条记录为welcomeMessage
       const record = {
-        content: bot.welcomeMessage,
+        content: bot.welcomeMessage || '你好，有什么我可以帮到你？',
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -417,7 +417,7 @@ Component({
         return;
       }
       const record = {
-        content: bot.welcomeMessage,
+        content: bot.welcomeMessage || '你好，有什么我可以帮到你？',
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -740,6 +740,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
+          console.log('event', event)
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -762,7 +763,7 @@ Component({
               knowledge_meta,
               knowledge_base,
               finish_reason,
-              search_results
+              search_results,
             } = dataJson;
             const newValue = [...this.data.chatRecords];
             // 取最后一条消息更新
@@ -815,13 +816,29 @@ Component({
             }
             // 内容
             if (type === "text") {
-              contentText += content;
-              lastValue.content = contentText;
-              this.setData({
-                [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
-                [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
-                chatStatus: 3,
-              }); // 聊天状态切换为输出content中
+              // 区分是 toolCall 的content 还是普通的 content
+              let isToolCallContent = false
+              const toolCallList = lastValue.toolCallList
+              if(toolCallList.length) {
+                const lastToolCallObj = toolCallList[toolCallList.length - 1]
+                if(lastToolCallObj.callParams && !lastToolCallObj.callResult) {
+                  isToolCallContent = true
+                  lastToolCallObj.content += content
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList
+                  })
+                }
+              }
+
+              if(!isToolCallContent) {
+                contentText += content;
+                lastValue.content = contentText;
+                this.setData({
+                  [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
+                  [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
+                  chatStatus: 3,
+                }); // 聊天状态切换为输出content中
+              }
             }
             // 知识库，只更新一次
             if (type === "knowledge" && !lastValue.knowledge_meta) {
@@ -839,6 +856,37 @@ Component({
                 [`chatRecords[${lastValueIndex}].db_len`]: lastValue.db_len,
                 chatStatus: 2,
               })
+            }
+            // tool_call 场景，调用请求
+            if(type === 'tool-call') {
+              const { tool_call } = dataJson
+              const callBody = {
+                id: tool_call.id,
+                name: tool_call.function.name,
+                callParams: JSON.stringify(tool_call.function.arguments),
+                content: ''
+              }
+              if(!lastValue.toolCallList) {
+                lastValue.toolCallList = [callBody]
+              }else {
+                lastValue.toolCallList.push(callBody)
+              }
+              this.setData({
+                [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+              })
+            }
+            // tool_call 场景，调用响应
+            if(type === 'tool-result') {
+              const { toolCallId, result } = dataJson
+              if(lastValue.toolCallList.length) {
+                const lastToolCallObj = lastValue.toolCallList.find(item => item.id === toolCallId)
+                if(lastToolCallObj && !lastToolCallObj.callResult) {
+                  lastToolCallObj.callResult = JSON.stringify(result) 
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList
+                  })
+                }
+              }
             }
           } catch (e) {
             // console.log('err', event, e)
