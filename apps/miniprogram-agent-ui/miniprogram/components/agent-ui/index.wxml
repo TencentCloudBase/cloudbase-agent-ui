@@ -66,6 +66,7 @@
               </view>
             </FoldedCard>
             <!-- 工具调用 -->
+            
             <view wx:if="{{item.toolCallList && item.toolCallList.length > 0}}">
               <block wx:for="{{item.toolCallList}}" wx:for-item="subItem" wx:key="id">
                 <markdownPreview markdown="{{subItem.content || ''}}"></markdownPreview>
@@ -73,7 +74,9 @@
                   <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
                     <block>
                      调用工具 {{subItem.name}}
-                     <image wx:if="{{!subItem.callResult}}" src="./imgs/loading.svg" mode="aspectFill" style="width: 14px;height: 14px;" />
+                     <image wx:if="{{!subItem.callResult && !subItem.error}}" src="./imgs/loading.svg" mode="aspectFill" style="width: 14px;height: 14px;" />
+                     <image wx:if="{{subItem.callResult}}" mode="widthFix" src='./imgs/check.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                     <image wx:if="{{subItem.error}}" mode="widthFix" src='./imgs/close-red.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
                     </block>
                     <!-- <block wx:else>
                       <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
