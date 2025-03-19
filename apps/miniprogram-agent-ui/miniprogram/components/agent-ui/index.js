@@ -122,6 +122,7 @@ Component({
       // 初始化第一条记录为welcomeMessage
       const record = {
         content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
+        // content: '使用提供的puppeteer_navigate工具来导航到qq.com。\n\n\t\n\n\t用户想要导航到qq.com，这是一个网页导航的任务。根据用户的请求，需要使用一个能够执行网页导航的工具。'.replaceAll("\t", ""),
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -182,6 +183,25 @@ Component({
         title: "错误原因",
         content: typeof content === "string" ? content : JSON.stringify({ content }),
       });
+    },
+    transformToolCallHistoryList: function (toolCallList) {
+      const callParamsList = toolCallList.filter((item) => item.type === "tool-call");
+      const callResultList = toolCallList.filter((item) => item.type === "tool-result");
+      const callContentList = toolCallList.filter((item) => item.type === "text");
+      const transformToolCallList = [];
+      for (let i = 0; i < callParamsList.length; i++) {
+        const curParam = callParamsList[i];
+        const curResult = callResultList[i];
+        const curContent = callContentList[i];
+        transformToolCallList.push({
+          id: curParam.tool_call.id,
+          name: curParam.tool_call.function.name,
+          callParams: "```json\n" + JSON.stringify(curParam.tool_call.function.arguments) + "\n```",
+          content: curContent.content || "",
+          callResult: "```json\n" + JSON.stringify(curResult.result) + "\n```",
+        });
+      }
+      return transformToolCallList;
     },
     handleLineChange: function (e) {
       console.log("linechange", e.detail.lineCount);
@@ -381,8 +401,20 @@ Component({
                   if (item.role === "assistant" && item.content === "") {
                     transformItem.content = this.data.defaultErrorMsg;
                   }
+                  if (item.role === "assistant" && item.origin_msg) {
+                    console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
+                    const origin_msg_obj = JSON.parse(item.origin_msg);
+                    if (origin_msg_obj.aiResHistory) {
+                      const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
+                      transformItem.toolCallList = transformToolCallList;
+                    } else {
+                      // 之前异常的返回
+                      // return null
+                    }
+                  }
                   return transformItem;
-                });
+                })
+                .filter((item) => item);
               this.setData({
                 chatRecords: [...freshChatRecords, ...this.data.chatRecords],
               });
@@ -749,7 +781,6 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
-          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -838,13 +869,16 @@ Component({
               // 区分是 toolCall 的content 还是普通的 content
               let isToolCallContent = false;
               const toolCallList = lastValue.toolCallList;
-              if (toolCallList.length) {
+              if (toolCallList && toolCallList.length) {
                 const lastToolCallObj = toolCallList[toolCallList.length - 1];
                 if (lastToolCallObj.callParams && !lastToolCallObj.callResult) {
                   isToolCallContent = true;
-                  lastToolCallObj.content += content;
+                  lastToolCallObj.content += content.replaceAll("\t", "");
+                  // lastToolCallObj.content = '使用提供的puppeteer_navigate工具来导航到qq.com。\n\n\t\n\n\t用户想要导航到qq.com，这是一个网页导航的任务。根据用户的请求，需要使用一个能够执行网页导航的工具。'
+
                   this.setData({
                     [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                    chatStatus: 3,
                   });
                 }
               }
@@ -882,7 +916,7 @@ Component({
               const callBody = {
                 id: tool_call.id,
                 name: tool_call.function.name,
-                callParams: JSON.stringify(tool_call.function.arguments),
+                callParams: "```json\n" + JSON.stringify(tool_call.function.arguments) + "\n```",
                 content: "",
               };
               if (!lastValue.toolCallList) {
@@ -897,10 +931,10 @@ Component({
             // tool_call 场景，调用响应
             if (type === "tool-result") {
               const { toolCallId, result } = dataJson;
-              if (lastValue.toolCallList.length) {
+              if (lastValue.toolCallList && lastValue.toolCallList.length) {
                 const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
                 if (lastToolCallObj && !lastToolCallObj.callResult) {
-                  lastToolCallObj.callResult = JSON.stringify(result);
+                  lastToolCallObj.callResult = "```json\n" + JSON.stringify(result) + "\n```";
                   this.setData({
                     [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
                   });
