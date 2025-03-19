@@ -22,7 +22,7 @@ Component({
         allowUploadFile: Boolean,
         allowWebSearch: Boolean,
         allowPullRefresh: Boolean,
-        // allowUploadImage: Boolean,
+        allowUploadImage: Boolean,
       },
     },
     modelConfig: {
@@ -106,7 +106,7 @@ Component({
     footerHeight: 73,
     lastScrollTop: 0,
     showUploadFile: true,
-    showUploadImg: false,
+    showUploadImg: true,
     showWebSearchSwitch: false,
     showPullRefresh: true,
     useWebSearch: false,
@@ -159,11 +159,12 @@ Component({
       const { chatRecords } = this.data;
       // 随机选取三个初始化问题
       const questions = randomSelectInitquestion(bot.initQuestions, 3);
-      let { allowWebSearch, allowUploadFile, allowPullRefresh } = this.data.agentConfig;
+      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage } = this.data.agentConfig;
       console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
+      allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
       console.log("allowUploadFile", allowUploadFile);
       this.setData({
         bot,
@@ -171,6 +172,7 @@ Component({
         chatRecords: [...chatRecords, record],
         showWebSearchSwitch: allowWebSearch,
         showUploadFile: allowUploadFile,
+        showUploadImg: allowUploadImage,
         showPullRefresh: allowPullRefresh,
       });
     }
@@ -485,6 +487,13 @@ Component({
       });
     },
     handleUploadImg: function (sourceType) {
+      if(!this.data.bot.searchFileEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 文件上传功能",
+        });
+        return;
+      }
       const self = this;
       const isCurSendFile = this.data.sendFileList.find((item) => item.rawType === "file");
       if (isCurSendFile) {
