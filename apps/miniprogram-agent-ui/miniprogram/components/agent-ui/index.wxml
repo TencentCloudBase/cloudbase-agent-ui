@@ -142,13 +142,13 @@
         <image src="./imgs/clear.svg" alt="widthFix" class="icon" />
         <text class="text_desc">清除</text>
       </view>
-      <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleAlbum">
-        <image src="./imgs/uploadImg.svg" alt="widthFix" class="icon" />
-        <text class="text_desc">图片</text>
-      </view>
       <view wx:if="{{showUploadFile && chatMode === 'bot'}}" class="function" bind:tap="handleUploadMessageFile">
         <image src="./imgs/wechat.svg" alt="widthFix" class="icon" />
         <text class="text_desc">微信文件</text>
+      </view>
+      <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleAlbum">
+        <image src="./imgs/uploadImg.svg" alt="widthFix" class="icon" />
+        <text class="text_desc">图片</text>
       </view>
       <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleCamera">
         <image src="./imgs/camera.svg" alt="widthFix" class="icon" />
