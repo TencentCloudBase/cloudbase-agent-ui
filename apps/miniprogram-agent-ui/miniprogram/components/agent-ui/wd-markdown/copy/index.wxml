@@ -1,0 +1,1 @@
+<view class="markdown-it-code-copy" bindtap="copyClipBoard"></view>

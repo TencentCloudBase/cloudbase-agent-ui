@@ -1,0 +1,49 @@
+@font-face {
+  font-family: WdTd;
+  src: url("t.eot"), url("t_iefix.eot") format("embedded-opentype"),
+    url("t.woff") format("woff"), url("t.ttf") format("truetype"),
+    url("t.svg") format("svg"),
+    url("https://comp-public-replace-1303824488-cos.weda.tencent.com/icon/0.0.7/t.eot"),
+    url("https://comp-public-replace-1303824488-cos.weda.tencent.com/icon/0.0.7/t_iefix.eot") format("embedded-opentype"),
+    url("https://comp-public-replace-1303824488-cos.weda.tencent.com/icon/0.0.7/t.woff") format("woff"),
+    url("https://comp-public-replace-1303824488-cos.weda.tencent.com/icon/0.0.7/t.ttf") format("truetype"),
+    url("https://comp-public-replace-1303824488-cos.weda.tencent.com/icon/0.0.7/t.svg") format("svg");
+  font-weight: 400;
+  font-style: normal;
+}
+
+/* .markdown-it-code-wrap {
+    position: relative;
+  } */
+.markdown-it-code-copy {
+  font-family: WdTd !important;
+  vertical-align: middle;
+  font-size: 14px;
+  border: none;
+  background: transparent;
+  position: absolute;
+  top: 7.5px;
+  right: 6px;
+  cursor: pointer;
+  outline: none;
+  color: black;
+}
+
+/* i.markdown-it-code-copy {
+    font-style: normal;
+  } */
+.markdown-it-code-copy::before {
+  content: '\E1AC';
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  text-align: center;
+}
+
+.markdown-it-code-copy:hover::before {
+  background: #eef1f4;
+}
