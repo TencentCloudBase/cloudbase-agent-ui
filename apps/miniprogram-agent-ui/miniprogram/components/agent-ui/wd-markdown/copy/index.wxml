@@ -1,0 +1,3 @@
+<view class="markdown-it-code-copy" bindtap="copyClipBoard">
+  <image src="../../imgs/copy.svg" style="width: 32rpx;height: 32rpx" mode="aspectFill" />
+</view>
