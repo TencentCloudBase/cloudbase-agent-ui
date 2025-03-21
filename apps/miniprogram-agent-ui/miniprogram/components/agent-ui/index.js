@@ -124,6 +124,7 @@ Component({
     feedbackType: "",
     textareaHeight: 50,
     curLineCount: 1,
+    defaultErrorMsg: "网络繁忙，请稍后重试!",
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -151,7 +152,7 @@ Component({
 
       // 初始化第一条记录为welcomeMessage
       const record = {
-        content: bot.welcomeMessage,
+        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -183,6 +184,14 @@ Component({
     });
   },
   methods: {
+    showErrorMsg: function (e) {
+      const { content } = e.currentTarget.dataset;
+      console.log("content", content);
+      wx.showModal({
+        title: "错误原因",
+        content: typeof content === "string" ? content : JSON.stringify({ content }),
+      });
+    },
     handleLineChange: function (e) {
       console.log("linechange", e.detail.lineCount);
       // 查foot-function height
@@ -389,6 +398,9 @@ Component({
                       fileSize: item.bytes,
                     }));
                   }
+                  if (item.role === "assistant" && item.content === "") {
+                    transformItem.content = this.data.defaultErrorMsg;
+                  }
                   return transformItem;
                 });
               this.setData({
@@ -420,7 +432,7 @@ Component({
         return;
       }
       const record = {
-        content: bot.welcomeMessage,
+        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -492,6 +504,13 @@ Component({
         wx.showModal({
           title: "提示",
           content: "请前往腾讯云开发平台启用 Agent 文件上传功能",
+        });
+        return;
+      }
+      if (this.data.useWebSearch) {
+        wx.showModal({
+          title: "提示",
+          content: "联网搜索不支持上传文件/图片",
         });
         return;
       }
@@ -608,7 +627,7 @@ Component({
       if (this.data.useWebSearch) {
         wx.showModal({
           title: "提示",
-          content: "联网搜索不支持上传附件",
+          content: "联网搜索不支持上传文件/图片",
         });
         return;
       }
@@ -760,6 +779,9 @@ Component({
             this.toBottom(40);
           }
           const { data } = event;
+          if (data === "[DONE]") {
+            break;
+          }
           try {
             const dataJson = JSON.parse(data);
             const {
@@ -773,6 +795,7 @@ Component({
               knowledge_base,
               finish_reason,
               search_results,
+              error,
             } = dataJson;
             const newValue = [...this.data.chatRecords];
             // 取最后一条消息更新
@@ -785,7 +808,13 @@ Component({
               lastValue.search_info = null;
               lastValue.reasoning_content = "";
               lastValue.knowledge_meta = [];
-              lastValue.content = "网络繁忙，请稍后重试!";
+              lastValue.content = this.data.defaultErrorMsg;
+              if (error && error.message) {
+                lastValue.error = error.message;
+                this.setData({
+                  [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
+                });
+              }
               this.setData({
                 [`chatRecords[${lastValueIndex}].search_info`]: lastValue.search_info,
                 [`chatRecords[${lastValueIndex}].reasoning_content`]: lastValue.reasoning_content,
@@ -851,7 +880,7 @@ Component({
               });
             }
           } catch (e) {
-            // console.log('err', event, e)
+            console.log("err", event, e);
             break;
           }
           index++;
@@ -862,6 +891,12 @@ Component({
         // 取最后一条消息更新
         const lastValue = newValue[lastValueIndex];
         lastValue.hiddenBtnGround = isManuallyPaused;
+        if (lastValue.content === "") {
+          lastValue.content = this.data.defaultErrorMsg;
+          this.setData({
+            [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
+          });
+        }
         this.setData({
           chatStatus: 0,
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
