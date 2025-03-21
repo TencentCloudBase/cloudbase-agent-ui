@@ -68,13 +68,16 @@
             <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
             <!-- 下面的按钮 -->
             <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
+              <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" />
               <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
-              <button class="share_btn" open-type="share">
-                <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
-              </button>
-              <block wx:if="{{chatMode=== 'bot'}}">
-                <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
-                <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
+              <block wx:if="{{!item.error}}">                
+                <button class="share_btn" open-type="share">
+                  <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                </button>
+                <block wx:if="{{chatMode=== 'bot'}}">
+                  <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
+                  <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
+                </block>
               </block>
             </view>
           </block>
