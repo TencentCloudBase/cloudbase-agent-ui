@@ -30,3 +30,26 @@ export function addCustomClassPlugin(md) {
     };
   });
 }
+function renderCode(origRule) {
+  return (...args) => {
+    const [tokens, idx] = args;
+    const content = tokens[idx].content
+      .replaceAll('"', '&quot;')
+      .replaceAll("'", "&apos;");
+    const origRendered = origRule(...args);
+
+    if (content.length === 0)
+      return origRendered;
+
+    return `
+<div  style="position: relative" >
+  ${origRendered}
+  <a class="__preCodeCopyWrap" href="${content}"></a>
+</div>
+`;
+  };
+}
+export const copy = (md) => {
+  md.renderer.rules.code_block = renderCode(md.renderer.rules.code_block);
+  md.renderer.rules.fence = renderCode(md.renderer.rules.fence);
+};
