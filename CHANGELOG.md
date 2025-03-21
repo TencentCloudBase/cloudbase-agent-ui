@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.6.0...v1.7.0) (2025-03-21)
+
+
+### Features
+
+* 添加复制 ([69c4aad](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/69c4aad44de2994aadeaff20cb3c5bd86eeff4bb))
+* 添加复制按钮 ([07f14f9](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/07f14f9dbe7d20904bc824cf28f796633a31b079))
+* 修复输入框的问题 ([beb93e8](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/beb93e88b9994352fc0e86e3a29b3d18f670a7df))
+* 修改文档 ([0e642e5](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/0e642e59139043a592f7b4dd1d0ea406fbb36737))
+* support upload img ([f2fcc00](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/f2fcc00cc60c7717dc9035ea1e3a426c050262e0))
+
+
+### Bug Fixes
+
+* fix readme ([8e959db](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/8e959db57f890765437e6ae6ba48105bbd872964))
+* remove invalid code ([e4a998f](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/e4a998f2d8228c75e41ff5f39c04598d153eb98a))
+* support error handler ([d72487a](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/d72487a219bdf5adcd2fca517cbfbf216f16bdda))
+
 ## [1.6.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.8...v1.6.0) (2025-03-18)
 
 
