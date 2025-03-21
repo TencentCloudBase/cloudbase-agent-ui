@@ -112,19 +112,9 @@
       <chatFile enableDel="{{true}}" wx:for="{{sendFileList}}" wx:key="tempId" fileData="{{item}}" bind:removeChild="handleRemoveChild" bind:changeChild="handleChangeChild"></chatFile>
     </view>
     <view class="foot_function">
-      <!-- <scroll-view class="img-box" scroll-x="true" wx:if="{{!!imageList.length}}">
-        <block wx:for="{{imageList}}" wx:key="tempFilePath">
-          <view class="img-preview">
-            <image src="{{item.tempFilePath}}" alt="" model='aspectFill' class="img-preview-image" />
-            <view class="img-preview-loading" wx:if="{{!!!item.base64Url}}"></view>
-            <image src="./imgs/close.svg" mode="aspectFill" class="img-preview-close" bind:tap="deleteImg" data-index="{{index}}" />
-          </view>
-        </block>
-      </scroll-view> -->
-
       <view class="input_box">
         <view class="input_inner_box">
-        <textarea class="input" value="{{inputValue}}" maxlength="1024" bindfocus="bindInputFocus" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="handleSendMessage" confirm-type="send" adjust-position cursor-spacing="40" auto-height="{{true}}" show-confirm-bar="{{false}}" bindlinechange="handleLineChange"/>
+          <textarea class="input" value="{{inputValue}}" maxlength="1024" bindfocus="bindInputFocus" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="handleSendMessage" confirm-type="send" adjust-position cursor-spacing="40" auto-height="{{true}}" show-confirm-bar="{{false}}" bindlinechange="handleLineChange" />
         </view>
         <view class="right_btns">
           <!-- 加号 -->
