@@ -101,7 +101,8 @@ Page({
       botId: "bot-e7d1e736", // agent id,
       allowWebSearch: true, // 允许客户端选择启用联网搜索
       allowUploadFile: true, // 允许上传文件
-      allowPullRefresh: true // 允许下拉刷新
+      allowPullRefresh: true, // 允许下拉刷新
+      allowUploadImage: true, // 允许上传图片
     },
     modelConfig: {
       modelProvider: "hunyuan-open", // 大模型服务厂商
@@ -152,6 +153,7 @@ Page({
 | `allowWebSearch`   | `Boolean` | 否   | 是否允许客户端界面展示联网搜索                |
 | `allowUploadFile`  | `Boolean` | 否   | 是否允许客户端界面展示文件上传                |
 | `allowPullRefresh` | `Boolean` | 否   | 是否允许客户端界面展示下拉获取历史记录        |
+| `allowUploadImage` | `Boolean` | 否   | 是否允许客户端界面展示图片上传及拍照上传        |
 
 #### ModelConfig
 
@@ -251,7 +253,8 @@ Page({
       botId: "bot-e7d1e736", // agent id,
       allowWebSearch: true, // 允许客户端选择启用联网搜索
       allowUploadFile: true, // 允许上传文件
-      allowPullRefresh: true // 允许下拉刷新
+      allowPullRefresh: true, // 允许下拉刷新
+      allowUploadImage: true, // 允许上传图片及拍照上传
     }
   }
   //...
@@ -267,15 +270,16 @@ Page({
 - ✅ 流式输出
 - ✅ 联网搜索 （Agent模式）
 - ✅ 文档解析 （Agent模式）
+- ✅ 图片上传解析（拍照/图片）
 
 ### 🚧 进行中开发
 
 - 多模型（快速响应/深度推理）切换调用配置化
 - 历史会话管理，多轮对话上下文记忆
-- 图片上传解析（拍照/图片）
 - 支持文字转语音播放
 - 支持用户语音输入转文字
 - 支持语音音色配置
+- agent支持环境共享下使用
 
 ### 📅 未来计划
 

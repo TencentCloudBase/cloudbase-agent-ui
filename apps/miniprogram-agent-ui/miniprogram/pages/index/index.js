@@ -28,7 +28,8 @@ Page({
     botId: "bot-e7d1e736", // agent id,
     allowWebSearch: true, // 允许客户端选择启用联网搜索
     allowUploadFile: true, // 允许上传文件
-    allowPullRefresh: true // 允许下拉刷新
+    allowPullRefresh: true, // 允许下拉刷新
+    allowUploadImage: true, // 允许上传图片
   }
 }`,
       modelConfig1: `data: {
@@ -99,6 +100,11 @@ Page({
         type: "boolean",
         desc: "允许下拉刷新",
       },
+      {
+        name: "agentConfig.allowUploadImage",
+        type: "boolean",
+        desc: "允许上传图片",
+      },
     ],
     guide: [
       `{
@@ -114,7 +120,8 @@ Page({
     botId: "bot-e7d1e736", // agent id,
     allowWebSearch: true, // 允许客户端选择启用联网搜索
     allowUploadFile: true, // 允许上传文件
-    allowPullRefresh: true // 允许下拉刷新
+    allowPullRefresh: true, // 允许下拉刷新
+    allowUploadImage: true // 允许上传图片
   },
   modelConfig: {
     modelProvider: "hunyuan-open", // 大模型服务厂商

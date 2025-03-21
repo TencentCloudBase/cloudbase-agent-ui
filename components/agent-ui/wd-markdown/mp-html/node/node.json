@@ -1,1 +1,1 @@
-{"component":true,"usingComponents":{"node":"./node"}}
+{"component":true,"usingComponents":{"node":"./node","copy":"../../copy/index"}}

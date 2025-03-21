@@ -68,13 +68,16 @@
             <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
             <!-- 下面的按钮 -->
             <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
+              <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" />
               <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
-              <button class="share_btn" open-type="share">
-                <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
-              </button>
-              <block wx:if="{{chatMode=== 'bot'}}">
-                <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
-                <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
+              <block wx:if="{{!item.error}}">                
+                <button class="share_btn" open-type="share">
+                  <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                </button>
+                <block wx:if="{{chatMode=== 'bot'}}">
+                  <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
+                  <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
+                </block>
               </block>
             </view>
           </block>
@@ -112,19 +115,9 @@
       <chatFile enableDel="{{true}}" wx:for="{{sendFileList}}" wx:key="tempId" fileData="{{item}}" bind:removeChild="handleRemoveChild" bind:changeChild="handleChangeChild"></chatFile>
     </view>
     <view class="foot_function">
-      <!-- <scroll-view class="img-box" scroll-x="true" wx:if="{{!!imageList.length}}">
-        <block wx:for="{{imageList}}" wx:key="tempFilePath">
-          <view class="img-preview">
-            <image src="{{item.tempFilePath}}" alt="" model='aspectFill' class="img-preview-image" />
-            <view class="img-preview-loading" wx:if="{{!!!item.base64Url}}"></view>
-            <image src="./imgs/close.svg" mode="aspectFill" class="img-preview-close" bind:tap="deleteImg" data-index="{{index}}" />
-          </view>
-        </block>
-      </scroll-view> -->
-
       <view class="input_box">
         <view class="input_inner_box">
-        <textarea class="input" value="{{inputValue}}" maxlength="1024" bindfocus="bindInputFocus" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="handleSendMessage" confirm-type="send" adjust-position cursor-spacing="40" auto-height="{{true}}" show-confirm-bar="{{false}}" bindlinechange="handleLineChange"/>
+          <textarea class="input" value="{{inputValue}}" maxlength="1024" bindfocus="bindInputFocus" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="handleSendMessage" confirm-type="send" adjust-position cursor-spacing="40" auto-height="{{true}}" show-confirm-bar="{{false}}" bindlinechange="handleLineChange" />
         </view>
         <view class="right_btns">
           <!-- 加号 -->
@@ -142,13 +135,13 @@
         <image src="./imgs/clear.svg" alt="widthFix" class="icon" />
         <text class="text_desc">清除</text>
       </view>
-      <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleAlbum">
-        <image src="./imgs/uploadImg.svg" alt="widthFix" class="icon" />
-        <text class="text_desc">图片</text>
-      </view>
       <view wx:if="{{showUploadFile && chatMode === 'bot'}}" class="function" bind:tap="handleUploadMessageFile">
         <image src="./imgs/wechat.svg" alt="widthFix" class="icon" />
         <text class="text_desc">微信文件</text>
+      </view>
+      <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleAlbum">
+        <image src="./imgs/uploadImg.svg" alt="widthFix" class="icon" />
+        <text class="text_desc">图片</text>
       </view>
       <view wx:if="{{showUploadImg && chatMode === 'bot'}}" class="function" bind:tap="handleCamera">
         <image src="./imgs/camera.svg" alt="widthFix" class="icon" />

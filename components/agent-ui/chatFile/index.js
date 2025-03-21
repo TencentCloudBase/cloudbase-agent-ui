@@ -22,7 +22,7 @@ Component({
       }
 
       // 上传云存储获取 fileId
-      console.log('rawFileName tempFileName tempPath', rawFileName, tempFileName, tempPath)
+      // console.log('rawFileName tempFileName tempPath', rawFileName, tempFileName, tempPath)
       wx.cloud.uploadFile({
         cloudPath: this.generateCosUploadPath(botId, rawFileName ? (rawFileName.split('.')[0] + '-' + tempFileName) : tempFileName), // 云上文件路径
         filePath: tempPath,
