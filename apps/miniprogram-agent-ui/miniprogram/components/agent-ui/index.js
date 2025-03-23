@@ -43,42 +43,14 @@ Component({
         showFeatureList: showWebSearchSwitch,
       });
     },
-    showTools: function (isShow) {
-      // console.log('showTools', isShow)
-      if (isShow) {
-        this.setData({
-          footerHeight: this.data.footerHeight + 80,
-        });
-      } else {
-        this.setData({
-          footerHeight: this.data.footerHeight - 80,
-        });
-      }
+    showTools: function () {
+      wx.nextTick(() => this.calcScrollHeight())
     },
-    showFileList: function (isShow) {
-      console.log("showFileList", isShow);
-      if (isShow) {
-        this.setData({
-          footerHeight: this.data.footerHeight + 80,
-        });
-      } else {
-        this.setData({
-          footerHeight: this.data.footerHeight - 80,
-        });
-      }
+    showFileList: function () {
+      wx.nextTick(() => this.calcScrollHeight())
     },
-    showFeatureList: function (isShow) {
-      console.log("showFeatureList", isShow);
-      if (isShow) {
-        this.setData({
-          footerHeight: this.data.footerHeight + 30,
-        });
-      } else {
-        const subHeight = this.data.footerHeight - 30;
-        this.setData({
-          footerHeight: subHeight >= 80 ? subHeight : 80,
-        });
-      }
+    showFeatureList: function () {
+      wx.nextTick(() => this.calcScrollHeight())
     },
   },
 
@@ -103,7 +75,6 @@ Component({
     showFileList: false, // 展示输入框顶部文件行
     showTopBar: false, // 展示顶部bar
     sendFileList: [],
-    footerHeight: 73,
     lastScrollTop: 0,
     showUploadFile: true,
     showUploadImg: true,
@@ -125,6 +96,7 @@ Component({
     textareaHeight: 50,
     curLineCount: 1,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
+    curScrollHeight: 0
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -182,8 +154,30 @@ Component({
     this.setData({
       contentHeightInScrollViewTop: topHeight,
     });
+    this.calcScrollHeight()
   },
   methods: {
+    calcScrollHeight: async function () {
+      // windowHeight - topHeight - footerHeight
+      const topAndFooterHeight = await new Promise((resolve) => {
+        const query = wx.createSelectorQuery().in(this);
+        query
+          .selectAll(".agent-ui >>> .navBar, .agent-ui >>> .footer")
+          .boundingClientRect((rects) => {
+            let totalHeight = 0;
+            rects.forEach((rect) => {
+              totalHeight += rect.height;
+            });
+            // console.log('top height', totalHeight);
+            resolve(totalHeight);
+          })
+          .exec();
+      });
+      // console.log('this.data.windowInfo.windowHeight - topAndFooterHeight', this.data.windowInfo.windowHeight - topAndFooterHeight)
+      this.setData({
+        curScrollHeight: this.data.windowInfo.windowHeight - topAndFooterHeight
+      })
+    },
     showErrorMsg: function (e) {
       const { content } = e.currentTarget.dataset;
       console.log("content", content);
@@ -201,19 +195,10 @@ Component({
         .select(".foot_function")
         .boundingClientRect(function (res) {
           if (res) {
-            if (res.height < self.data.textareaHeight) {
-              self.setData({
-                footerHeight: self.data.footerHeight - (self.data.textareaHeight - res.height),
-              });
-            }
-            if (res.height > self.data.textareaHeight) {
-              self.setData({
-                footerHeight: self.data.footerHeight + (res.height - self.data.textareaHeight),
-              });
-            }
             self.setData({
               textareaHeight: res.height,
             });
+            self.calcScrollHeight()
           } else {
             console.log("未找到指定元素");
           }
@@ -333,12 +318,10 @@ Component({
       });
     },
     autoToBottom: function () {
-      // console.log("autoToBottom");
       this.setData({
         manualScroll: false,
         scrollTo: "scroll-bottom",
       });
-      // console.log('scrollTop', this.data.scrollTop);
     },
     bindInputFocus: function (e) {
       this.setData({
@@ -1019,8 +1002,9 @@ Component({
       }
 
       // 只有当内容高度接近scroll 区域视口高度时才开始增加 scrollTop
-      const clientHeight =
-        this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
+      // const clientHeight =
+      //   this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
+      const clientHeight = this.data.curScrollHeight
       const contentHeight =
         (await this.calculateContentHeight()) +
         (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度
