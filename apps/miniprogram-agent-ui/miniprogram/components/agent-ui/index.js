@@ -62,10 +62,8 @@ Component({
     inputValue: "",
     output: "",
     chatRecords: [],
-    scrollTop: 0,
     setPanelVisibility: false,
     questions: [],
-    scrollTop: 0,
     scrollTop: 0, // 文字撑起来后能滚动的最大高度
     viewTop: 0, // 根据实际情况，可能用户手动滚动，需要记录当前滚动的位置
     scrollTo: "", // 快速定位到指定元素，置底用
@@ -94,7 +92,6 @@ Component({
     feedbackRecordId: "",
     feedbackType: "",
     textareaHeight: 50,
-    curLineCount: 1,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
     curScrollHeight: 0
   },
