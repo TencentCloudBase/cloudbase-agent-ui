@@ -3,6 +3,9 @@
   width: 750rpx;
   height: 100vh;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow:hidden;
 }
 
 .nav {
@@ -11,6 +14,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .navBar {
@@ -88,6 +92,7 @@
 .main {
   background-color: #fff;
   /* padding-top:10px; */
+  flex: 1;
 }
 
 .share_btn {
@@ -122,9 +127,10 @@
   width: 100%;
   min-height: 80px;
   max-height: 380px;
+  flex-shrink: 0;
   /* background-color: aquamarine; */
-  position: absolute;
-  bottom: 0;
+  /* position: absolute; */
+  /* bottom: 0; */
 }
 
 .foot_function {
