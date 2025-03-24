@@ -83,7 +83,7 @@
                         <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
                       </block> -->
                     </view>
-                    <view style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
+                    <view wx:if="{{showToolCallDetail}}" style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
                       <view>参数：</view>
                       <markdownPreview markdown="{{subItem.callParams||''}}" fontSize="{{28}}"></markdownPreview>
                       <view>结果：</view>
