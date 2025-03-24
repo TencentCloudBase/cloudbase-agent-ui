@@ -844,12 +844,12 @@ Component({
                 [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
                 [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
               });
-              if (error) {
-                lastValue.error = error;
-                this.setData({
-                  [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
-                });
-              }
+              // if (error) {
+              //   lastValue.error = error;
+              //   this.setData({
+              //     [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
+              //   });
+              // }
               break;
             }
             // 下面根据type来确定输出的内容
