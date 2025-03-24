@@ -43,15 +43,6 @@ Component({
         showFeatureList: showWebSearchSwitch,
       });
     },
-    showTools: function () {
-      wx.nextTick(() => this.calcScrollHeight())
-    },
-    showFileList: function () {
-      wx.nextTick(() => this.calcScrollHeight())
-    },
-    showFeatureList: function () {
-      wx.nextTick(() => this.calcScrollHeight())
-    },
   },
 
   data: {
@@ -93,7 +84,7 @@ Component({
     feedbackType: "",
     textareaHeight: 50,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
-    curScrollHeight: 0
+    curScrollHeight: 0,
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -151,30 +142,8 @@ Component({
     this.setData({
       contentHeightInScrollViewTop: topHeight,
     });
-    this.calcScrollHeight()
   },
   methods: {
-    calcScrollHeight: async function () {
-      // windowHeight - topHeight - footerHeight
-      const topAndFooterHeight = await new Promise((resolve) => {
-        const query = wx.createSelectorQuery().in(this);
-        query
-          .selectAll(".agent-ui >>> .navBar, .agent-ui >>> .footer")
-          .boundingClientRect((rects) => {
-            let totalHeight = 0;
-            rects.forEach((rect) => {
-              totalHeight += rect.height;
-            });
-            // console.log('top height', totalHeight);
-            resolve(totalHeight);
-          })
-          .exec();
-      });
-      // console.log('this.data.windowInfo.windowHeight - topAndFooterHeight', this.data.windowInfo.windowHeight - topAndFooterHeight)
-      this.setData({
-        curScrollHeight: this.data.windowInfo.windowHeight - topAndFooterHeight
-      })
-    },
     showErrorMsg: function (e) {
       const { content } = e.currentTarget.dataset;
       console.log("content", content);
@@ -195,7 +164,6 @@ Component({
             self.setData({
               textareaHeight: res.height,
             });
-            self.calcScrollHeight()
           } else {
             console.log("未找到指定元素");
           }
@@ -997,11 +965,10 @@ Component({
         }
         return;
       }
-
       // 只有当内容高度接近scroll 区域视口高度时才开始增加 scrollTop
       // const clientHeight =
       //   this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
-      const clientHeight = this.data.curScrollHeight
+      const clientHeight = this.data.curScrollHeight; // TODO:
       const contentHeight =
         (await this.calculateContentHeight()) +
         (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度

@@ -6,103 +6,105 @@
       <text class="bot-name">{{bot.name}}</text>
     </view>
   </view>
-  <!-- 聊天对话区 -->
-  <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: {{curScrollHeight}}px;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh}}" refresher-threshold="{{80}}" bindrefresherrefresh="handelRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
-    <view wx:if="{{chatMode === 'bot' && showPullRefresh}}" class="tips">
-      {{refreshText}}
-    </view>
-    <view wx:if="{{chatMode === 'model'}}" class="nav">
-      <image src="{{bot.avatar||modelConfig.logo}}" mode="aspectFill" class="avatar" />
-      <view style="line-height: 47px; font-size: 20px; font-weight: 500;">{{chatMode==='bot'?bot.name:modelConfig.modelProvider}}</view>
-      <view style="line-height: 26px;padding: 0px 16px; font-size: 32rpx;">{{chatMode==='bot'?"":modelConfig.welcomeMsg}}</view>
-    </view>
-    <block wx:for="{{chatRecords}}" wx:key="record_id">
-      <!-- 系统聊天 -->
-      <view class="system" style="padding-left: {{showBotAvatar?80:0}}rpx;" wx:if="{{item.role==='assistant'}}">
-        <view class="avatar-left" wx:if="{{showBotAvatar}}">
-          <image src="{{chatMode==='bot'?bot.avatar:modelConfig.logo}}" mode="aspectFill" style="width: 56rpx;height: 56rpx; border-radius: 28rpx;" />
-        </view>
-        <view>
-          <!-- 最后一条消息，并且是发送状态显示发送中 -->
-          <block wx:if="{{(chatRecords.length-1)===index&&chatStatus===1}}">
-            <view style="display: flex;align-items: center; gap: 4px; font-size: 32rpx;line-height: 1.8;">
-              <image src="./imgs/loading.svg" mode="aspectFill" style="width: 14px;height: 14px;" /> 请稍等，正在卖力思考中 🤔
-            </view>
-          </block>
-          <block wx:else>
-            <!-- 数据库检索 -->
-            <view wx:if="{{item.db_len}}" style="border-radius: 8px;margin-bottom: 12px;background-color: #f5f5f5;padding: 18rpx 26rpx;display: inline-block;opacity: 0.7;font-size: 14px;">
-              已匹配 {{item.db_len}} 张数据表
-            </view>
-            <!-- 联网搜索 -->
-            <FoldedCard wx:if="{{item.search_info}}" initStatus="{{false}}" showBgColor="{{true}}">
-              <view slot="title" style="opacity: 0.7;font-size: 14px;display: flex; align-items: center; gap: 8px;">
-                <image src="./imgs/search.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
-                <text>已参考 {{item.search_info.search_results.length}} 个网页</text>
-              </view>
-              <view slot="content" class="link-box">
-                <block wx:for="{{item.search_info.search_results}}" wx:key="index">
-                  <view bind:tap="copyUrl" data-url="{{item.url}}" style="margin-bottom: 3px; font-size: 14px;color: rgb(0, 82, 217); line-height: 24px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"> {{index+1}}.{{item.title}}</view>
-                </block>
-              </view>
-            </FoldedCard>
-            <!-- 知识库 -->
-            <view wx:if="{{item.knowledge_base&&item.knowledge_base.length}}" style="border-radius: 8px;margin-bottom: 12px;background-color: #f5f5f5;padding: 18rpx 26rpx;display: inline-block;opacity: 0.7;font-size: 14px;">
-              已参考 {{item.knowledge_base.length}} 个知识库
-            </view>
-            <!-- 推理过程 -->
-            <FoldedCard wx:if="{{!!item.reasoning_content}}" initStatus="{{true}}" showBgColor="{{false}}">
-              <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
-                <image src="./imgs/system-sum.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
-                <block wx:if="{{item.pauseThinking}}">
-                  已停止思考
-                </block>
-                <block wx:else>
-                  <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
-                </block>
-              </view>
-              <view style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
-                <markdownPreview markdown="{{item.reasoning_content||''}}" fontSize="{{28}}"></markdownPreview>
-              </view>
-            </FoldedCard>
-            <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
-            <!-- 下面的按钮 -->
-            <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
-              <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" />
-              <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
-              <block wx:if="{{!item.error}}">                
-                <button class="share_btn" open-type="share">
-                  <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
-                </button>
-                <block wx:if="{{chatMode=== 'bot'}}">
-                  <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
-                  <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
-                </block>
-              </block>
-            </view>
-          </block>
-        </view>
+  <view style="height: 100%;overflow: auto">
+    <!-- 聊天对话区 -->
+    <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: 100%;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh}}" refresher-threshold="{{80}}" bindrefresherrefresh="handelRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
+      <view wx:if="{{chatMode === 'bot' && showPullRefresh}}" class="tips">
+        {{refreshText}}
       </view>
-      <!-- 用户输入 -->
-      <view class="userContent" wx:if="{{item.role==='user'}}">
-        <view class="user" style="padding-left: {{showBotAvatar?80:0}}rpx;">
-          <view class="user_content">
-            {{item.content}}
+      <view wx:if="{{chatMode === 'model'}}" class="nav">
+        <image src="{{bot.avatar||modelConfig.logo}}" mode="aspectFill" class="avatar" />
+        <view style="line-height: 47px; font-size: 20px; font-weight: 500;">{{chatMode==='bot'?bot.name:modelConfig.modelProvider}}</view>
+        <view style="line-height: 26px;padding: 0px 16px; font-size: 32rpx;">{{chatMode==='bot'?"":modelConfig.welcomeMsg}}</view>
+      </view>
+      <block wx:for="{{chatRecords}}" wx:key="record_id">
+        <!-- 系统聊天 -->
+        <view class="system" style="padding-left: {{showBotAvatar?80:0}}rpx;" wx:if="{{item.role==='assistant'}}">
+          <view class="avatar-left" wx:if="{{showBotAvatar}}">
+            <image src="{{chatMode==='bot'?bot.avatar:modelConfig.logo}}" mode="aspectFill" style="width: 56rpx;height: 56rpx; border-radius: 28rpx;" />
+          </view>
+          <view>
+            <!-- 最后一条消息，并且是发送状态显示发送中 -->
+            <block wx:if="{{(chatRecords.length-1)===index&&chatStatus===1}}">
+              <view style="display: flex;align-items: center; gap: 4px; font-size: 32rpx;line-height: 1.8;">
+                <image src="./imgs/loading.svg" mode="aspectFill" style="width: 14px;height: 14px;" /> 请稍等，正在卖力思考中 🤔
+              </view>
+            </block>
+            <block wx:else>
+              <!-- 数据库检索 -->
+              <view wx:if="{{item.db_len}}" style="border-radius: 8px;margin-bottom: 12px;background-color: #f5f5f5;padding: 18rpx 26rpx;display: inline-block;opacity: 0.7;font-size: 14px;">
+                已匹配 {{item.db_len}} 张数据表
+              </view>
+              <!-- 联网搜索 -->
+              <FoldedCard wx:if="{{item.search_info}}" initStatus="{{false}}" showBgColor="{{true}}">
+                <view slot="title" style="opacity: 0.7;font-size: 14px;display: flex; align-items: center; gap: 8px;">
+                  <image src="./imgs/search.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
+                  <text>已参考 {{item.search_info.search_results.length}} 个网页</text>
+                </view>
+                <view slot="content" class="link-box">
+                  <block wx:for="{{item.search_info.search_results}}" wx:key="index">
+                    <view bind:tap="copyUrl" data-url="{{item.url}}" style="margin-bottom: 3px; font-size: 14px;color: rgb(0, 82, 217); line-height: 24px;white-space: nowrap;overflow: hidden;text-overflow: ellipsis;"> {{index+1}}.{{item.title}}</view>
+                  </block>
+                </view>
+              </FoldedCard>
+              <!-- 知识库 -->
+              <view wx:if="{{item.knowledge_base&&item.knowledge_base.length}}" style="border-radius: 8px;margin-bottom: 12px;background-color: #f5f5f5;padding: 18rpx 26rpx;display: inline-block;opacity: 0.7;font-size: 14px;">
+                已参考 {{item.knowledge_base.length}} 个知识库
+              </view>
+              <!-- 推理过程 -->
+              <FoldedCard wx:if="{{!!item.reasoning_content}}" initStatus="{{true}}" showBgColor="{{false}}">
+                <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
+                  <image src="./imgs/system-sum.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
+                  <block wx:if="{{item.pauseThinking}}">
+                    已停止思考
+                  </block>
+                  <block wx:else>
+                    <text>{{item.reasoning_content&&!item.content?"思考中...":"已深度思考（用时"+item.thinkingTime+"秒）"}}</text>
+                  </block>
+                </view>
+                <view style="padding-left: 25rpx;margin-top: 28rpx; border-left: rgb(165, 164, 164) solid 2px; opacity: 0.7;" slot="content">
+                  <markdownPreview markdown="{{item.reasoning_content||''}}" fontSize="{{28}}"></markdownPreview>
+                </view>
+              </FoldedCard>
+              <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
+              <!-- 下面的按钮 -->
+              <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
+                <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" />
+                <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
+                <block wx:if="{{!item.error}}">                
+                  <button class="share_btn" open-type="share">
+                    <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                  </button>
+                  <block wx:if="{{chatMode=== 'bot'}}">
+                    <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
+                    <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
+                  </block>
+                </block>
+              </view>
+            </block>
           </view>
         </view>
-        <view class="fileBar">
-          <chatFile enableDel="{{false}}" wx:for="{{item.fileList}}" wx:for-item="innerItem" wx:key="tempPath" fileData="{{innerItem}}" bind:removeChild="handleRemoveChild" bind:changeChild="handleChangeChild"></chatFile>
+        <!-- 用户输入 -->
+        <view class="userContent" wx:if="{{item.role==='user'}}">
+          <view class="user" style="padding-left: {{showBotAvatar?80:0}}rpx;">
+            <view class="user_content">
+              {{item.content}}
+            </view>
+          </view>
+          <view class="fileBar">
+            <chatFile enableDel="{{false}}" wx:for="{{item.fileList}}" wx:for-item="innerItem" wx:key="tempPath" fileData="{{innerItem}}" bind:removeChild="handleRemoveChild" bind:changeChild="handleChangeChild"></chatFile>
+          </view>
         </view>
-      </view>
-    </block>
-    <!-- 推荐问题 -->
-    <block wx:for="{{questions}}" wx:key="item">
-      <view class="questions" style="padding-left: {{showBotAvatar?80:0}}rpx;">
-        <view class="question_content" bind:tap="handleSendMessage" data-message="{{item}}">{{item}}</view>
-      </view>
-    </block>
-    <view id="scroll-bottom" style="width: 100%;height: 20px;"></view>
-  </scroll-view>
+      </block>
+      <!-- 推荐问题 -->
+      <block wx:for="{{questions}}" wx:key="item">
+        <view class="questions" style="padding-left: {{showBotAvatar?80:0}}rpx;">
+          <view class="question_content" bind:tap="handleSendMessage" data-message="{{item}}">{{item}}</view>
+        </view>
+      </block>
+      <view id="scroll-bottom" style="width: 100%;height: 20px;"></view>
+    </scroll-view>
+  </view>
   <!-- 底部输入区 -->
   <view class="footer">
     <view class="feature_list" wx:if="{{showFeatureList}}">
