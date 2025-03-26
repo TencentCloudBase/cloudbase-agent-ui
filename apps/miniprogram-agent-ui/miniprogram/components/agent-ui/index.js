@@ -7,6 +7,10 @@ Component({
       type: String,
       value: "",
     },
+    aiInstance:{
+      type:Object,
+      value:null
+    },
     showBotAvatar: {
       type: Boolean,
       value: false,
@@ -101,7 +105,8 @@ Component({
     }
     if (chatMode === "bot") {
       const { botId } = this.data.agentConfig;
-      const ai = wx.cloud.extend.AI;
+      console.log(this.data.aiInstance)
+      const ai = this.data.aiInstance||wx.cloud.extend.AI;
       const bot = await ai.bot.get({ botId });
       // 新增错误提示
       if (bot.code) {
@@ -369,7 +374,8 @@ Component({
                 page: newPage,
               });
             }
-            const res = await wx.cloud.extend.AI.bot.getChatRecords({
+            const ai=this.data.aiInstance.extend.AI||wx.cloud.extend.AI
+            const res = await ai.bot.getChatRecords({
               botId: this.data.agentConfig.botId,
               pageNumber: this.data.page,
               pageSize: this.data.size,
@@ -771,7 +777,7 @@ Component({
       // 新增一轮对话记录时 自动往下滚底
       this.autoToBottom();
       if (chatMode === "bot") {
-        const ai = wx.cloud.extend.AI;
+        const ai = this.data.aiInstance||wx.cloud.extend.AI;
         const res = await ai.bot.sendMessage({
           data: {
             botId: bot.botId,
@@ -994,7 +1000,7 @@ Component({
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
         }); // 对话完成，切回0 ,并且修改最后一条消息的状态，让下面的按钮展示
         if (bot.isNeedRecommend && !isManuallyPaused) {
-          const ai = wx.cloud.extend.AI;
+          const ai = this.data.aiInstance||wx.cloud.extend.AI;
           const chatRecords = this.data.chatRecords;
           const lastPairChatRecord = chatRecords.length >= 2 ? chatRecords.slice(chatRecords.length - 2) : [];
           const recommendRes = await ai.bot.getRecommendQuestions({
@@ -1023,7 +1029,9 @@ Component({
       }
       if (chatMode === "model") {
         const { modelProvider, quickResponseModel } = modelConfig;
-        const aiModel = wx.cloud.extend.AI.createModel(modelProvider);
+        console.log('ryan',this.data.aiInstance)
+        const ai=this.data.aiInstance||wx.cloud.extend.AI
+        const aiModel = ai.createModel(modelProvider);
         const res = await aiModel.streamText({
           data: {
             model: quickResponseModel,
