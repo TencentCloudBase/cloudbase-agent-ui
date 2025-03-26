@@ -10,7 +10,7 @@ cloudbase-agent-ui 是由腾讯云开发团队推出的 AI 智能对话 UI 组�
 
 Agent UI 演示效果图
 
-<img src="https://github.com/TencentCloudBase/cloudbase-agent-ui/blob/luke--migrate-repo/docs/modelExample.gif" width="375px">   <img src="https://github.com/TencentCloudBase/cloudbase-agent-ui/blob/luke--migrate-repo/docs/botExample.gif" width="375px">
+<img src="https://raw.githubusercontent.com/TencentCloudBase/cloudbase-agent-ui/luke--migrate-repo/docs/modelExample.gif" width="375px">   <img src="https://raw.githubusercontent.com/TencentCloudBase/cloudbase-agent-ui/luke--migrate-repo/docs/botExample.gif" width="375px">
 
 ## 🌟 特性亮点
 
