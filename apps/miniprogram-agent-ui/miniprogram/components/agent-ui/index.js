@@ -1,5 +1,5 @@
 // components/agent-ui/index.js
-import { checkConfig, randomSelectInitquestion } from "./tools";
+import { checkConfig, randomSelectInitquestion,getCloudInstance } from "./tools";
 import md5 from "./md5.js";
 Component({
   properties: {
@@ -7,9 +7,12 @@ Component({
       type: String,
       value: "",
     },
-    aiInstance:{
+    envShareConfig:{
       type:Object,
-      value:null
+      value:{
+        resourceAppid:String,
+        resourceEnv:String
+      }
     },
     showBotAvatar: {
       type: Boolean,
@@ -103,10 +106,11 @@ Component({
       });
       return;
     }
+    // 初始化一次cloudInstance，它是单例的，后面不传参数也可以获取到
+    const cloudInstance=await getCloudInstance(this.data.envShareConfig)
     if (chatMode === "bot") {
       const { botId } = this.data.agentConfig;
-      console.log(this.data.aiInstance)
-      const ai = this.data.aiInstance||wx.cloud.extend.AI;
+      const ai=cloudInstance.extend.AI;
       const bot = await ai.bot.get({ botId });
       // 新增错误提示
       if (bot.code) {
@@ -128,13 +132,13 @@ Component({
       // 随机选取三个初始化问题
       const questions = randomSelectInitquestion(bot.initQuestions, 3);
       let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage, showToolCallDetail } = this.data.agentConfig;
-      console.log("allowWebSearch", allowWebSearch);
+      // console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
       showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail
-      console.log("allowUploadFile", allowUploadFile);
+      // console.log("allowUploadFile", allowUploadFile);
       this.setData({
         bot,
         questions,
@@ -155,7 +159,7 @@ Component({
   methods: {
     showErrorMsg: function (e) {
       const { content, reqid } = e.currentTarget.dataset;
-      console.log("content", content);
+      // console.log("content", content);
       const transformContent =
         typeof content === "string"
           ? reqid
@@ -211,7 +215,7 @@ Component({
       return transformToolCallList;
     },
     handleLineChange: function (e) {
-      console.log("linechange", e.detail.lineCount);
+      // console.log("linechange", e.detail.lineCount);
       // 查foot-function height
       const self = this;
       const query = wx.createSelectorQuery().in(this);
@@ -223,7 +227,7 @@ Component({
               textareaHeight: res.height,
             });
           } else {
-            console.log("未找到指定元素");
+            // console.log("未找到指定元素");
           }
         })
         .exec();
@@ -374,7 +378,8 @@ Component({
                 page: newPage,
               });
             }
-            const ai=this.data.aiInstance.extend.AI||wx.cloud.extend.AI
+            const cloudInstance= await getCloudInstance(this.data.envShareConfig);
+            const ai=cloudInstance.extend.AI;
             const res = await ai.bot.getChatRecords({
               botId: this.data.agentConfig.botId,
               pageNumber: this.data.page,
@@ -409,13 +414,13 @@ Component({
                     transformItem.content = this.data.defaultErrorMsg;
                   }
                   if (item.role === "assistant" && item.origin_msg) {
-                    console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
+                    // console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
                     const origin_msg_obj = JSON.parse(item.origin_msg);
                     if (origin_msg_obj.aiResHistory) {
                       const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
                       transformItem.toolCallList = transformToolCallList;
                       const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
-                      console.log("toolCallErr", toolCallErr);
+                      // console.log("toolCallErr", toolCallErr);
                       if (toolCallErr?.error?.message) {
                         transformItem.error = toolCallErr.error.message;
                         transformItem.reqId = item.trace_id || "";
@@ -431,7 +436,7 @@ Component({
               this.setData({
                 chatRecords: [...freshChatRecords, ...this.data.chatRecords],
               });
-              console.log("totalChatRecords", this.data.chatRecords);
+              // console.log("totalChatRecords", this.data.chatRecords);
             }
             this.setData({
               triggered: false,
@@ -479,8 +484,8 @@ Component({
         maxDuration: 30,
         camera: "back",
         success(res) {
-          console.log("res", res);
-          console.log("tempFiles", res.tempFiles);
+          // console.log("res", res);
+          // console.log("tempFiles", res.tempFiles);
           const isImageSizeValid = res.tempFiles.every((item) => item.size <= 30 * 1024 * 1024);
           if (!isImageSizeValid) {
             wx.showToast({
@@ -507,7 +512,7 @@ Component({
           });
 
           const finalFileList = [...tempFiles];
-          console.log("final", finalFileList);
+          // console.log("final", finalFileList);
           self.setData({
             sendFileList: finalFileList, //
           });
@@ -549,11 +554,11 @@ Component({
           cancelText: "取消",
           confirmText: "确认",
           success(res) {
-            console.log("res", res);
+            // console.log("res", res);
             self.chooseMedia(sourceType);
           },
           fail(error) {
-            console.log("choose file e", error);
+            // console.log("choose file e", error);
           },
         });
       } else {
@@ -561,10 +566,10 @@ Component({
       }
     },
     chooseMessageFile: function () {
-      console.log("触发choose");
+      // console.log("触发choose");
       const self = this;
       const oldFileLen = this.data.sendFileList.filter((item) => item.rawType === "file").length;
-      console.log("oldFileLen", oldFileLen);
+      // console.log("oldFileLen", oldFileLen);
       const subFileCount = oldFileLen <= 5 ? 5 - oldFileLen : 0;
       if (subFileCount === 0) {
         wx.showToast({
@@ -579,7 +584,7 @@ Component({
         success(res) {
           // tempFilePath可以作为img标签的src属性显示图片
           // const tempFilePaths = res.tempFiles;
-          console.log("res", res);
+          // console.log("res", res);
           // 检验文件后缀
           const isFileExtValid = res.tempFiles.every((item) => self.checkFileExt(item.name.split(".")[1]));
           if (!isFileExtValid) {
@@ -777,7 +782,8 @@ Component({
       // 新增一轮对话记录时 自动往下滚底
       this.autoToBottom();
       if (chatMode === "bot") {
-        const ai = this.data.aiInstance||wx.cloud.extend.AI;
+        const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+        const ai=cloudInstance.extend.AI;
         const res = await ai.bot.sendMessage({
           data: {
             botId: bot.botId,
@@ -1000,7 +1006,8 @@ Component({
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
         }); // 对话完成，切回0 ,并且修改最后一条消息的状态，让下面的按钮展示
         if (bot.isNeedRecommend && !isManuallyPaused) {
-          const ai = this.data.aiInstance||wx.cloud.extend.AI;
+          const cloudInstance = await getCloudInstance(this.data.envShareConfig)
+          const ai=cloudInstance.extend.AI;
           const chatRecords = this.data.chatRecords;
           const lastPairChatRecord = chatRecords.length >= 2 ? chatRecords.slice(chatRecords.length - 2) : [];
           const recommendRes = await ai.bot.getRecommendQuestions({
@@ -1029,8 +1036,8 @@ Component({
       }
       if (chatMode === "model") {
         const { modelProvider, quickResponseModel } = modelConfig;
-        console.log('ryan',this.data.aiInstance)
-        const ai=this.data.aiInstance||wx.cloud.extend.AI
+        const cloudInstance= await getCloudInstance(this.data.envShareConfig)
+        const ai=cloudInstance.extend.AI;
         const aiModel = ai.createModel(modelProvider);
         const res = await aiModel.streamText({
           data: {
