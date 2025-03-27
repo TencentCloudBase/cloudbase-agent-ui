@@ -20,6 +20,7 @@ Page({
       allowPullRefresh: true, // 允许下拉刷新
       allowUploadImage: true, // 允许上传图片
       showToolCallDetail: true, // 展示 toolCall 细节
+      allowMultiConversation: true,
     },
     modelConfig: {
       modelProvider: "deepseek", // 大模型服务厂商

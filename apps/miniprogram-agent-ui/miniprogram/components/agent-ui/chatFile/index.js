@@ -35,64 +35,31 @@ Component({
           const appBaseInfo = wx.getAppBaseInfo();
           const fileId = res.fileID;
           this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, status: "parsing" });
-
           console.log("当前版本", appBaseInfo.SDKVersion);
-          // 3.8.1 及以上版本走sdk 内置方法
-          if (compareVersions(appBaseInfo.SDKVersion, "3.8.1") < 0) {
-            const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
-            commonRequest({
-              url: `https://${
-                cloudInstance.env || cloudInstance.extend.AI.bot.context.env
-              }.api.tcloudbasegateway.com/v1/aibot/bots/${botId}/files`,
-              data: {
-                fileList: [
-                  {
-                    fileName: rawFileName || tempFileName,
-                    fileId,
-                    type: rawType,
-                  },
-                ],
-              },
-              header: {
-                Authorization: `Bearer ${token}`,
-              },
-              method: "POST",
-              success: (res) => {
-                console.log("old resolve agent file res", res);
-                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
-              },
-              fail: (e) => {
-                console.log("resolve agent file e", e);
-                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
-              },
-            });
-          } else {
-            const ai = cloudInstance.extend.AI;
-            ai.request({
-              path: `bots/${botId}/files`, // 填写 "v1/aibot/" 后面的内容
-              data: {
-                fileList: [
-                  {
-                    fileName: rawFileName || tempFileName,
-                    fileId,
-                    type: rawType,
-                  },
-                ],
-              }, // any
-              method: "POST",
-              timeout: 30000,
-              success: (res) => {
-                console.log("resolve agent file res", res);
-                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
-              },
-              fail: (e) => {
-                console.log("e", e);
-                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
-              },
-              complete: () => {},
-              header: {},
-            });
-          }
+          commonRequest({
+            path: `bots/${botId}/files`,
+            data: {
+              fileList: [
+                {
+                  fileName: rawFileName || tempFileName,
+                  fileId,
+                  type: rawType,
+                },
+              ],
+            }, // any
+            method: "POST",
+            timeout: 60000,
+            success: (res) => {
+              console.log("resolve agent file res", res);
+              this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
+            },
+            fail: (e) => {
+              console.log("e", e);
+              this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
+            },
+            complete: () => {},
+            header: {},
+          })
         },
         fail: (err) => {
           console.error("上传失败：", err);
