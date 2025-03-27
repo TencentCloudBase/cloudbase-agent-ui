@@ -72,5 +72,6 @@
     "include": []
   },
   "appid": "wx5ceb4e4809aa1d28",
-  "libVersion": "3.7.8"
+  "libVersion": "3.7.10",
+  "simulatorPluginLibVersion": {}
 }

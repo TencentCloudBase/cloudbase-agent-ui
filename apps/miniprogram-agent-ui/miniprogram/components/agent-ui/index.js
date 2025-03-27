@@ -1,5 +1,5 @@
 // components/agent-ui/index.js
-import { checkConfig, randomSelectInitquestion, getCloudInstance } from "./tools";
+import { checkConfig, randomSelectInitquestion, getCloudInstance, commonRequest } from "./tools";
 import md5 from "./md5.js";
 Component({
   properties: {
@@ -30,6 +30,7 @@ Component({
         allowWebSearch: Boolean,
         allowPullRefresh: Boolean,
         allowUploadImage: Boolean,
+        allowMultiConversation: Boolean,
         showToolCallDetail: Boolean,
       },
     },
@@ -80,6 +81,7 @@ Component({
     showWebSearchSwitch: false,
     showPullRefresh: true,
     showToolCallDetail: true,
+    showMultiConversation: true,
     useWebSearch: false,
     showFeatureList: false,
     chatStatus: 0, // 页面状态： 0-正常状态，可输入，可发送， 1-发送中 2-思考中 3-输出content中
@@ -96,6 +98,17 @@ Component({
     textareaHeight: 50,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
     curScrollHeight: 0,
+    isDrawerShow: false,
+    conversations: [],
+    transformConversations: {},
+    conversationPageOptions: {
+      page: 1,
+      size: 15,
+      total: 0,
+    },
+    conversation: null,
+    defaultConversation: null, // 旧结构默认会话
+    fetchConversationLoading: false,
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -133,14 +146,21 @@ Component({
       const { chatRecords } = this.data;
       // 随机选取三个初始化问题
       const questions = randomSelectInitquestion(bot.initQuestions, 3);
-      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage, showToolCallDetail } =
-        this.data.agentConfig;
-      // console.log("allowWebSearch", allowWebSearch);
+      let {
+        allowWebSearch,
+        allowUploadFile,
+        allowPullRefresh,
+        allowUploadImage,
+        showToolCallDetail,
+        allowMultiConversation,
+      } = this.data.agentConfig;
+      console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
       showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
+      allowMultiConversation = allowMultiConversation === undefined ? true : allowMultiConversation;
       this.setData({
         bot,
         questions,
@@ -150,7 +170,15 @@ Component({
         showUploadImg: allowUploadImage,
         showPullRefresh: allowPullRefresh,
         showToolCallDetail: showToolCallDetail,
+        showMultiConversation: allowMultiConversation,
       });
+      console.log("bot", this.data.bot);
+      if (chatMode === "bot" && this.data.bot.multiConversationEnable) {
+        // 拉一次默认旧会话
+        await this.fetchDefaultConversationList();
+        // 拉一遍新会话列表
+        await this.resetFetchConversationList();
+      }
     }
     const topHeight = await this.calculateContentInTop();
     // console.log('topHeight', topHeight)
@@ -208,6 +236,260 @@ Component({
         }
       }
       return "";
+    },
+    handleClickConversation: async function (e) {
+      // 清除旧的会话聊天记录
+      this.clearChatRecords();
+      const { conversation } = e.currentTarget.dataset;
+      this.setData({
+        isDrawerShow: false,
+        conversation: {
+          conversationId: conversation.conversationId,
+          title: conversation.title,
+        },
+        page: 1, // 重置历史记录分页参数
+        size: 10,
+      });
+      this.handleRefresh();
+      // // 拉取当前会话聊天记录
+      // const res = await wx.cloud.extend.AI.bot.getChatRecords({
+      //   botId: this.data.agentConfig.botId,
+      //   pageNumber: this.data.page,
+      //   pageSize: this.data.size,
+      //   sort: "desc",
+      //   conversationId: this.data.conversation?.conversationId || undefined,
+      // });
+      // if (res.recordList) {
+      // }
+    },
+    fetchDefaultConversationList: async function () {
+      try {
+        if (this.data.bot.botId) {
+          const res = await this.fetchConversationList(true, this.data.bot.botId);
+          if(res) {
+            const { data } = res
+            console.log('data default', data.code)
+            if (data && !data.code) {
+              console.log("data", data);
+              this.setData({
+                defaultConversation: data,
+                conversations: [data],
+                transformConversations: this.transformConversationList([data]),
+                // conversationPageOptions: {
+                //   ...this.data.conversationPageOptions,
+                //   total: data.total,
+                // },
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.log("fetchDefaultConversationList e", e);
+      }
+    },
+    fetchConversationList: async function (isDefault, botId) {
+      // const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
+      if (this.data.fetchConversationLoading) {
+        return;
+      }
+
+      return new Promise((resolve, reject) => {
+        const { page, size } = this.data.conversationPageOptions;
+        const limit = size;
+        const offset = (page - 1) * size;
+        this.setData({
+          fetchConversationLoading: true,
+        });
+
+        commonRequest({
+          path: `conversation/?botId=${botId}&limit=${limit}&offset=${offset}&isDefault=${isDefault}`,
+          method: "GET",
+          header: {},
+          success: (res) => {
+            console.log("conversation list res", res);
+            resolve(res);
+          },
+          fail(e) {
+            console.log("conversation list e", e);
+            reject(e);
+          },
+          complete: () => {
+            this.setData({
+              fetchConversationLoading: false,
+            });
+            // wx.hideLoading();
+          },
+        });
+      });
+    },
+    createConversation: async function () {
+      // const cloudInstance = await getCloudInstance();
+      // const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
+      return new Promise((resolve, reject) => {
+        commonRequest({
+          path: `conversation`,
+          header: {
+            // Authorization: `Bearer ${token}`,
+          },
+          data: {
+            botId: this.data.agentConfig.botId,
+          },
+          method: "POST",
+          success: (res) => {
+            console.log("create conversation res", res);
+            resolve(res);
+          },
+          fail(e) {
+            console.log("create conversation e", e);
+            reject(e);
+          },
+        });
+      });
+    },
+    clickCreateInDrawer: function () {
+      this.setData({
+        isDrawerShow: false,
+      });
+      this.createNewConversation();
+    },
+    createNewConversation: async function () {
+      if (!this.data.bot.multiConversationEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 多会话模式",
+        });
+        return;
+      }
+      // // TODO: 创建新对话
+      // const { data } = await this.createConversation();
+      // console.log("createRes", data);
+      this.clearChatRecords();
+      // this.setData({
+      //   conversation: {
+      //     conversationId: data.conversationId,
+      //     title: data.title,
+      //   },
+      // });
+    },
+    scrollConToBottom: async function (e) {
+      console.log("scrollConToBottom", e);
+      const { page, size } = this.data.conversationPageOptions;
+      if (page * size >= this.data.conversationPageOptions.total) {
+        return;
+      }
+      this.setData({
+        conversationPageOptions: {
+          ...this.data.conversationPageOptions,
+          page: this.data.conversationPageOptions.page + 1,
+        },
+      });
+      console.log("conversationPageOptions", this.data.conversationPageOptions);
+      // 调用分页接口查询更多
+      if (this.data.bot.botId) {
+        const res = await this.fetchConversationList(false, this.data.bot.botId);
+        if(res) {
+          const { data } = res
+          if (data && !data.code) {
+            const addConversations = [...this.data.conversations, ...data.data];
+            // TODO: 临时倒序处理
+            const sortConData = addConversations.sort(
+              (a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
+            );
+            this.setData({
+              conversations: sortConData,
+              transformConversations: this.transformConversationList(sortConData),
+            });
+          }
+        }
+      }
+    },
+    resetFetchConversationList: async function () {
+      this.setData({
+        conversationPageOptions: {
+          page: 1,
+          size: 15,
+          total: 0,
+        },
+      });
+      try {
+        if (this.data.bot.botId) {
+          const res = await this.fetchConversationList(false, this.data.bot.botId);
+          console.log("res", res);
+          if (res) {
+            const { data } = res;
+            if (data && !data.code) {
+              // TODO: 临时倒序处理
+              const sortData = data.data.sort(
+                (a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
+              );
+              console.log("sortData", sortData);
+              const finalConData = this.data.defaultConversation
+                ? sortData.concat(this.data.defaultConversation)
+                : sortData;
+              console.log("finalConData", finalConData);
+              this.setData({
+                conversations: finalConData,
+                transformConversations: this.transformConversationList(finalConData),
+                conversationPageOptions: {
+                  ...this.data.conversationPageOptions,
+                  total: data.total,
+                },
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.log("fetchConversationList e", e);
+      }
+    },
+    transformConversationList: function (conversations) {
+      // 区分今天，本月，更早
+      const todayCon = [];
+      const curMonthCon = [];
+      const earlyCon = [];
+      const now = new Date();
+      const todayDate = now.setHours(0, 0, 0, 0);
+      const monthFirstDate = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      for (let item of conversations) {
+        const itemDate = new Date(item.createTime).getTime();
+        if (itemDate >= todayDate) {
+          todayCon.push(item);
+        } else if (itemDate >= monthFirstDate) {
+          curMonthCon.push(item);
+        } else {
+          earlyCon.push(item);
+        }
+      }
+      console.log("todayCon curMonthCon earlyCon", todayCon, curMonthCon, earlyCon);
+      return {
+        todayCon,
+        curMonthCon,
+        earlyCon,
+      };
+    },
+    openDrawer: async function () {
+      if (!this.data.bot.multiConversationEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 多会话模式",
+        });
+        return;
+      }
+      this.setData({
+        isDrawerShow: true,
+        // conversationPageOptions: {
+        //   ...this.data.conversationPageOptions,
+        //   page: 1,
+        //   size: 15,
+        // },
+      });
+
+      // await this.fetchHistoryConversationData();
+    },
+    closeDrawer() {
+      this.setData({
+        isDrawerShow: false,
+      });
     },
     showErrorMsg: function (e) {
       const { content, reqid } = e.currentTarget.dataset;
@@ -442,11 +724,22 @@ Component({
               pageSize: this.data.size,
               sort: "desc",
             };
+            if (this.data.conversation?.conversationId) {
+              getRecordsReq.conversationId = this.data.conversation?.conversationId;
+            }
             const res = await ai.bot.getChatRecords(getRecordsReq);
             if (res.recordList) {
               this.setData({
                 total: res.total,
               });
+
+              if (this.data.total === this.data.chatRecords.length - 1) {
+                this.setData({
+                  triggered: false,
+                  refreshText: "到底啦",
+                });
+                return;
+              }
 
               // 找出新获取的一页中，不在内存中的数据
               const freshNum = this.data.size - ((this.data.chatRecords.length - 1) % this.data.size);
@@ -509,6 +802,7 @@ Component({
       );
     },
     clearChatRecords: function () {
+      console.log("执行清理");
       const chatMode = this.data.chatMode;
       const { bot } = this.data;
       this.setData({ showTools: false });
@@ -520,9 +814,9 @@ Component({
         return;
       }
       // 只有一条不需要清
-      if (this.data.chatRecords.length === 1) {
-        return;
-      }
+      // if (this.data.chatRecords.length === 1) {
+      //   return;
+      // }
       const record = {
         content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
@@ -535,6 +829,7 @@ Component({
         chatStatus: 0,
         questions,
         page: 1, // 重置分页页码
+        conversation: null,
       });
     },
     chooseMedia: function (sourceType) {
@@ -846,14 +1141,53 @@ Component({
       if (chatMode === "bot") {
         const cloudInstance = await getCloudInstance(this.data.envShareConfig);
         const ai = cloudInstance.extend.AI;
-        const res = await ai.bot.sendMessage({
-          data: {
+        // const ai = wx.cloud.extend.AI;
+        // 区分当前是旧的单会话模式 or 新的多会话模式
+        let res;
+        if (!this.data.bot.multiConversationEnable) {
+          // 单会话
+          res = await ai.bot.sendMessage({
+            data: {
+              botId: bot.botId,
+              msg: inputValue,
+              files: this.data.showUploadFile ? userRecord.fileList.map((item) => item.fileId) : undefined,
+              searchEnable: this.data.useWebSearch,
+            },
+          });
+        } else {
+          // 多会话
+          if (!this.data.conversation && this.data.bot.multiConversationEnable) {
+            // 发消息前构造新会话
+            try {
+              const { data } = await this.createConversation();
+              this.setData({
+                conversation: {
+                  conversationId: data.conversationId,
+                  title: data.title,
+                },
+              });
+            } catch (e) {
+              console.log("createConversation e", e);
+            }
+          }
+
+          const sendReq = {
             botId: bot.botId,
             msg: inputValue,
             files: this.data.showUploadFile ? userRecord.fileList.map((item) => item.fileId) : undefined,
             searchEnable: this.data.useWebSearch,
-          },
-        });
+          };
+
+          if (this.data.conversation?.conversationId) {
+            sendReq.conversationId = this.data.conversation.conversationId;
+          }
+
+          res = await ai.bot.sendMessage({
+            data: sendReq,
+          });
+          // 当前已产生新会话，重刷一遍
+          await this.resetFetchConversationList();
+        }
         let contentText = "";
         let reasoningContentText = "";
         let isManuallyPaused = false; //这个标记是为了处理手动暂停时，不要请求推荐问题，不显示下面的按钮
@@ -1260,16 +1594,16 @@ Component({
       // curFile.fileId = fileId
       const newSendFileList = this.data.sendFileList.map((item) => {
         if (item.tempId === tempId) {
-          const obj = {}
-          if(fileId) {
-            obj.fileId = fileId
+          const obj = {};
+          if (fileId) {
+            obj.fileId = fileId;
           }
-          if(status) {
-            obj.status = status
+          if (status) {
+            obj.status = status;
           }
           return {
             ...item,
-            ...obj
+            ...obj,
           };
         }
         return item;
