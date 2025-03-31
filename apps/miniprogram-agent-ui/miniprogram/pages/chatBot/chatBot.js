@@ -4,7 +4,7 @@ Page({
    * 页面的初始数据
    */
   data: {
-    chatMode: "model", // bot 表示使用agent，model 表示使用大模型
+    chatMode: "bot", // bot 表示使用agent，model 表示使用大模型
     showBotAvatar: true, // 是否在对话框左侧显示头像
     // envShareConfig: {
     //   // 不使用环境共享，请删除此配置或配置EnvShareConfig:null
@@ -14,7 +14,7 @@ Page({
     //   resourceEnv: "chriscc-demo-7ghlpjf846d46d2d",
     // },
     agentConfig: {
-      botId: "bot-9e014f20", // agent id,
+      botId: "bot-db3cab4a", // agent id,
       allowWebSearch: true, // 允许客户端选择启用联网搜索
       allowUploadFile: true, // 允许上传文件
       allowPullRefresh: true, // 允许下拉刷新

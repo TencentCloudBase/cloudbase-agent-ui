@@ -1,5 +1,5 @@
 // components/agent-ui/index.js
-import { checkConfig, randomSelectInitquestion,getCloudInstance } from "./tools";
+import { checkConfig, randomSelectInitquestion, getCloudInstance } from "./tools";
 import md5 from "./md5.js";
 Component({
   properties: {
@@ -7,12 +7,12 @@ Component({
       type: String,
       value: "",
     },
-    envShareConfig:{
-      type:Object,
-      value:{
-        resourceAppid:String,
-        resourceEnv:String
-      }
+    envShareConfig: {
+      type: Object,
+      value: {
+        resourceAppid: String,
+        resourceEnv: String,
+      },
     },
     showBotAvatar: {
       type: Boolean,
@@ -30,7 +30,7 @@ Component({
         allowWebSearch: Boolean,
         allowPullRefresh: Boolean,
         allowUploadImage: Boolean,
-        showToolCallDetail: Boolean
+        showToolCallDetail: Boolean,
       },
     },
     modelConfig: {
@@ -107,10 +107,10 @@ Component({
       return;
     }
     // 初始化一次cloudInstance，它是单例的，后面不传参数也可以获取到
-    const cloudInstance=await getCloudInstance(this.data.envShareConfig)
+    const cloudInstance = await getCloudInstance(this.data.envShareConfig);
     if (chatMode === "bot") {
       const { botId } = this.data.agentConfig;
-      const ai=cloudInstance.extend.AI;
+      const ai = cloudInstance.extend.AI;
       const bot = await ai.bot.get({ botId });
       // 新增错误提示
       if (bot.code) {
@@ -131,13 +131,14 @@ Component({
       const { chatRecords } = this.data;
       // 随机选取三个初始化问题
       const questions = randomSelectInitquestion(bot.initQuestions, 3);
-      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage, showToolCallDetail } = this.data.agentConfig;
+      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage, showToolCallDetail } =
+        this.data.agentConfig;
       // console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
-      showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail
+      showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
       // console.log("allowUploadFile", allowUploadFile);
       this.setData({
         bot,
@@ -147,7 +148,7 @@ Component({
         showUploadFile: allowUploadFile,
         showUploadImg: allowUploadImage,
         showPullRefresh: allowPullRefresh,
-        showToolCallDetail: showToolCallDetail
+        showToolCallDetail: showToolCallDetail,
       });
     }
     const topHeight = await this.calculateContentInTop();
@@ -194,8 +195,8 @@ Component({
         );
         const curContent = callContentList[i];
         const curError = toolCallList.find(
-          // (item) => item.finish_reason === "error" && item.error.message.toolCallId === curParam.tool_call.id
-          (item) => item.finish_reason === "error"
+          (item) => item.finish_reason === "error" && item.error.message.toolCallId === curParam.tool_call.id
+          // (item) => item.finish_reason === "error"
         );
         const transformToolCallObj = {
           id: curParam.tool_call.id,
@@ -378,8 +379,8 @@ Component({
                 page: newPage,
               });
             }
-            const cloudInstance= await getCloudInstance(this.data.envShareConfig);
-            const ai=cloudInstance.extend.AI;
+            const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+            const ai = cloudInstance.extend.AI;
             const res = await ai.bot.getChatRecords({
               botId: this.data.agentConfig.botId,
               pageNumber: this.data.page,
@@ -783,7 +784,7 @@ Component({
       this.autoToBottom();
       if (chatMode === "bot") {
         const cloudInstance = await getCloudInstance(this.data.envShareConfig);
-        const ai=cloudInstance.extend.AI;
+        const ai = cloudInstance.extend.AI;
         const res = await ai.bot.sendMessage({
           data: {
             botId: bot.botId,
@@ -914,7 +915,7 @@ Component({
                 const lastToolCallObj = toolCallList[toolCallList.length - 1];
                 if (lastToolCallObj.callParams && !lastToolCallObj.callResult) {
                   isToolCallContent = true;
-                  lastToolCallObj.content += content.replaceAll("\t", "");
+                  lastToolCallObj.content += content.replaceAll("\t", "").replaceAll("\n", "\n\n");
                   this.setData({
                     [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
                     chatStatus: 3,
@@ -1006,8 +1007,8 @@ Component({
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
         }); // 对话完成，切回0 ,并且修改最后一条消息的状态，让下面的按钮展示
         if (bot.isNeedRecommend && !isManuallyPaused) {
-          const cloudInstance = await getCloudInstance(this.data.envShareConfig)
-          const ai=cloudInstance.extend.AI;
+          const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+          const ai = cloudInstance.extend.AI;
           const chatRecords = this.data.chatRecords;
           const lastPairChatRecord = chatRecords.length >= 2 ? chatRecords.slice(chatRecords.length - 2) : [];
           const recommendRes = await ai.bot.getRecommendQuestions({
@@ -1036,8 +1037,8 @@ Component({
       }
       if (chatMode === "model") {
         const { modelProvider, quickResponseModel } = modelConfig;
-        const cloudInstance= await getCloudInstance(this.data.envShareConfig)
-        const ai=cloudInstance.extend.AI;
+        const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+        const ai = cloudInstance.extend.AI;
         const aiModel = ai.createModel(modelProvider);
         const res = await aiModel.streamText({
           data: {
