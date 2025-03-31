@@ -105,6 +105,16 @@ Page({
         type: "boolean",
         desc: "允许上传图片",
       },
+      {
+        name: "envShareConfig.resourceAppid",
+        type: "boolean",
+        desc: "环境共享资源方 AppID",
+      },
+      {
+        name: "envShareConfig.resourceEnv",
+        type: "boolean",
+        desc: "环境共享资源方环境 ID",
+      },
     ],
     guide: [
       `{

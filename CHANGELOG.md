@@ -2,6 +2,28 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.8.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.7.0...v1.8.0) (2025-03-31)
+
+
+### Features
+
+* 环境共享迁移完成 ([16f48cb](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/16f48cbbf96b6d8ea9ae0eee4c7b6b374af330df))
+* 添加环境共享 ([48d5180](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/48d51801417a485836652401ba79fabea94a23d2))
+* 添加环境共享参数 ([0946290](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/0946290c6e3c90acdd93776556f1544f3a52fde6))
+* support mcp ([f6b6663](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/f6b66636135d84a77dfa48ddf2c03ec7f8388491))
+
+
+### Bug Fixes
+
+* 继续优化scroll-view 高度设置 ([b520964](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/b520964192f15c70715bc07850f54fb59453857c))
+* 修复并发toolcall 处理 ([46c2a5a](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/46c2a5a4513ffcee7c367e67a8ab6d4ce0efcaf0))
+* 修复图链问题 ([5801646](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/5801646283296cfc55b337ee3ded3eb39251e46e))
+* 优化scroll height 计算 ([640adc0](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/640adc058a45bb1e210c89256889c69097b792af))
+* add toolCall detail config ([a951f14](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/a951f14a04685aad772f2fc0d4ae89288089969c))
+* fix style ([57589ab](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/57589ab8303f3ecbb50818d1ef9125d39100d3b3))
+* remove some var ([bf6afbb](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/bf6afbbc965a19934a4cd01548aa4f9ff6519cc2))
+* toolcall name fix ([ef747a8](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/ef747a8149e7d249f6b196dcbadb9253d682cb10))
+
 ## [1.7.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.6.0...v1.7.0) (2025-03-21)
 
 

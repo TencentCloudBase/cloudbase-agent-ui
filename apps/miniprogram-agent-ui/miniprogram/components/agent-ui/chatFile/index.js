@@ -1,7 +1,8 @@
 // components/agent-ui-new/chatFIle/chatFile.js
+import {getCloudInstance} from '../tools'
 Component({
   lifetimes: {
-    attached: function () {
+    attached: async function () {
       console.log('enableDel', this.data.enableDel)
       const { tempFileName, rawFileName, rawType, tempPath, fileId, botId, parsed } = this.data.fileData
       const type = this.getFileType(rawFileName || tempFileName)
@@ -20,20 +21,21 @@ Component({
         })
         return
       }
-
+      const cloudInstance= await getCloudInstance()
+      // console.log('file', cloudInstance)
       // 上传云存储获取 fileId
       // console.log('rawFileName tempFileName tempPath', rawFileName, tempFileName, tempPath)
-      wx.cloud.uploadFile({
+      cloudInstance.uploadFile({
         cloudPath: this.generateCosUploadPath(botId, rawFileName ? (rawFileName.split('.')[0] + '-' + tempFileName) : tempFileName), // 云上文件路径
         filePath: tempPath,
         success: async res => {
-          const { token } = await wx.cloud.extend.AI.bot.tokenManager.getToken()
+          const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken()
           const fileId = res.fileID
           this.setData({
             formatSize: '解析中',
           })
           wx.request({
-            url: `https://${wx.cloud.extend.AI.bot.context.env}.api.tcloudbasegateway.com/v1/aibot/bots/${botId}/files`,
+            url: `https://${cloudInstance.env||cloudInstance.extend.AI.bot.context.env}.api.tcloudbasegateway.com/v1/aibot/bots/${botId}/files`,
             data: {
               fileList: [{
                 fileName: rawFileName || tempFileName,
@@ -182,7 +184,7 @@ Component({
         }
       })
     },
-    openFile: function () {
+    openFile: async function () {
       if (this.data.fileData.tempPath) {
         // 本地上传的文件
         if (this.data.fileData.rawType === 'file') {
@@ -195,7 +197,8 @@ Component({
         }
       } else if (this.data.fileData.fileId) {
         // 针对历史记录中带cloudID的处理（历史记录中附带的文件）
-        wx.cloud.downloadFile({
+        const cloudInsatnce=await getCloudInstance()
+        cloudInsatnce.downloadFile({
           fileID: this.data.fileData.fileId,
           success: res => {
             console.log('download res', res)
