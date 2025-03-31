@@ -158,6 +158,17 @@ Component({
     });
   },
   methods: {
+    transformToolName: function (str) {
+      if (str) {
+        const strArr = str.split("/");
+        if (strArr[1]) {
+          return strArr[1];
+        } else if (strArr[0]) {
+          return strArr[0];
+        }
+      }
+      return "";
+    },
     showErrorMsg: function (e) {
       const { content, reqid } = e.currentTarget.dataset;
       // console.log("content", content);
@@ -200,7 +211,7 @@ Component({
         );
         const transformToolCallObj = {
           id: curParam.tool_call.id,
-          name: curParam.tool_call.function.name,
+          name: this.transformToolName(curParam.tool_call.function.name),
           callParams: "```json\n\n" + JSON.stringify(curParam.tool_call.function.arguments, null, 2) + "\n```",
           content: ((curContent && curContent.content) || "").replaceAll("\t", "").replaceAll("\n", "\n\n"),
         };
@@ -958,7 +969,7 @@ Component({
               const { tool_call } = dataJson;
               const callBody = {
                 id: tool_call.id,
-                name: tool_call.function.name,
+                name: this.transformToolName(tool_call.function.name),
                 callParams: "```json\n" + JSON.stringify(tool_call.function.arguments, null, 2) + "\n```",
                 content: "",
               };
