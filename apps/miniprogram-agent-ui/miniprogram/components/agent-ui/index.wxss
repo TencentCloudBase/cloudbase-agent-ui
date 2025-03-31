@@ -315,6 +315,7 @@
   margin-right: 32rpx;
   border-radius: 12rpx;
   padding-bottom: 16px;
+  margin-top: 16px;
   box-sizing: border-box;
   position: relative;
 }

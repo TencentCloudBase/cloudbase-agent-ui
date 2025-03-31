@@ -9,6 +9,7 @@
 .wd-markdown ._p {
   margin-bottom: 10rpx;
   line-height: 1.8;
+  word-break: break-all;
 }
 .wd-markdown ._ol {
   margin-bottom: 30rpx;
