@@ -800,6 +800,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
+          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -912,10 +913,11 @@ Component({
               let isToolCallContent = false;
               const toolCallList = lastValue.toolCallList;
               if (toolCallList && toolCallList.length) {
-                const lastToolCallObj = toolCallList[toolCallList.length - 1];
-                if (lastToolCallObj.callParams && !lastToolCallObj.callResult) {
+                // const lastToolCallObj = toolCallList[toolCallList.length - 1];
+                const findToolCallObj = toolCallList.find((item) => item.callParams && !item.callResult);
+                if (findToolCallObj) {
                   isToolCallContent = true;
-                  lastToolCallObj.content += content.replaceAll("\t", "").replaceAll("\n", "\n\n");
+                  findToolCallObj.content += content.replaceAll("\t", "").replaceAll("\n", "\n\n");
                   this.setData({
                     [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
                     chatStatus: 3,
