@@ -1,11 +1,18 @@
 // components/agent-ui/index.js
-import { checkConfig, randomSelectInitquestion } from "./tools";
+import { checkConfig, randomSelectInitquestion, getCloudInstance } from "./tools";
 import md5 from "./md5.js";
 Component({
   properties: {
     chatMode: {
       type: String,
       value: "",
+    },
+    envShareConfig: {
+      type: Object,
+      value: {
+        resourceAppid: String,
+        resourceEnv: String,
+      },
     },
     showBotAvatar: {
       type: Boolean,
@@ -23,6 +30,7 @@ Component({
         allowWebSearch: Boolean,
         allowPullRefresh: Boolean,
         allowUploadImage: Boolean,
+        showToolCallDetail: Boolean,
       },
     },
     modelConfig: {
@@ -43,43 +51,6 @@ Component({
         showFeatureList: showWebSearchSwitch,
       });
     },
-    showTools: function (isShow) {
-      // console.log('showTools', isShow)
-      if (isShow) {
-        this.setData({
-          footerHeight: this.data.footerHeight + 80,
-        });
-      } else {
-        this.setData({
-          footerHeight: this.data.footerHeight - 80,
-        });
-      }
-    },
-    showFileList: function (isShow) {
-      console.log("showFileList", isShow);
-      if (isShow) {
-        this.setData({
-          footerHeight: this.data.footerHeight + 80,
-        });
-      } else {
-        this.setData({
-          footerHeight: this.data.footerHeight - 80,
-        });
-      }
-    },
-    showFeatureList: function (isShow) {
-      console.log("showFeatureList", isShow);
-      if (isShow) {
-        this.setData({
-          footerHeight: this.data.footerHeight + 30,
-        });
-      } else {
-        const subHeight = this.data.footerHeight - 30;
-        this.setData({
-          footerHeight: subHeight >= 80 ? subHeight : 80,
-        });
-      }
-    },
   },
 
   data: {
@@ -90,10 +61,8 @@ Component({
     inputValue: "",
     output: "",
     chatRecords: [],
-    scrollTop: 0,
     setPanelVisibility: false,
     questions: [],
-    scrollTop: 0,
     scrollTop: 0, // 文字撑起来后能滚动的最大高度
     viewTop: 0, // 根据实际情况，可能用户手动滚动，需要记录当前滚动的位置
     scrollTo: "", // 快速定位到指定元素，置底用
@@ -103,12 +72,12 @@ Component({
     showFileList: false, // 展示输入框顶部文件行
     showTopBar: false, // 展示顶部bar
     sendFileList: [],
-    footerHeight: 73,
     lastScrollTop: 0,
     showUploadFile: true,
     showUploadImg: true,
     showWebSearchSwitch: false,
     showPullRefresh: true,
+    showToolCallDetail: true,
     useWebSearch: false,
     showFeatureList: false,
     chatStatus: 0, // 页面状态： 0-正常状态，可输入，可发送， 1-发送中 2-思考中 3-输出content中
@@ -123,8 +92,8 @@ Component({
     feedbackRecordId: "",
     feedbackType: "",
     textareaHeight: 50,
-    curLineCount: 1,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
+    curScrollHeight: 0,
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -137,9 +106,11 @@ Component({
       });
       return;
     }
+    // 初始化一次cloudInstance，它是单例的，后面不传参数也可以获取到
+    const cloudInstance = await getCloudInstance(this.data.envShareConfig);
     if (chatMode === "bot") {
       const { botId } = this.data.agentConfig;
-      const ai = wx.cloud.extend.AI;
+      const ai = cloudInstance.extend.AI;
       const bot = await ai.bot.get({ botId });
       // 新增错误提示
       if (bot.code) {
@@ -152,7 +123,7 @@ Component({
 
       // 初始化第一条记录为welcomeMessage
       const record = {
-        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
+        content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -160,13 +131,15 @@ Component({
       const { chatRecords } = this.data;
       // 随机选取三个初始化问题
       const questions = randomSelectInitquestion(bot.initQuestions, 3);
-      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage } = this.data.agentConfig;
-      console.log("allowWebSearch", allowWebSearch);
+      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage, showToolCallDetail } =
+        this.data.agentConfig;
+      // console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
-      console.log("allowUploadFile", allowUploadFile);
+      showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
+      // console.log("allowUploadFile", allowUploadFile);
       this.setData({
         bot,
         questions,
@@ -175,6 +148,7 @@ Component({
         showUploadFile: allowUploadFile,
         showUploadImg: allowUploadImage,
         showPullRefresh: allowPullRefresh,
+        showToolCallDetail: showToolCallDetail,
       });
     }
     const topHeight = await this.calculateContentInTop();
@@ -184,16 +158,76 @@ Component({
     });
   },
   methods: {
+    transformToolName: function (str) {
+      if (str) {
+        const strArr = str.split("/");
+        if (strArr[1]) {
+          return strArr[1];
+        } else if (strArr[0]) {
+          return strArr[0];
+        }
+      }
+      return "";
+    },
     showErrorMsg: function (e) {
-      const { content } = e.currentTarget.dataset;
-      console.log("content", content);
+      const { content, reqid } = e.currentTarget.dataset;
+      // console.log("content", content);
+      const transformContent =
+        typeof content === "string"
+          ? reqid
+            ? `${content}|reqId:${reqid}`
+            : content
+          : JSON.stringify({ content, reqid });
       wx.showModal({
         title: "错误原因",
-        content: typeof content === "string" ? content : JSON.stringify({ content }),
+        content: transformContent,
+        success() {
+          wx.setClipboardData({
+            data: transformContent,
+            success: function (res) {
+              wx.showToast({
+                title: "复制错误完成",
+                icon: "success",
+              });
+            },
+          });
+        },
       });
     },
+    transformToolCallHistoryList: function (toolCallList) {
+      const callParamsList = toolCallList.filter((item) => item.type === "tool-call");
+      // const callResultList = toolCallList.filter(item => item.type === 'tool-result')
+      const callContentList = toolCallList.filter((item) => item.type === "text");
+      const transformToolCallList = [];
+      for (let i = 0; i < callParamsList.length; i++) {
+        const curParam = callParamsList[i];
+        const curResult = toolCallList.find(
+          (item) => item.type === "tool-result" && item.toolCallId === curParam.tool_call.id
+        );
+        const curContent = callContentList[i];
+        const curError = toolCallList.find(
+          (item) => item.finish_reason === "error" && item.error.message.toolCallId === curParam.tool_call.id
+          // (item) => item.finish_reason === "error"
+        );
+        const transformToolCallObj = {
+          id: curParam.tool_call.id,
+          name: this.transformToolName(curParam.tool_call.function.name),
+          callParams: "```json\n\n" + JSON.stringify(curParam.tool_call.function.arguments, null, 2) + "\n```",
+          content: ((curContent && curContent.content) || "").replaceAll("\t", "").replaceAll("\n", "\n\n"),
+        };
+        if (curResult) {
+          transformToolCallObj.callResult = "```json\n\n" + JSON.stringify(curResult.result, null, 2) + "\n```";
+        }
+        if (curError) {
+          transformToolCallObj.error = curError;
+        }
+
+        transformToolCallList.push(transformToolCallObj);
+      }
+      return transformToolCallList;
+    },
     handleLineChange: function (e) {
-      console.log("linechange", e.detail.lineCount);
+      // console.log("linechange", e.detail.lineCount);
       // 查foot-function height
       const self = this;
       const query = wx.createSelectorQuery().in(this);
@@ -201,21 +235,11 @@ Component({
         .select(".foot_function")
         .boundingClientRect(function (res) {
           if (res) {
-            if (res.height < self.data.textareaHeight) {
-              self.setData({
-                footerHeight: self.data.footerHeight - (self.data.textareaHeight - res.height),
-              });
-            }
-            if (res.height > self.data.textareaHeight) {
-              self.setData({
-                footerHeight: self.data.footerHeight + (res.height - self.data.textareaHeight),
-              });
-            }
             self.setData({
               textareaHeight: res.height,
             });
           } else {
-            console.log("未找到指定元素");
+            // console.log("未找到指定元素");
           }
         })
         .exec();
@@ -333,12 +357,10 @@ Component({
       });
     },
     autoToBottom: function () {
-      // console.log("autoToBottom");
       this.setData({
         manualScroll: false,
         scrollTo: "scroll-bottom",
       });
-      // console.log('scrollTop', this.data.scrollTop);
     },
     bindInputFocus: function (e) {
       this.setData({
@@ -368,7 +390,9 @@ Component({
                 page: newPage,
               });
             }
-            const res = await wx.cloud.extend.AI.bot.getChatRecords({
+            const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+            const ai = cloudInstance.extend.AI;
+            const res = await ai.bot.getChatRecords({
               botId: this.data.agentConfig.botId,
               pageNumber: this.data.page,
               pageSize: this.data.size,
@@ -401,12 +425,30 @@ Component({
                   if (item.role === "assistant" && item.content === "") {
                     transformItem.content = this.data.defaultErrorMsg;
                   }
+                  if (item.role === "assistant" && item.origin_msg) {
+                    // console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
+                    const origin_msg_obj = JSON.parse(item.origin_msg);
+                    if (origin_msg_obj.aiResHistory) {
+                      const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
+                      transformItem.toolCallList = transformToolCallList;
+                      const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
+                      // console.log("toolCallErr", toolCallErr);
+                      if (toolCallErr?.error?.message) {
+                        transformItem.error = toolCallErr.error.message;
+                        transformItem.reqId = item.trace_id || "";
+                      }
+                    } else {
+                      // 之前异常的返回
+                      // return null
+                    }
+                  }
                   return transformItem;
-                });
+                })
+                .filter((item) => item);
               this.setData({
                 chatRecords: [...freshChatRecords, ...this.data.chatRecords],
               });
-              console.log("totalChatRecords", this.data.chatRecords);
+              // console.log("totalChatRecords", this.data.chatRecords);
             }
             this.setData({
               triggered: false,
@@ -432,7 +474,7 @@ Component({
         return;
       }
       const record = {
-        content: bot.welcomeMessage || "您好，有什么需要帮助您的？",
+        content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
         role: "assistant",
         hiddenBtnGround: true,
@@ -454,8 +496,8 @@ Component({
         maxDuration: 30,
         camera: "back",
         success(res) {
-          console.log("res", res);
-          console.log("tempFiles", res.tempFiles);
+          // console.log("res", res);
+          // console.log("tempFiles", res.tempFiles);
           const isImageSizeValid = res.tempFiles.every((item) => item.size <= 30 * 1024 * 1024);
           if (!isImageSizeValid) {
             wx.showToast({
@@ -482,7 +524,7 @@ Component({
           });
 
           const finalFileList = [...tempFiles];
-          console.log("final", finalFileList);
+          // console.log("final", finalFileList);
           self.setData({
             sendFileList: finalFileList, //
           });
@@ -524,11 +566,11 @@ Component({
           cancelText: "取消",
           confirmText: "确认",
           success(res) {
-            console.log("res", res);
+            // console.log("res", res);
             self.chooseMedia(sourceType);
           },
           fail(error) {
-            console.log("choose file e", error);
+            // console.log("choose file e", error);
           },
         });
       } else {
@@ -536,10 +578,10 @@ Component({
       }
     },
     chooseMessageFile: function () {
-      console.log("触发choose");
+      // console.log("触发choose");
       const self = this;
       const oldFileLen = this.data.sendFileList.filter((item) => item.rawType === "file").length;
-      console.log("oldFileLen", oldFileLen);
+      // console.log("oldFileLen", oldFileLen);
       const subFileCount = oldFileLen <= 5 ? 5 - oldFileLen : 0;
       if (subFileCount === 0) {
         wx.showToast({
@@ -554,7 +596,7 @@ Component({
         success(res) {
           // tempFilePath可以作为img标签的src属性显示图片
           // const tempFilePaths = res.tempFiles;
-          console.log("res", res);
+          // console.log("res", res);
           // 检验文件后缀
           const isFileExtValid = res.tempFiles.every((item) => self.checkFileExt(item.name.split(".")[1]));
           if (!isFileExtValid) {
@@ -751,9 +793,9 @@ Component({
 
       // 新增一轮对话记录时 自动往下滚底
       this.autoToBottom();
-
       if (chatMode === "bot") {
-        const ai = wx.cloud.extend.AI;
+        const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+        const ai = cloudInstance.extend.AI;
         const res = await ai.bot.sendMessage({
           data: {
             botId: bot.botId,
@@ -769,6 +811,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
+          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -814,6 +857,23 @@ Component({
                 this.setData({
                   [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
                 });
+                if (lastValue.toolCallList && lastValue.toolCallList.length) {
+                  let errToolCallObj = null;
+                  if (typeof error.message === "string") {
+                    errToolCallObj = lastValue.toolCallList[lastValue.toolCallList.length - 1];
+                  } else {
+                    if (error.message?.toolCallId) {
+                      errToolCallObj = lastValue.toolCallList.find((item) => item.id === error.message.toolCallId);
+                    }
+                  }
+                  if (errToolCallObj && !errToolCallObj.callResult) {
+                    errToolCallObj.error = error;
+                    this.setData({
+                      [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                    });
+                    this.autoToBottom();
+                  }
+                }
               }
               this.setData({
                 [`chatRecords[${lastValueIndex}].search_info`]: lastValue.search_info,
@@ -822,6 +882,12 @@ Component({
                 [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
                 [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
               });
+              // if (error) {
+              //   lastValue.error = error;
+              //   this.setData({
+              //     [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
+              //   });
+              // }
               break;
             }
             // 下面根据type来确定输出的内容
@@ -854,13 +920,32 @@ Component({
             }
             // 内容
             if (type === "text") {
-              contentText += content;
-              lastValue.content = contentText;
-              this.setData({
-                [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
-                [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
-                chatStatus: 3,
-              }); // 聊天状态切换为输出content中
+              // 区分是 toolCall 的content 还是普通的 content
+              let isToolCallContent = false;
+              const toolCallList = lastValue.toolCallList;
+              if (toolCallList && toolCallList.length) {
+                // const lastToolCallObj = toolCallList[toolCallList.length - 1];
+                const findToolCallObj = toolCallList.find((item) => item.callParams && !item.callResult);
+                if (findToolCallObj) {
+                  isToolCallContent = true;
+                  findToolCallObj.content += content.replaceAll("\t", "").replaceAll("\n", "\n\n");
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                    chatStatus: 3,
+                  });
+                  this.autoToBottom();
+                }
+              }
+
+              if (!isToolCallContent) {
+                contentText += content;
+                lastValue.content = contentText;
+                this.setData({
+                  [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
+                  [`chatRecords[${lastValueIndex}].record_id`]: lastValue.record_id,
+                  chatStatus: 3,
+                }); // 聊天状态切换为输出content中
+              }
             }
             // 知识库，只更新一次
             if (type === "knowledge" && !lastValue.knowledge_meta) {
@@ -878,6 +963,39 @@ Component({
                 [`chatRecords[${lastValueIndex}].db_len`]: lastValue.db_len,
                 chatStatus: 2,
               });
+            }
+            // tool_call 场景，调用请求
+            if (type === "tool-call") {
+              const { tool_call } = dataJson;
+              const callBody = {
+                id: tool_call.id,
+                name: this.transformToolName(tool_call.function.name),
+                callParams: "```json\n" + JSON.stringify(tool_call.function.arguments, null, 2) + "\n```",
+                content: "",
+              };
+              if (!lastValue.toolCallList) {
+                lastValue.toolCallList = [callBody];
+              } else {
+                lastValue.toolCallList.push(callBody);
+              }
+              this.setData({
+                [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+              });
+              this.autoToBottom();
+            }
+            // tool_call 场景，调用响应
+            if (type === "tool-result") {
+              const { toolCallId, result } = dataJson;
+              if (lastValue.toolCallList && lastValue.toolCallList.length) {
+                const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
+                if (lastToolCallObj && !lastToolCallObj.callResult) {
+                  lastToolCallObj.callResult = "```json\n" + JSON.stringify(result, null, 2) + "\n```";
+                  this.setData({
+                    [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
+                  });
+                  this.autoToBottom();
+                }
+              }
             }
           } catch (e) {
             console.log("err", event, e);
@@ -902,7 +1020,8 @@ Component({
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
         }); // 对话完成，切回0 ,并且修改最后一条消息的状态，让下面的按钮展示
         if (bot.isNeedRecommend && !isManuallyPaused) {
-          const ai = wx.cloud.extend.AI;
+          const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+          const ai = cloudInstance.extend.AI;
           const chatRecords = this.data.chatRecords;
           const lastPairChatRecord = chatRecords.length >= 2 ? chatRecords.slice(chatRecords.length - 2) : [];
           const recommendRes = await ai.bot.getRecommendQuestions({
@@ -931,7 +1050,9 @@ Component({
       }
       if (chatMode === "model") {
         const { modelProvider, quickResponseModel } = modelConfig;
-        const aiModel = wx.cloud.extend.AI.createModel(modelProvider);
+        const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+        const ai = cloudInstance.extend.AI;
+        const aiModel = ai.createModel(modelProvider);
         const res = await aiModel.streamText({
           data: {
             model: quickResponseModel,
@@ -1017,10 +1138,10 @@ Component({
         }
         return;
       }
-
       // 只有当内容高度接近scroll 区域视口高度时才开始增加 scrollTop
-      const clientHeight =
-        this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
+      // const clientHeight =
+      //   this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
+      const clientHeight = this.data.curScrollHeight; // TODO:
       const contentHeight =
         (await this.calculateContentHeight()) +
         (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度
