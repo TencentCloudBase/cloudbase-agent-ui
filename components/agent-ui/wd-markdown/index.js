@@ -84,8 +84,9 @@ Component({
     markdown: function () {
       const { mdInstance } = this.data;
       if (!mdInstance) return;
+      // console.log('*****markdown', this.data.markdown)
       const html = mdInstance.render(this.data.markdown)
-      // console.log(html)
+      // console.log('*****((((((',html)
       this.setData({
         __html: html,
       });
