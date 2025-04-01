@@ -218,7 +218,7 @@ Component({
           ? reqid
             ? `${content}|reqId:${reqid}`
             : content
-          : JSON.stringify({ content, reqid });
+          : JSON.stringify({ err: content, reqid });
       wx.showModal({
         title: "错误原因",
         content: transformContent,
@@ -463,24 +463,29 @@ Component({
                       fileSize: item.bytes,
                     }));
                   }
-                  if (item.role === "assistant" && item.content === "") {
-                    transformItem.content = this.data.defaultErrorMsg;
-                  }
-                  if (item.role === "assistant" && item.origin_msg) {
-                    // console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
-                    const origin_msg_obj = JSON.parse(item.origin_msg);
-                    if (origin_msg_obj.aiResHistory) {
-                      const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
-                      transformItem.toolCallList = transformToolCallList;
-                      const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
-                      // console.log("toolCallErr", toolCallErr);
-                      if (toolCallErr?.error?.message) {
-                        transformItem.error = toolCallErr.error.message;
-                        transformItem.reqId = item.trace_id || "";
+                  if (item.role === "assistant") {
+                    if (item.content === "") {
+                      transformItem.content = this.data.defaultErrorMsg;
+                      transformItem.error = {};
+                      transformItem.reqId = item.trace_id || "";
+                    }
+
+                    if (item.origin_msg) {
+                      // console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
+                      const origin_msg_obj = JSON.parse(item.origin_msg);
+                      if (origin_msg_obj.aiResHistory) {
+                        const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
+                        transformItem.toolCallList = transformToolCallList;
+                        const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
+                        // console.log("toolCallErr", toolCallErr);
+                        if (toolCallErr?.error?.message) {
+                          transformItem.error = toolCallErr.error.message;
+                          transformItem.reqId = item.trace_id || "";
+                        }
+                      } else {
+                        // 之前异常的返回
+                        // return null
                       }
-                    } else {
-                      // 之前异常的返回
-                      // return null
                     }
                   }
                   return transformItem;
