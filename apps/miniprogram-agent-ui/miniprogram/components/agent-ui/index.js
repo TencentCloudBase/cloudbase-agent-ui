@@ -54,6 +54,8 @@ Component({
   },
 
   data: {
+    showMenu: false,
+    tapMenuRecordId: "",
     isLoading: true, // 判断是否尚在加载中
     article: {},
     windowInfo: wx.getWindowInfo(),
@@ -158,6 +160,45 @@ Component({
     });
   },
   methods: {
+    handleCopyAll(e) {
+      const { content } = e.currentTarget.dataset;
+      wx.setClipboardData({
+        data: content,
+        success: () => {
+          wx.showToast({
+            title: "复制成功",
+            icon: "success",
+          });
+          this.hideMenu();
+        },
+      });
+    },
+    handleEdit(e) {
+      const { content } = e.currentTarget.dataset;
+      this.setData({
+        inputValue: content,
+      });
+      this.hideMenu();
+    },
+    handleLongPress(e) {
+      const { id } = e.currentTarget.dataset;
+      this.setData({
+        showMenu: true,
+        tapMenuRecordId: id,
+      });
+    },
+    hideMenu() {
+      this.setData({
+        showMenu: false,
+        tapMenuRecordId: "",
+      });
+    },
+    // 点击页面其他地方隐藏菜单
+    onTapPage() {
+      if (this.data.showMenu) {
+        this.hideMenu();
+      }
+    },
     transformToolName: function (str) {
       if (str) {
         const strArr = str.split("/");

@@ -1,5 +1,5 @@
 <!-- agent ui 组件根容器 -->
-<view class="agent-ui">
+<view class="agent-ui" bind:tap="onTapPage">
   <view class="navBar" wx:if="{{chatMode === 'bot'}}">
     <view class="nav-content">
       <!-- <image src="{{bot.avatar}}" mode="aspectFill" class="bot-avatar"/> -->
@@ -113,9 +113,20 @@
         </view>
         <!-- 用户输入 -->
         <view class="userContent" wx:if="{{item.role==='user'}}">
-          <view class="user" style="padding-left: {{showBotAvatar?80:0}}rpx;">
-            <view class="user_content">
+          <view class="user" style="padding-left: {{showBotAvatar?80:0}}rpx;display: flex;">
+            <view class="user_content"  bind:longpress="handleLongPress" data-content="{{item.content}}" data-id="{{item.record_id}}">
               {{item.content}}
+            <!-- 长按菜单 -->
+            <view class="operation-menu" wx:if="{{showMenu && tapMenuRecordId === item.record_id}}">
+              <view class="menu-item" bind:tap="handleCopyAll" data-content="{{item.content}}">
+                <image src="./imgs/copy.svg" class="menu-icon" />
+                <text>复制全文</text>
+              </view>
+              <view class="menu-item" bind:tap="handleEdit" data-content="{{item.content}}">
+                <image src="./imgs/edit.svg" class="menu-icon" />
+                <text>修改</text>
+              </view>
+            </view>
             </view>
           </view>
           <view class="fileBar">
