@@ -852,7 +852,6 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
-          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
