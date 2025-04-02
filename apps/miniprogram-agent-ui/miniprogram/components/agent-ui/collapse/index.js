@@ -12,6 +12,10 @@ Component({
     showBgColor:{
       type: Boolean,
       value: false
+    },
+    showExpandIcon: {
+      type: Boolean,
+      value: true
     }
   },
 
