@@ -71,7 +71,7 @@
               <view wx:if="{{item.toolCallList && item.toolCallList.length > 0}}">
                 <block wx:for="{{item.toolCallList}}" wx:for-item="subItem" wx:key="id">
                   <markdownPreview markdown="{{subItem.content || ''}}"></markdownPreview>
-                  <FoldedCard initStatus="{{false}}" showBgColor="{{false}}">
+                  <FoldedCard showExpandIcon="{{showToolCallDetail}}" initStatus="{{false}}" showBgColor="{{false}}">
                     <view slot="title" style="opacity: 0.7;font-size: 14px; display: flex; align-items: center; gap: 8px;">
                       <block>
                        调用工具 {{subItem.name}}
