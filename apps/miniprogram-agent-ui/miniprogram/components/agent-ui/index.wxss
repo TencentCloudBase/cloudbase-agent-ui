@@ -131,6 +131,7 @@
   /* background-color: aquamarine; */
   /* position: absolute; */
   /* bottom: 0; */
+  position: relative;
 }
 
 .foot_function {
@@ -479,6 +480,7 @@
   border-radius: 25px;
   border: 1px solid rgba(0, 0, 0, 0.08);
   font-size: 14px;
+  background-color: #fff;
 }
 
 .feature_enable {
@@ -488,5 +490,9 @@
 }
 
 .feature_list {
+  position: absolute;
   margin: 0 16px;
+  background-color: transparent;
+  top: 0;
+  transform: translateY(-100%);
 }
