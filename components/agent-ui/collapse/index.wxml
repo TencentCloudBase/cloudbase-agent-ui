@@ -1,7 +1,7 @@
 <!--components/agent-ui/collapsibleCard/index.wxml-->
 <view class="collapse" style="{{collapsedStatus&&showBgColor?'background-color: #f5f5f5;':''}}">
   <view class="collapse-header" bind:tap="changeCollapsedStatus">
-    <image src="../imgs/arrow.svg" mode="aspectFill" style="width: 16px;height: 16px;transform: rotate({{collapsedStatus?360:270}}deg);" />
+    <image wx:if="{{showExpandIcon}}" src="../imgs/arrow.svg" mode="aspectFill" style="width: 16px;height: 16px;transform: rotate({{collapsedStatus?360:270}}deg);" />
     <slot name="title"></slot>
   </view>
   <block wx:if="{{collapsedStatus}}">
