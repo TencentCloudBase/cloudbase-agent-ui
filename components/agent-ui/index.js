@@ -54,6 +54,8 @@ Component({
   },
 
   data: {
+    showMenu: false,
+    tapMenuRecordId: "",
     isLoading: true, // 判断是否尚在加载中
     article: {},
     windowInfo: wx.getWindowInfo(),
@@ -158,6 +160,45 @@ Component({
     });
   },
   methods: {
+    handleCopyAll(e) {
+      const { content } = e.currentTarget.dataset;
+      wx.setClipboardData({
+        data: content,
+        success: () => {
+          wx.showToast({
+            title: "复制成功",
+            icon: "success",
+          });
+          this.hideMenu();
+        },
+      });
+    },
+    handleEdit(e) {
+      const { content } = e.currentTarget.dataset;
+      this.setData({
+        inputValue: content,
+      });
+      this.hideMenu();
+    },
+    handleLongPress(e) {
+      const { id } = e.currentTarget.dataset;
+      this.setData({
+        showMenu: true,
+        tapMenuRecordId: id,
+      });
+    },
+    hideMenu() {
+      this.setData({
+        showMenu: false,
+        tapMenuRecordId: "",
+      });
+    },
+    // 点击页面其他地方隐藏菜单
+    onTapPage() {
+      if (this.data.showMenu) {
+        this.hideMenu();
+      }
+    },
     transformToolName: function (str) {
       if (str) {
         const strArr = str.split("/");
@@ -177,7 +218,7 @@ Component({
           ? reqid
             ? `${content}|reqId:${reqid}`
             : content
-          : JSON.stringify({ content, reqid });
+          : JSON.stringify({ err: content, reqid });
       wx.showModal({
         title: "错误原因",
         content: transformContent,
@@ -422,24 +463,29 @@ Component({
                       fileSize: item.bytes,
                     }));
                   }
-                  if (item.role === "assistant" && item.content === "") {
-                    transformItem.content = this.data.defaultErrorMsg;
-                  }
-                  if (item.role === "assistant" && item.origin_msg) {
-                    // console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
-                    const origin_msg_obj = JSON.parse(item.origin_msg);
-                    if (origin_msg_obj.aiResHistory) {
-                      const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
-                      transformItem.toolCallList = transformToolCallList;
-                      const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
-                      // console.log("toolCallErr", toolCallErr);
-                      if (toolCallErr?.error?.message) {
-                        transformItem.error = toolCallErr.error.message;
-                        transformItem.reqId = item.trace_id || "";
+                  if (item.role === "assistant") {
+                    if (item.content === "") {
+                      transformItem.content = this.data.defaultErrorMsg;
+                      transformItem.error = {};
+                      transformItem.reqId = item.trace_id || "";
+                    }
+
+                    if (item.origin_msg) {
+                      // console.log("toolcall origin_msg", JSON.parse(item.origin_msg));
+                      const origin_msg_obj = JSON.parse(item.origin_msg);
+                      if (origin_msg_obj.aiResHistory) {
+                        const transformToolCallList = this.transformToolCallHistoryList(origin_msg_obj.aiResHistory);
+                        transformItem.toolCallList = transformToolCallList;
+                        const toolCallErr = transformToolCallList.find((item) => item.error)?.error;
+                        // console.log("toolCallErr", toolCallErr);
+                        if (toolCallErr?.error?.message) {
+                          transformItem.error = toolCallErr.error.message;
+                          transformItem.reqId = item.trace_id || "";
+                        }
+                      } else {
+                        // 之前异常的返回
+                        // return null
                       }
-                    } else {
-                      // 之前异常的返回
-                      // return null
                     }
                   }
                   return transformItem;
@@ -811,7 +857,6 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
-          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;

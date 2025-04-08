@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.8.0...v1.8.1) (2025-04-08)
+
+
+### Bug Fixes
+
+* 3.8.1版本切换兼容 ([190a59f](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/190a59f87d3323cb971b7627eb1806e6493651d6))
+* 支持用户内容粘贴及修改 ([5fb0e3e](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/5fb0e3ea033d1df5cfbb8459b129970d235b0b5c))
+* fix showToolcall icon ([a523d7f](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/a523d7fbaa4c3b0365eb548cb7b1122b0b8e6d90))
+* fix style ([1cd0289](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/1cd02891c0decf1e4d23714c5c3a2eae75299209))
+* fix toolcall error ([2ec9c52](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/2ec9c52024ca0114c262427924347d1fb6533528))
+* remove invalid comment ([77c433b](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/77c433b4c994958f95c79c8f2946038e8d5a4225))
+
 ## [1.8.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.7.0...v1.8.0) (2025-03-31)
 
 
