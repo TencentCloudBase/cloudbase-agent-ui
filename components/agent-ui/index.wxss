@@ -371,6 +371,50 @@
   word-wrap: break-word;
   word-break: break-all;
   font-size: 32rpx;
+  position: relative;
+}
+
+.operation-menu {
+  position: absolute;
+  bottom: -120rpx;
+  left: 0;
+  background: rgba(0, 0, 0, 1);
+  border-radius: 8rpx;
+  display: flex;
+  padding: 16rpx 24rpx;
+  gap: 32rpx;
+  z-index: 100;
+}
+
+/* 添加三角形指示器 */
+.operation-menu::before {
+  content: '';
+  position: absolute;
+  top: -16rpx;      /* 调整三角形位置 */
+  left: 30rpx;     /* 调整三角形的水平位置，使其指向文本 */
+  border-left: 16rpx solid transparent;
+  border-right: 16rpx solid transparent;
+  border-bottom: 16rpx solid rgba(0, 0, 0, 0.8);
+  width: 0;
+  height: 0;
+}
+
+.menu-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.menu-item text {
+  color: #ffffff;
+  font-size: 24rpx;
+}
+
+.menu-icon {
+  width: 36rpx;
+  height: 36rpx;
+  filter: brightness(0) invert(1);
 }
 
 .feedback_modal {
