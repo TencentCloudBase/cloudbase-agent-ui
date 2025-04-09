@@ -141,7 +141,6 @@ Component({
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
       showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
-      // console.log("allowUploadFile", allowUploadFile);
       this.setData({
         bot,
         questions,
@@ -312,7 +311,7 @@ Component({
       return new Promise((resolve) => {
         const query = wx.createSelectorQuery().in(this);
         query
-          .selectAll(".main >>> .system, .main >>> .userContent")
+          .selectAll(".main >>> .contentBox")
           .boundingClientRect((rects) => {
             let totalHeight = 0;
             rects.forEach((rect) => {
@@ -415,6 +414,10 @@ Component({
       });
     },
     handleRefresh: function (e) {
+      if (this.data.triggered) {
+        return;
+      }
+      console.log("开始刷新");
       this.setData(
         {
           triggered: true,
@@ -433,12 +436,13 @@ Component({
             }
             const cloudInstance = await getCloudInstance(this.data.envShareConfig);
             const ai = cloudInstance.extend.AI;
-            const res = await ai.bot.getChatRecords({
+            const getRecordsReq = {
               botId: this.data.agentConfig.botId,
               pageNumber: this.data.page,
               pageSize: this.data.size,
               sort: "desc",
-            });
+            };
+            const res = await ai.bot.getChatRecords(getRecordsReq);
             if (res.recordList) {
               this.setData({
                 total: res.total,
@@ -1187,9 +1191,10 @@ Component({
       // const clientHeight =
       //   this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
       const clientHeight = this.data.curScrollHeight; // TODO:
-      const contentHeight =
-        (await this.calculateContentHeight()) +
-        (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度
+      // const contentHeight =
+      //   (await this.calculateContentHeight()) +
+      //   (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度
+      const contentHeight = await this.calculateContentHeight();
       // console.log(
       //   'contentHeight clientHeight newTop',
       //   contentHeight,
