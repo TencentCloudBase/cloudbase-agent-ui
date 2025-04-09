@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.2](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.8.1...v1.8.2) (2025-04-09)
+
+
+### Bug Fixes
+
+* 源码组件对齐低码组件UI优化 ([b01fcc5](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/b01fcc5ae5afbd67d9e3a1a75855db0f4fcab867))
+* fix ([dab7ef9](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/dab7ef917bc7f658c01df453a23f15d1c9446721))
+* fix change cloud ins bug ([c2712aa](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/c2712aa1f7767a025373ab4a105137b0223359d1))
+
 ### [1.8.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.8.0...v1.8.1) (2025-04-08)
 
 
