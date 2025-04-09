@@ -60,7 +60,7 @@ Component({
               },
               method: "POST",
               success: (res) => {
-                console.log("resolve agent file res", res);
+                console.log("old resolve agent file res", res);
                 this.setData({
                   formatSize: this.transformSize(this.data.fileData.fileSize),
                 });
