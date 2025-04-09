@@ -1,12 +1,14 @@
 /* components/agent-ui-new/chatFIle/chatFile.wxss */
 .chat_file {
-  padding: 24rpx;
+  padding: 16rpx 24rpx;
   background: #ffffff;
   border-radius: 12rpx;
-  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.253);
-  margin: 16rpx 5rpx;
-  width: 130px;
+  /* box-shadow: 0 1px 8px rgba(0, 0, 0, 0.253); */
+  /* margin: 0rpx 5rpx; */
+  /* max-width: 110px; */
+  width: 110px;
   position: relative;
+  background-color: #f3f4f6;
 }
 
 .chat_file:active {
@@ -20,8 +22,8 @@
 }
 
 .chat_file__icon {
-  width: 80rpx;
-  height: 80rpx;
+  width: 60rpx;
+  height: 60rpx;
   flex-shrink: 0;
 }
 
