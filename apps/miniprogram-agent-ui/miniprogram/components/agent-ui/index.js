@@ -30,6 +30,7 @@ Component({
         allowWebSearch: Boolean,
         allowPullRefresh: Boolean,
         allowUploadImage: Boolean,
+        allowMultiConversation: Boolean,
         showToolCallDetail: Boolean,
       },
     },
@@ -80,6 +81,7 @@ Component({
     showWebSearchSwitch: false,
     showPullRefresh: true,
     showToolCallDetail: true,
+    showMultiConversation: true,
     useWebSearch: false,
     showFeatureList: false,
     chatStatus: 0, // 页面状态： 0-正常状态，可输入，可发送， 1-发送中 2-思考中 3-输出content中
@@ -96,6 +98,16 @@ Component({
     textareaHeight: 50,
     defaultErrorMsg: "网络繁忙，请稍后重试!",
     curScrollHeight: 0,
+    isDrawerShow: false,
+    conversations: [],
+    transformConversations: {},
+    conversationPageOptions: {
+      page: 1,
+      size: 15,
+      total: 0,
+    },
+    conversation: null,
+    fetchConversationLoading: false,
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -133,15 +145,21 @@ Component({
       const { chatRecords } = this.data;
       // 随机选取三个初始化问题
       const questions = randomSelectInitquestion(bot.initQuestions, 3);
-      let { allowWebSearch, allowUploadFile, allowPullRefresh, allowUploadImage, showToolCallDetail } =
-        this.data.agentConfig;
-      // console.log("allowWebSearch", allowWebSearch);
+      let {
+        allowWebSearch,
+        allowUploadFile,
+        allowPullRefresh,
+        allowUploadImage,
+        showToolCallDetail,
+        allowMultiConversation,
+      } = this.data.agentConfig;
+      console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
       showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
-      // console.log("allowUploadFile", allowUploadFile);
+      allowMultiConversation = allowMultiConversation === undefined ? true : allowMultiConversation;
       this.setData({
         bot,
         questions,
@@ -151,7 +169,14 @@ Component({
         showUploadImg: allowUploadImage,
         showPullRefresh: allowPullRefresh,
         showToolCallDetail: showToolCallDetail,
+        showMultiConversation: allowMultiConversation,
       });
+      console.log("bot", this.data.bot);
+
+      // 拉一遍会话列表
+      if (chatMode === "bot" && this.data.bot.multiConversationEnable) {
+        await this.resetFetchConversationList();
+      }
     }
     const topHeight = await this.calculateContentInTop();
     // console.log('topHeight', topHeight)
@@ -209,6 +234,226 @@ Component({
         }
       }
       return "";
+    },
+    handleClickConversation: async function (e) {
+      // 清除旧的会话聊天记录
+      this.clearChatRecords();
+      const { conversation } = e.currentTarget.dataset;
+      this.setData({
+        isDrawerShow: false,
+        conversation: {
+          conversationId: conversation.conversationId,
+          title: conversation.title,
+        },
+        page: 1, // 重置历史记录分页参数
+        size: 10,
+      });
+      this.handleRefresh();
+      // // 拉取当前会话聊天记录
+      // const res = await wx.cloud.extend.AI.bot.getChatRecords({
+      //   botId: this.data.agentConfig.botId,
+      //   pageNumber: this.data.page,
+      //   pageSize: this.data.size,
+      //   sort: "desc",
+      //   conversationId: this.data.conversation?.conversationId || undefined,
+      // });
+      // if (res.recordList) {
+      // }
+    },
+    fetchConversationList: async function () {
+      const cloudInstance = await getCloudInstance();
+      const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
+      if (this.data.fetchConversationLoading) {
+        return;
+      }
+      return new Promise((resolve, reject) => {
+        const { page, size } = this.data.conversationPageOptions;
+        const limit = size;
+        const offset = (page - 1) * size;
+        this.setData({
+          fetchConversationLoading: true,
+        });
+        // wx.showLoading({
+        //   title: "刷新中",
+        // });
+        wx.request({
+          url: `https://${cloudInstance.extend.AI.bot.context.env}.api.tcloudbasegateway.com/v1/aibot/bots/${this.data.agentConfig.botId}/conversation?limit=${limit}&offset=${offset}`,
+          header: {
+            Authorization: `Bearer ${token}`,
+          },
+          method: "GET",
+          success: (res) => {
+            console.log("conversation list res", res);
+            resolve(res);
+          },
+          fail(e) {
+            console.log("conversation list e", e);
+            reject(e);
+          },
+          complete: () => {
+            this.setData({
+              fetchConversationLoading: false,
+            });
+            // wx.hideLoading();
+          },
+        });
+      });
+    },
+    createConversation: async function () {
+      const cloudInstance = await getCloudInstance();
+      const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
+      return new Promise((resolve, reject) => {
+        wx.request({
+          url: `https://${cloudInstance.extend.AI.bot.context.env}.api.tcloudbasegateway.com/v1/aibot/bots/${this.data.agentConfig.botId}/conversation`,
+          header: {
+            Authorization: `Bearer ${token}`,
+          },
+          method: "POST",
+          success: (res) => {
+            console.log("create conversation res", res);
+            resolve(res);
+          },
+          fail(e) {
+            console.log("create conversation e", e);
+            reject(e);
+          },
+        });
+      });
+    },
+    clickCreateInDrawer: function () {
+      this.setData({
+        isDrawerShow: false,
+      });
+      this.createNewConversation();
+    },
+    createNewConversation: async function () {
+      if (!this.data.bot.multiConversationEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 多会话模式",
+        });
+        return;
+      }
+      // // TODO: 创建新对话
+      // const { data } = await this.createConversation();
+      // console.log("createRes", data);
+      this.clearChatRecords();
+      // this.setData({
+      //   conversation: {
+      //     conversationId: data.conversationId,
+      //     title: data.title,
+      //   },
+      // });
+    },
+    scrollConToBottom: async function (e) {
+      console.log("scrollConToBottom", e);
+      const { page, size } = this.data.conversationPageOptions;
+      if (page * size >= this.data.conversationPageOptions.total) {
+        return;
+      }
+      this.setData({
+        conversationPageOptions: {
+          ...this.data.conversationPageOptions,
+          page: this.data.conversationPageOptions.page + 1,
+        },
+      });
+      console.log("conversationPageOptions", this.data.conversationPageOptions);
+      // 调用分页接口查询更多
+      const { data } = await this.fetchConversationList();
+      if (!data.code) {
+        // 判断原有conversation 是否包含默认的会话，是则在新拉取的数据中去掉默认会话 （当前接口每次都会拼默认会话）
+        const addConversations = [
+          ...this.data.conversations,
+          ...data.data.filter((item) => item.conversationId !== item.userId),
+        ];
+
+        // TODO: 临时倒序处理
+        const sortConData = addConversations.sort(
+          (a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
+        );
+        this.setData({
+          conversations: sortConData,
+          transformConversations: this.transformConversationList(sortConData),
+        });
+      }
+    },
+    resetFetchConversationList: async function () {
+      this.setData({
+        conversationPageOptions: {
+          page: 1,
+          size: 15,
+          total: 0,
+        },
+      });
+      try {
+        const { data } = await this.fetchConversationList();
+        if (!data.code) {
+          // TODO: 临时倒序处理
+          const sortData = data.data.sort(
+            (a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
+          );
+          console.log("sortData", sortData);
+          this.setData({
+            conversations: sortData,
+            transformConversations: this.transformConversationList(sortData),
+            conversationPageOptions: {
+              ...this.data.conversationPageOptions,
+              total: data.total,
+            },
+          });
+        }
+      } catch (e) {
+        console.log("fetchConversationList e", e);
+      }
+    },
+    transformConversationList: function (conversations) {
+      // 区分今天，本月，更早
+      const todayCon = [];
+      const curMonthCon = [];
+      const earlyCon = [];
+      const now = new Date();
+      const todayDate = now.setHours(0, 0, 0, 0);
+      const monthFirstDate = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
+      for (let item of conversations) {
+        const itemDate = new Date(item.createTime).getTime();
+        if (itemDate >= todayDate) {
+          todayCon.push(item);
+        } else if (itemDate >= monthFirstDate) {
+          curMonthCon.push(item);
+        } else {
+          earlyCon.push(item);
+        }
+      }
+      console.log("todayCon curMonthCon earlyCon", todayCon, curMonthCon, earlyCon);
+      return {
+        todayCon,
+        curMonthCon,
+        earlyCon,
+      };
+    },
+    openDrawer: async function () {
+      if (!this.data.bot.multiConversationEnable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用 Agent 多会话模式",
+        });
+        return;
+      }
+      this.setData({
+        isDrawerShow: true,
+        // conversationPageOptions: {
+        //   ...this.data.conversationPageOptions,
+        //   page: 1,
+        //   size: 15,
+        // },
+      });
+
+      // await this.fetchHistoryConversationData();
+    },
+    closeDrawer() {
+      this.setData({
+        isDrawerShow: false,
+      });
     },
     showErrorMsg: function (e) {
       const { content, reqid } = e.currentTarget.dataset;
@@ -312,7 +557,7 @@ Component({
       return new Promise((resolve) => {
         const query = wx.createSelectorQuery().in(this);
         query
-          .selectAll(".main >>> .system, .main >>> .userContent")
+          .selectAll(".main >>> .contentBox")
           .boundingClientRect((rects) => {
             let totalHeight = 0;
             rects.forEach((rect) => {
@@ -414,7 +659,11 @@ Component({
         inputValue: e.detail.value,
       });
     },
-    handelRefresh: function (e) {
+    handleRefresh: function (e) {
+      if (this.data.triggered) {
+        return;
+      }
+      console.log("开始刷新");
       this.setData(
         {
           triggered: true,
@@ -433,12 +682,16 @@ Component({
             }
             const cloudInstance = await getCloudInstance(this.data.envShareConfig);
             const ai = cloudInstance.extend.AI;
-            const res = await ai.bot.getChatRecords({
+            const getRecordsReq = {
               botId: this.data.agentConfig.botId,
               pageNumber: this.data.page,
               pageSize: this.data.size,
               sort: "desc",
-            });
+            };
+            if (this.data.conversation?.conversationId) {
+              getRecordsReq.conversationId = this.data.conversation?.conversationId;
+            }
+            const res = await ai.bot.getChatRecords(getRecordsReq);
             if (res.recordList) {
               this.setData({
                 total: res.total,
@@ -505,6 +758,7 @@ Component({
       );
     },
     clearChatRecords: function () {
+      console.log("执行清理");
       const chatMode = this.data.chatMode;
       const { bot } = this.data;
       this.setData({ showTools: false });
@@ -531,6 +785,7 @@ Component({
         chatStatus: 0,
         questions,
         page: 1, // 重置分页页码
+        conversation: null,
       });
     },
     chooseMedia: function (sourceType) {
@@ -842,14 +1097,53 @@ Component({
       if (chatMode === "bot") {
         const cloudInstance = await getCloudInstance(this.data.envShareConfig);
         const ai = cloudInstance.extend.AI;
-        const res = await ai.bot.sendMessage({
-          data: {
+        // const ai = wx.cloud.extend.AI;
+        // 区分当前是旧的单会话模式 or 新的多会话模式
+        let res;
+        if (!this.data.bot.multiConversationEnable) {
+          // 单会话
+          res = await ai.bot.sendMessage({
+            data: {
+              botId: bot.botId,
+              msg: inputValue,
+              files: this.data.showUploadFile ? userRecord.fileList.map((item) => item.fileId) : undefined,
+              searchEnable: this.data.useWebSearch,
+            },
+          });
+        } else {
+          // 多会话
+          if (!this.data.conversation) {
+            // 发消息前构造新会话
+            try {
+              const { data } = await this.createConversation();
+              this.setData({
+                conversation: {
+                  conversationId: data.conversationId,
+                  title: data.title,
+                },
+              });
+            } catch (e) {
+              console.log("createConversation e", e);
+            }
+          }
+
+          const sendReq = {
             botId: bot.botId,
             msg: inputValue,
             files: this.data.showUploadFile ? userRecord.fileList.map((item) => item.fileId) : undefined,
             searchEnable: this.data.useWebSearch,
-          },
-        });
+          };
+
+          if (this.data.conversation?.conversationId) {
+            sendReq.conversationId = this.data.conversation.conversationId;
+          }
+
+          res = await ai.bot.sendMessage({
+            data: sendReq,
+          });
+          // 当前已产生新会话，重刷一遍
+          await this.resetFetchConversationList();
+        }
         let contentText = "";
         let reasoningContentText = "";
         let isManuallyPaused = false; //这个标记是为了处理手动暂停时，不要请求推荐问题，不显示下面的按钮
@@ -1187,9 +1481,10 @@ Component({
       // const clientHeight =
       //   this.data.windowInfo.windowHeight - this.data.footerHeight - (this.data.chatMode === "bot" ? 40 : 0); // 视口高度
       const clientHeight = this.data.curScrollHeight; // TODO:
-      const contentHeight =
-        (await this.calculateContentHeight()) +
-        (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度
+      // const contentHeight =
+      //   (await this.calculateContentHeight()) +
+      //   (this.data.contentHeightInScrollViewTop || (await this.calculateContentInTop())); // 内容总高度
+      const contentHeight = await this.calculateContentHeight();
       // console.log(
       //   'contentHeight clientHeight newTop',
       //   contentHeight,
