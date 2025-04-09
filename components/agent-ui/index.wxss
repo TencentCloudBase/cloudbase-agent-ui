@@ -6,6 +6,7 @@
   display: flex;
   flex-direction: column;
   overflow:hidden;
+  color: #333;
 }
 
 .nav {
@@ -18,7 +19,7 @@
 }
 
 .navBar {
-  height: 40px;
+  height: 72px;
   width: 100%;
   box-shadow: 0 16px 16px #fff;
   /* background: linear-gradient(to bottom, 
@@ -49,7 +50,8 @@
   width: 100%;
   color: rgb(128, 128, 128);
   font-size: 12px;
-  height: 52px;
+  height: 32px;
+  margin-bottom: 16px;
 }
 .tips::before,
 .tips::after {
@@ -68,10 +70,10 @@
 }
 
 .nav-content {
-  height:40px;
+  height:100%;
   display: flex;
   align-items: center;
-  justify-content: center;
+  justify-content: space-around;
   gap: 12px;
 }
 
@@ -92,7 +94,8 @@
 .main {
   background-color: #fff;
   /* padding-top:10px; */
-  flex: 1;
+  flex-grow: 1;
+  position: relative;
 }
 
 .share_btn {
@@ -132,20 +135,24 @@
   /* position: absolute; */
   /* bottom: 0; */
   position: relative;
+  padding: 0px 8px 12px;
+  box-sizing: border-box;
 }
 
 .foot_function {
-  margin: 8px 8px 15px;
+  /* margin: 0px 0px 15px; */
 }
 
 .footer .file_list {
   display: flex;
   flex-direction: row;
   flex-wrap: nowrap;
-  gap: 10px;
-  padding: 0px 16px;
+  gap: 16rpx;
+  /* padding: 0px 16px; */
   overflow-x: scroll;
-  height: 80px;
+  /* overflow-y: initial; */
+  /* height: 80px; */
+  padding: 20rpx 0px;
 }
 
 .img-box {
@@ -209,7 +216,7 @@
   /* overflow-y: scroll;
   overflow-x: hidden; */
   /* margin: 8px 0px 15px; */
-  padding: 0px 8px;
+  padding: 0px 0px;
   /* position: relative; */
   background-color: white;
   transition: all 0.3s;
@@ -250,17 +257,18 @@
 }
 
 .function {
-  width: 50px;
+  /* width: 25%; */
   display: flex;
+  flex: 1;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   gap: 8px;
   background-color: #fff;
   color: black;
-  padding: 0px 6px;
+  padding: 12px 6px;
   border-radius: 16px;
-  box-shadow: 0 0px 2px rgba(0, 0, 0, 0.253);
+  /* box-shadow: 0 0px 2px rgba(0, 0, 0, 0.253); */
 }
 
 .icon {
@@ -271,6 +279,7 @@
 .text_desc {
   font-weight: 300;
   font-size: 24rpx;
+  color: rgb(95, 114, 146);
 }
 
 .input_inner_box {
@@ -282,8 +291,9 @@
   align-items: center;
   border: #f3f3f3 solid 1px;
   border-radius: 16px;
-  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2);
+  /* box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.2); */
   box-sizing: border-box;
+  background-color: #f3f4f6;
 }
 
 .input {
@@ -311,12 +321,18 @@
   height: 58rpx;
 }
 
+.send-set {
+  width: 38rpx;
+  height: 38rpx;
+}
+
 .system {
-  margin-left: 32rpx;
-  margin-right: 32rpx;
+  margin-left: 24rpx;
+  margin-right: 24rpx;
   border-radius: 12rpx;
+  margin-top: 12px;
   padding-bottom: 16px;
-  margin-top: 16px;
+  /* margin-top: 16px; */
   box-sizing: border-box;
   position: relative;
 }
@@ -344,7 +360,12 @@
 .user {
   display: flex;
   justify-content: flex-end;
-  margin-bottom: 16px;
+  /* margin-bottom: 16px; */
+}
+
+.userContent {
+  margin-top: 12px;
+  padding-bottom: 16px;
 }
 
 .userContent .fileBar {
@@ -360,6 +381,7 @@
   overflow-x: scroll;
   max-height: 80px;
   gap: 10px;
+  margin-top: 10px;
 }
 
 .user .user_content {
@@ -456,19 +478,22 @@
 }
 
 .tool_box {
-  height: 80px;
+  /* height: 80px; */
   display: flex;
   flex-direction: row;
-  padding: 5px 16px;
+  /* padding: 5px 0px; */
   box-sizing: border-box;
-  gap: 10px;
+  gap: 20rpx;
   justify-content: flex-start;
   flex-wrap: nowrap;
   overflow-x: scroll;
+  /* margin-bottom: 15px; */
+  padding: 20rpx 0rpx;
 }
 
 .tool_box .function {
-  flex: 0 0 calc(25% - 20px);
+  /* flex: 0 0 calc(25% - 20px); */
+  background-color: #f3f4f6;
 }
 
 .webSearchSwitch {
@@ -491,8 +516,18 @@
 
 .feature_list {
   position: absolute;
-  margin: 0 16px;
   background-color: transparent;
-  top: 0;
-  transform: translateY(-100%);
+  /* top: 0; */
+  /* transform: translateY(calc(-100% - 20rpx)); */
+  bottom: calc(100% + 20rpx);
+  /* width: auto; */
+}
+
+.no_feature_list {
+  position: absolute;
+  background-color: transparent;
+  /* top: 0; */
+  /* transform: translateY(calc(-100% - 20rpx)); */
+  bottom: calc(100%);
+  /* width: auto; */
 }
