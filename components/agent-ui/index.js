@@ -414,7 +414,7 @@ Component({
         inputValue: e.detail.value,
       });
     },
-    handelRefresh: function (e) {
+    handleRefresh: function (e) {
       this.setData(
         {
           triggered: true,
