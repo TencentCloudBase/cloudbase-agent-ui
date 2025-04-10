@@ -1,22 +1,22 @@
 // components/agent-ui-new/chatFIle/chatFile.js
-import { getCloudInstance, compareVersions } from "../tools";
+import { getCloudInstance, compareVersions, commonRequest } from "../tools";
 Component({
   lifetimes: {
     attached: async function () {
       console.log("enableDel", this.data.enableDel);
-      const { tempFileName, rawFileName, rawType, tempPath, fileId, botId, parsed } = this.data.fileData;
+      const { tempFileName, rawFileName, rawType, tempPath, fileId, botId, status } = this.data.fileData;
       const type = this.getFileType(rawFileName || tempFileName);
       console.log("type", type);
       if (!fileId) {
         this.setData({
-          formatSize: "上传中",
           iconPath: "../imgs/" + type + ".svg",
         });
+
+        this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, status: "uploading" });
       }
 
-      if (fileId && parsed) {
+      if (fileId && status === "parsed") {
         this.setData({
-          formatSize: this.transformSize(this.data.fileData.fileSize),
           iconPath: "../imgs/" + type + ".svg",
         });
         return;
@@ -34,15 +34,13 @@ Component({
         success: async (res) => {
           const appBaseInfo = wx.getAppBaseInfo();
           const fileId = res.fileID;
-          this.setData({
-            formatSize: "解析中",
-          });
+          this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, status: "parsing" });
 
           console.log("当前版本", appBaseInfo.SDKVersion);
           // 3.8.1 及以上版本走sdk 内置方法
           if (compareVersions(appBaseInfo.SDKVersion, "3.8.1") < 0) {
             const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
-            wx.request({
+            commonRequest({
               url: `https://${
                 cloudInstance.env || cloudInstance.extend.AI.bot.context.env
               }.api.tcloudbasegateway.com/v1/aibot/bots/${botId}/files`,
@@ -61,13 +59,11 @@ Component({
               method: "POST",
               success: (res) => {
                 console.log("old resolve agent file res", res);
-                this.setData({
-                  formatSize: this.transformSize(this.data.fileData.fileSize),
-                });
-                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, parsed: true });
+                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
               },
-              fail(e) {
+              fail: (e) => {
                 console.log("resolve agent file e", e);
+                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
               },
             });
           } else {
@@ -87,13 +83,11 @@ Component({
               timeout: 30000,
               success: (res) => {
                 console.log("resolve agent file res", res);
-                this.setData({
-                  formatSize: this.transformSize(this.data.fileData.fileSize),
-                });
-                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, parsed: true });
+                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
               },
               fail: (e) => {
                 console.log("e", e);
+                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
               },
               complete: () => {},
               header: {},
@@ -107,14 +101,9 @@ Component({
     },
   },
   observers: {
-    "fileData.fileId": function (fileId) {
+    "fileData.status": function (status) {
       this.setData({
-        formatSize: fileId ? this.transformSize(this.data.fileData.fileSize) : "上传中",
-      });
-    },
-    "fileData.parsed": function (parsed) {
-      this.setData({
-        formatSize: parsed ? this.transformSize(this.data.fileData.fileSize) : "解析中",
+        statusTxt: this.getFormatStatusText(status),
       });
     },
   },
@@ -137,7 +126,7 @@ Component({
         fileSize: 0,
         fileUrl: "",
         fileId: "",
-        parsed: false,
+        status: "",
       },
     },
   },
@@ -148,11 +137,23 @@ Component({
   data: {
     formatSize: "",
     iconPath: "../imgs/file.svg",
+    statusTextMap: {
+      uploading: "上传中",
+      parsing: "解析中",
+      parseFailed: "解析失败",
+    },
+    statusTxt: "",
   },
   /**
    * 组件的方法列表，
    */
   methods: {
+    getFormatStatusText: function (status) {
+      if (status === "parsed") {
+        return this.transformSize(this.data.fileData.fileSize);
+      }
+      return this.data.statusTextMap[status] || "";
+    },
     generateCosUploadPath: function (botId, fileName) {
       return `agent_file/${botId}/${fileName}`;
     },
