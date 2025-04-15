@@ -89,3 +89,39 @@ export const compareVersions = (version1, version2) => {
   }
   return 0;
 };
+
+let isDomainWarn = false
+
+export const commonRequest = (options) => {
+  const self = this
+  return wx.request({
+    ...options,
+    fail: (e) => {
+      if(options.fail) {
+        options.fail.bind(self)(e)
+        if(e.errno === 600002 || e.errMsg.includes("url not in domain list")) {
+          const { url } = options
+          let msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 https://{envid}.api.tcloudbasegateway.com`
+          if(url) {
+            const regex = /^(https?:\/\/[^/?#]+)/i;
+            const matches = url.match(regex);
+            console.log('matches', matches)
+            if(matches[1]) {
+              msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 ${matches[1]}`
+            }
+          }
+          if(!isDomainWarn) {
+            isDomainWarn = true
+            wx.showModal({
+              title: "提示",
+              content: msg,
+              complete: () => {
+                isDomainWarn = false
+              }
+            })
+          }
+        }
+      }
+    }
+  })
+}
