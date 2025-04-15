@@ -460,7 +460,7 @@ Component({
                   };
                   if (item.role === "user" && item.fileInfos) {
                     transformItem.fileList = item.fileInfos.map((item) => ({
-                      parsed: true,
+                      status: "parsed",
                       rawFileName: item.fileName,
                       rawType: item.type,
                       fileId: item.cloudId,
@@ -569,7 +569,7 @@ Component({
               fileUrl: "",
               fileId: "",
               botId: self.data.agentConfig.botId,
-              parsed: false,
+              status: "",
             };
           });
 
@@ -679,7 +679,7 @@ Component({
               fileUrl: "",
               fileId: "",
               botId: self.data.agentConfig.botId,
-              parsed: false,
+              status: "",
             };
           });
           // 过滤掉已选择中的 image 文件（保留file)
@@ -780,7 +780,7 @@ Component({
     },
     handleSendMessage: async function (event) {
       // 发送消息前校验所有文件上传状态
-      if (this.data.sendFileList.some((item) => !item.fileId || !item.parsed)) {
+      if (this.data.sendFileList.some((item) => !item.fileId || item.status !== "parsed")) {
         wx.showToast({
           title: "文件上传解析中",
           icon: "error",
@@ -1255,15 +1255,21 @@ Component({
     },
     handleChangeChild: function (e) {
       console.log("change", e.detail);
-      const { fileId, tempId, parsed } = e.detail;
+      const { fileId, tempId, status } = e.detail;
       // const curFile = this.data.sendFileList.find(item => item.tempId === tempId)
       // curFile.fileId = fileId
       const newSendFileList = this.data.sendFileList.map((item) => {
         if (item.tempId === tempId) {
+          const obj = {}
+          if(fileId) {
+            obj.fileId = fileId
+          }
+          if(status) {
+            obj.status = status
+          }
           return {
             ...item,
-            fileId,
-            parsed,
+            ...obj
           };
         }
         return item;
