@@ -1,8 +1,11 @@
 {
-  "pages": [
-    "pages/index/index",
-    "pages/chatBot/chatBot"
-  ],
+  "pages": ["pages/index/index", "pages/chatBot/chatBot", "pages/foodBuy/foodBuy"],
+  "usingComponents": {
+    "custom-map": "/components/toolCard/map/index",
+    "custom-weather": "/components/toolCard/weather/index",
+    "custom-food-list": "/components/toolCard/food-list/index",
+    "custom-business-list": "/components/toolCard/business-list/index"
+  },
   "window": {
     "navigationBarBackgroundColor": "#ffffff",
     "navigationBarTextStyle": "black",

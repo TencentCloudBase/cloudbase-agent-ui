@@ -1,0 +1,11 @@
+<view class="food-card-list">
+  <view wx:for="{{foodList}}" wx:key="id" bindtap="onFoodItemTap" data-id="{{item.id}}">
+    <view class="food-card">
+      <image class="food-image" src="{{item.image}}" mode="aspectFill" />
+      <view class="food-info">
+        <text class="food-name">{{item.name}}</text>
+        <text class="food-price">¥{{item.price}}</text>
+      </view>
+    </view>
+  </view>
+</view>
