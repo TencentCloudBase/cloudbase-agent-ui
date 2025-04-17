@@ -861,6 +861,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
+          // console.log('event', event)
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -1035,9 +1036,11 @@ Component({
             // tool_call 场景，调用响应
             if (type === "tool-result") {
               const { toolCallId, result } = dataJson;
+              console.log('tool-result', result)
               if (lastValue.toolCallList && lastValue.toolCallList.length) {
                 const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
                 if (lastToolCallObj && !lastToolCallObj.callResult) {
+                  lastToolCallObj.rawResult = result;
                   lastToolCallObj.callResult = "```json\n" + JSON.stringify(result, null, 2) + "\n```";
                   this.setData({
                     [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
@@ -1064,6 +1067,7 @@ Component({
             [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
           });
         }
+        console.log("this.data.chatRecords", this.data.chatRecords);
         this.setData({
           chatStatus: 0,
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
@@ -1260,16 +1264,16 @@ Component({
       // curFile.fileId = fileId
       const newSendFileList = this.data.sendFileList.map((item) => {
         if (item.tempId === tempId) {
-          const obj = {}
-          if(fileId) {
-            obj.fileId = fileId
+          const obj = {};
+          if (fileId) {
+            obj.fileId = fileId;
           }
-          if(status) {
-            obj.status = status
+          if (status) {
+            obj.status = status;
           }
           return {
             ...item,
-            ...obj
+            ...obj,
           };
         }
         return item;

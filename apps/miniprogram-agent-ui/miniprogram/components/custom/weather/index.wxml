@@ -1,0 +1,21 @@
+<view class="container {{isDay ? 'day' : 'night'}}">
+  <view class="header">
+    <view class="temp-container">
+      <!-- <view class="temp-circle {{isDay ? 'day-circle' : 'night-circle'}}"></view> -->
+      <image class="temp-circle" src="{{'./assets/' + (isDay ? today.dayweatherIcon : today.nightweatherIcon) + '.svg'}}" mode="aspectFit"></image>
+      <text class="temp-text">{{isDay ? today.daytemp : today.nighttemp}}{{currentUnit}}</text>
+    </view>
+    <text class="city-text">{{city}}</text>
+    <text class="high-low-text">最高:{{today.daytemp}}° 最低:{{today.nighttemp}}°</text>
+  </view>
+  <view class="hourly-container">
+    <block wx:for="{{forecasts}}" wx:key="date">
+      <view class="hourly-item">
+        <text class="hour-text">{{item.date}}</text>
+        <!-- <view class="hour-circle {{true ? 'hour-day-circle' : 'hour-night-circle'}}"></view> -->
+        <image class="hour-circle" src="{{'./assets/' + (isDay ? item.dayweatherIcon : item.nightweatherIcon) + '.svg'}}" mode="aspectFit"></image>
+        <text class="hour-temp">{{item.nighttemp}}°~{{item.daytemp}}° </text>
+      </view>
+    </block>
+  </view>
+</view>

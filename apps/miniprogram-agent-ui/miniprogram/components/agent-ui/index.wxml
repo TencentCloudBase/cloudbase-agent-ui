@@ -6,7 +6,7 @@
       <text class="bot-name">{{bot.name}}</text>
     </view>
   </view>
-  <view style="height: 100%;overflow: auto;position: relative;">    
+  <view style="height: 100%;overflow: auto;position: relative;"> 
     <!-- 聊天对话区 -->
     <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: 100%;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh}}" refresher-threshold="{{80}}" bindrefresherrefresh="handleRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
       <view class="contentBox" style="margin-bottom: 30px;">
@@ -92,6 +92,7 @@
                         <markdownPreview markdown="{{subItem.callResult||''}}" fontSize="{{28}}"></markdownPreview>
                       </view>
                     </FoldedCard>
+                   <customCard wx:if="{{subItem.rawResult}}" name="{{subItem.name}}" toolData="{{subItem.rawResult}}"></customCard>
                   </block>
                 </view>
                 <!-- 正文 -->
