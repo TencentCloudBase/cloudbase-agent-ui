@@ -30,6 +30,8 @@ Page({
     allowUploadFile: true, // 允许上传文件
     allowPullRefresh: true, // 允许下拉刷新
     allowUploadImage: true, // 允许上传图片
+    allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
+    showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
   }
 }`,
       modelConfig1: `data: {
@@ -101,9 +103,19 @@ Page({
         desc: "允许下拉刷新",
       },
       {
+        name: "agentConfig.allowMultiConversation",
+        type: "boolean",
+        desc: "允许展示会话列表&创建会话按钮",
+      },
+      {
+        name: "agentConfig.showToolCallDetail",
+        type: "boolean",
+        desc: "允许展示mcp server toolCall 细节",
+      },
+      {
         name: "agentConfig.allowUploadImage",
         type: "boolean",
-        desc: "允许上传图片",
+        desc: "允许展示上传图片按钮",
       },
       {
         name: "envShareConfig.resourceAppid",
@@ -128,10 +140,12 @@ Page({
   showBotAvatar: true, // 是否在对话框左侧显示头像
   agentConfig: {
     botId: "bot-e7d1e736", // agent id,
-    allowWebSearch: true, // 允许客户端选择启用联网搜索
-    allowUploadFile: true, // 允许上传文件
-    allowPullRefresh: true, // 允许下拉刷新
-    allowUploadImage: true // 允许上传图片
+    allowWebSearch: true, // 允许客户端选择展示联网搜索按钮
+    allowUploadFile: true, // 允许客户端展示上传文件按钮
+    allowPullRefresh: true, // 允许客户端展示下拉刷新
+    allowUploadImage: true, // 允许客户端展示上传图片按钮
+    allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
+    showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
   },
   modelConfig: {
     modelProvider: "hunyuan-open", // 大模型服务厂商

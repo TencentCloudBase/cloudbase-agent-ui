@@ -1,16 +1,65 @@
 <!-- agent ui 组件根容器 -->
 <view class="agent-ui" bind:tap="onTapPage">
+  <!-- 左侧抽屉 -->
+  <view class="drawer-mask {{isDrawerShow ? 'show' : ''}}" bindtap="closeDrawer"></view>
+  <view class="drawer {{isDrawerShow ? 'show' : ''}}">
+    <view class="drawer-header">
+      <view class="create-new-chat" bind:tap="clickCreateInDrawer">
+        <image style="width: 48rpx;height: 48rpx;margin-right: 10rpx" src="./imgs/chat-add.svg" mode="aspectFill"/>
+        <text> 开启新对话 </text>
+      </view>
+      <!-- <text>会话记录</text> -->
+      <image class="close-icon" src="./imgs/indent-left.svg" bindtap="closeDrawer"/>
+    </view>
+    <!-- <view class="drawer-content"> -->
+    <view class="drawer-content">
+      <scroll-view enhanced="{{true}}" style="height: 100%;" show-scrollbar="{{false}}" scroll-y="true" bindscrolltolower="scrollConToBottom">
+      <!-- 会话列表 -->
+      <!-- <view class="drawer-content"> -->
+      <block wx:if="{{ conversations.length > 0 }}">
+        <view class="con-block" wx:if="{{transformConversations.todayCon.length}}">
+          <text class="date-title">今天</text>
+          <view class="con-container">
+            <view class="con-item" bind:tap="handleClickConversation" data-conversation="{{item}}" wx:for="{{transformConversations.todayCon}}" wx:key="index">{{item.title}}</view>
+          </view>
+        </view>
+        <view class="con-block" wx:if="{{transformConversations.curMonthCon.length}}">
+          <text class="date-title">本月</text>
+          <view class="con-container">
+            <view class="con-item {{item.conversationId === conversation.conversationId ? 'selected-con' : ''}}" bind:tap="handleClickConversation" data-conversation="{{item}}" wx:for="{{transformConversations.curMonthCon}}"  wx:key="index">{{item.title}}</view>
+          </view>
+        </view>
+        <view class="con-block" wx:if="{{transformConversations.earlyCon.length}}">
+          <text class="date-title">更早</text>
+          <view class="con-container">
+            <view class="con-item" bind:tap="handleClickConversation" data-conversation="{{item}}" wx:for="{{transformConversations.earlyCon}}" wx:key="index">{{item.title}}</view>
+          </view>
+        </view>
+      </block>
+      <block wx:else>
+        <view style="width: 100%;height: 100%;display: flex;flex-direction: column;justify-content: center;align-items: center;">      
+          <image src="./imgs/chat-bubble-history.svg" mode="aspectFill" style="width: 100rpx;height: 100rpx;transform: translateY(-50%);"/>
+          <text style="color: rgb(160, 160, 160)">暂无历史记录</text>
+        </view>
+      </block>
+      <!-- </view> -->
+      </scroll-view>
+    </view>
+    <!-- </view> -->
+  </view>
   <view class="navBar" wx:if="{{chatMode === 'bot'}}">
-    <view class="nav-content">
+    <view class="nav-content" style="{{showMultiConversation ? 'justify-content: space-between;' : ''}}">
+      <image wx:if="{{bot.botId && showMultiConversation}}" bind:tap="openDrawer" class="con-icon" src="./imgs/indent-right.svg" mode="aspectFill"/>
       <!-- <image src="{{bot.avatar}}" mode="aspectFill" class="bot-avatar"/> -->
       <text class="bot-name">{{bot.name}}</text>
+      <image wx:if="{{bot.botId && showMultiConversation}}" class="con-icon" bind:tap="createNewConversation" src="./imgs/chat-bubble-add.svg" mode="aspectFill"/>
     </view>
   </view>
   <view style="height: 100%;overflow: auto;position: relative;">    
     <!-- 聊天对话区 -->
-    <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: 100%;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh}}" refresher-threshold="{{80}}" bindrefresherrefresh="handleRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
+    <scroll-view bindwheel="onWheel" enhanced="{{true}}" bindscroll="onScroll" binddragstart="handleScrollStart" class="main" style="height: 100%;" scroll-y="{{true}}" scroll-top="{{viewTop}}" scroll-into-view="{{ scrollTo }}" lower-threshold="1" bindscrolltolower="handleScrollToLower" show-scrollbar="{{false}}" refresher-enabled="{{showPullRefresh && (bot.multiConversationEnable ? conversation : true)}}" refresher-threshold="{{80}}" bindrefresherrefresh="handleRefresh" refresher-triggered="{{triggered}}" bounces="{{false}}">
       <view class="contentBox" style="margin-bottom: 30px;">
-        <view wx:if="{{chatMode === 'bot' && bot.botId &&  showPullRefresh}}" class="tips">
+        <view wx:if="{{chatMode === 'bot' && bot.botId &&  showPullRefresh && (bot.multiConversationEnable ? conversation : true)}}" class="tips">
           {{refreshText}}
         </view>
         <view wx:if="{{chatMode === 'model'}}" class="nav">
@@ -177,7 +226,7 @@
     </view>
     <!-- 底部工具栏 -->
     <view class="tool_box" wx:if="{{showTools}}">
-      <view class="function" bind:tap="clearChatRecords">
+      <view class="function" bind:tap="handleTapClear">
         <image src="./imgs/clear.svg" alt="widthFix" class="icon" />
         <text class="text_desc">清除</text>
       </view>

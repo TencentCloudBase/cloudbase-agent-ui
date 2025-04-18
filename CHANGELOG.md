@@ -2,8 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-### [1.8.2](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.8.1...v1.8.2) (2025-04-09)
+## 1.9.0 (2025-04-18)
 
+### Features
+
+* 支持多会话
+
+### Bug Fixes
+
+* 修复系统提示语在切会话时插入位置bug ([7c3e77a](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/7c3e77a2b13b5a33c18e0821fc4eb23937ebdfd5))
+* 支持request 域名校验 ([5c21561](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/5c21561ffc06523bbcb7fcb3b91b17f492ab4b8f))
+
+### [1.8.2](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.8.1...v1.8.2) (2025-04-09)
 
 ### Bug Fixes
 
@@ -12,7 +22,6 @@ All notable changes to this project will be documented in this file. See [standa
 * fix change cloud ins bug ([c2712aa](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/c2712aa1f7767a025373ab4a105137b0223359d1))
 
 ### [1.8.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.8.0...v1.8.1) (2025-04-08)
-
 
 ### Bug Fixes
 
@@ -25,14 +34,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [1.8.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.7.0...v1.8.0) (2025-03-31)
 
-
 ### Features
 
 * 环境共享迁移完成 ([16f48cb](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/16f48cbbf96b6d8ea9ae0eee4c7b6b374af330df))
 * 添加环境共享 ([48d5180](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/48d51801417a485836652401ba79fabea94a23d2))
 * 添加环境共享参数 ([0946290](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/0946290c6e3c90acdd93776556f1544f3a52fde6))
 * support mcp ([f6b6663](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/f6b66636135d84a77dfa48ddf2c03ec7f8388491))
-
 
 ### Bug Fixes
 
@@ -47,7 +54,6 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [1.7.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.6.0...v1.7.0) (2025-03-21)
 
-
 ### Features
 
 * 添加复制 ([69c4aad](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/69c4aad44de2994aadeaff20cb3c5bd86eeff4bb))
@@ -55,7 +61,6 @@ All notable changes to this project will be documented in this file. See [standa
 * 修复输入框的问题 ([beb93e8](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/beb93e88b9994352fc0e86e3a29b3d18f670a7df))
 * 修改文档 ([0e642e5](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/0e642e59139043a592f7b4dd1d0ea406fbb36737))
 * support upload img ([f2fcc00](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/f2fcc00cc60c7717dc9035ea1e3a426c050262e0))
-
 
 ### Bug Fixes
 
@@ -65,14 +70,12 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [1.6.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.8...v1.6.0) (2025-03-18)
 
-
 ### Features
 
 * 修改参数 ([9e2a868](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/9e2a8683716958ba3c0f10d06d0482f854c514b1))
 * 支持数据模型检索 ([e2c6da6](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/e2c6da63cf1b4e51185bfdfa1f98f6f1807caab2))
 * support agent uploadfile config ([d7006a2](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/d7006a2827489938411ca6e5b5244c8019e85ae7))
 * support file in history ([bbe9810](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/bbe9810b6b3c8d68a6a7a7d6549bc7730530cd16))
-
 
 ### Bug Fixes
 
@@ -81,20 +84,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ## [1.5.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.8...v1.5.0) (2025-03-14)
 
-
 ### Features
 
 * 支持数据模型检索 ([be5ed84](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/be5ed8419b9be0ba2284ae5017f2ad35995e8b4e))
 * support agent uploadfile config ([a249866](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/a249866aaafe1e744d43c2ccdbd83856c72d1eb2))
 * support file in history ([51d3ef0](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/51d3ef0f4cf45bc12a7b62cb1a887e834a948be5))
 
-
 ### Bug Fixes
 
 * fix readme ([42b5830](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/42b5830de3e885a3adf6ab658f785c496158cd5c))
 
 ### [1.4.8](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.7...v1.4.8) (2025-03-10)
-
 
 ### Bug Fixes
 
@@ -105,13 +105,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.4.7](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.6...v1.4.7) (2025-03-10)
 
-
 ### Bug Fixes
 
 * fix workflow ([eaed4f2](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/eaed4f28a10d9eecd4d83c8f25d731442851ab52))
 
 ### [1.4.6](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.5...v1.4.6) (2025-03-10)
-
 
 ### Bug Fixes
 
@@ -119,20 +117,17 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.4.5](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.4...v1.4.5) (2025-03-10)
 
-
 ### Bug Fixes
 
 * fix workflow ([38969a5](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/38969a598b35ca4408e79ce98d53ae5780efe32b))
 
 ### [1.4.4](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.3...v1.4.4) (2025-03-10)
 
-
 ### Bug Fixes
 
 * fix workflow ([2013490](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/201349079931e3c4fd4d102c189e3d63d41ebf66))
 
 ### [1.4.3](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.2...v1.4.3) (2025-03-10)
-
 
 ### Bug Fixes
 
@@ -142,18 +137,15 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### [1.4.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.4.0...v1.4.1) (2025-03-10)
 
-
 ### Bug Fixes
 
 * fix scripts ([271354d](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/271354d5ffafbfd8451ed763a4a64d851a0d9f7d))
 
 ## 1.4.0 (2025-03-10)
 
-
 ### ✨ Features | 新功能
 
 * 优化工作流 ([ee33c15](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/ee33c155fe013b7e8342fd42785aa1920da58dd5))
-
 
 ### 📦 Chores | 其他更新
 
@@ -168,7 +160,6 @@ All notable changes to this project will be documented in this file. See [standa
 * sync agent-ui component before release ([9d38d64](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/9d38d64381671691e9409479c3baaf669d79d559))
 * sync agent-ui component before release ([0d24ce6](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/0d24ce6ec687f5dc5941ec18de6109c2abda9273))
 * sync agent-ui component before release ([43b22b6](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/43b22b677860115841400cba0c9fd0e4db2afdb0))
-
 
 ### 🐛 Bug Fixes | Bug 修复
 
