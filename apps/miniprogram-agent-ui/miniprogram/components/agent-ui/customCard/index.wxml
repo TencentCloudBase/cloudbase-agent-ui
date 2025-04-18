@@ -2,13 +2,14 @@
 <!-- <text>components/agent-ui-new/chatFIle/chatFile.wxml</text> -->
 <block>
   <!-- <view wx:if="{{mapTools.indexOf(name) !== -1}}"> -->
-  <view wx:if="{{name === 'maps_geo' || name === 'maps_bicycling' || name === 'maps_direction_walking' || name === 'maps_direction_driving' || name === 'maps_direction_transit_integrated' || name === 'maps_text_search' || name === 'maps_around_search'}}">
+  <view wx:if="{{name === 'maps_geo' || name === 'maps_direction_driving'}}">
     <custom-map name="{{name}}" toolData="{{toolData}}"></custom-map>
   </view>
   <view wx:if="{{name === 'maps_weather'}}">
     <custom-weather name="{{name}}" toolData="{{toolData}}"></custom-weather>
   </view>
-  <view wx:if="{{true || name === 'get_recommend_foods'}}">
+  <view wx:if="{{name === 'map_search_places'}}">
+    <custom-business-list name="{{name}}" toolData="{{toolData}}"></custom-business-list>
     <custom-food-list name="{{name}}" toolData="{{toolData}}"></custom-food-list>
   </view>
   <!-- 用户可自行维护 tools 与 自定义组件映射 -->

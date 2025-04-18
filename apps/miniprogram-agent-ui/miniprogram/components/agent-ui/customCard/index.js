@@ -9,8 +9,6 @@ Component({
       value: {},
     },
   },
-  data: {
-    mapTools: ["maps_geo", "maps_direction_driving"],
-  },
+  data: {},
   lifetimes: {},
 });
