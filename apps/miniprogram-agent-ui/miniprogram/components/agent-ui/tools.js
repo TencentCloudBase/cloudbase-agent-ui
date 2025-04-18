@@ -90,38 +90,62 @@ export const compareVersions = (version1, version2) => {
   return 0;
 };
 
-let isDomainWarn = false
+let isDomainWarn = false;
 
-export const commonRequest = (options) => {
-  const self = this
-  return wx.request({
-    ...options,
-    fail: (e) => {
-      if(options.fail) {
-        options.fail.bind(self)(e)
-        if(e.errno === 600002 || e.errMsg.includes("url not in domain list")) {
-          const { url } = options
-          let msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 https://{envid}.api.tcloudbasegateway.com`
-          if(url) {
-            const regex = /^(https?:\/\/[^/?#]+)/i;
-            const matches = url.match(regex);
-            console.log('matches', matches)
-            if(matches[1]) {
-              msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 ${matches[1]}`
+export const commonRequest = async (options) => {
+  const cloudInstance = await getCloudInstance();
+  const self = this;
+  // 判断 当前sdk 版本是否 小于 3.8.1
+  const appBaseInfo = wx.getAppBaseInfo();
+  console.log("当前版本", appBaseInfo.SDKVersion);
+  const { path } = options;
+  if (compareVersions(appBaseInfo.SDKVersion, "3.8.1") < 0) {
+    console.log('走wx request')
+    const cloudInstance = await getCloudInstance();
+    const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
+    const envId = cloudInstance.env || cloudInstance.extend.AI.bot.context.env
+    console.log('envId', envId)
+    return wx.request({
+      ...options,
+      path: undefined,
+      url: `https://${
+        envId
+      }.api.tcloudbasegateway.com/v1/aibot/${path}`,
+      header: {
+        ...options.header,
+        Authorization: `Bearer ${token}`,
+      },
+      fail: (e) => {
+        if (options.fail) {
+          options.fail.bind(self)(e);
+          if (e.errno === 600002 || e.errMsg.includes("url not in domain list")) {
+            // const { url } = options;
+            let msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 https://${envId}.api.tcloudbasegateway.com`;
+            // if (url) {
+            //   const regex = /^(https?:\/\/[^/?#]+)/i;
+            //   const matches = url.match(regex);
+            //   console.log("matches", matches);
+            //   if (matches[1]) {
+            //     msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 ${matches[1]}`;
+            //   }
+            // }
+            if (!isDomainWarn) {
+              isDomainWarn = true;
+              wx.showModal({
+                title: "提示",
+                content: msg,
+                complete: () => {
+                  isDomainWarn = false;
+                },
+              });
             }
           }
-          if(!isDomainWarn) {
-            isDomainWarn = true
-            wx.showModal({
-              title: "提示",
-              content: msg,
-              complete: () => {
-                isDomainWarn = false
-              }
-            })
-          }
         }
-      }
-    }
-  })
-}
+      },
+    });
+  } else {
+    console.log('走内部request')
+    const ai = cloudInstance.extend.AI;
+    return ai.request(options);
+  }
+};
