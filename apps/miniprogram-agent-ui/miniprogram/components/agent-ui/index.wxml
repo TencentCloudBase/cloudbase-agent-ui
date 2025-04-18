@@ -226,7 +226,7 @@
     </view>
     <!-- 底部工具栏 -->
     <view class="tool_box" wx:if="{{showTools}}">
-      <view class="function" bind:tap="clearChatRecords">
+      <view class="function" bind:tap="handleTapClear">
         <image src="./imgs/clear.svg" alt="widthFix" class="icon" />
         <text class="text_desc">清除</text>
       </view>

@@ -164,7 +164,7 @@ Component({
       this.setData({
         bot,
         questions,
-        chatRecords: [...chatRecords, record],
+        chatRecords: chatRecords.length > 0 ? chatRecords : [record],
         showWebSearchSwitch: allowWebSearch,
         showUploadFile: allowUploadFile,
         showUploadImg: allowUploadImage,
@@ -266,9 +266,9 @@ Component({
       try {
         if (this.data.bot.botId) {
           const res = await this.fetchConversationList(true, this.data.bot.botId);
-          if(res) {
-            const { data } = res
-            console.log('data default', data.code)
+          if (res) {
+            const { data } = res;
+            console.log("data default", data.code);
             if (data && !data.code) {
               console.log("data", data);
               this.setData({
@@ -370,6 +370,9 @@ Component({
       //     title: data.title,
       //   },
       // });
+      this.setData({
+        refreshText: "下拉加载历史记录",
+      });
     },
     scrollConToBottom: async function (e) {
       console.log("scrollConToBottom", e);
@@ -387,8 +390,8 @@ Component({
       // 调用分页接口查询更多
       if (this.data.bot.botId) {
         const res = await this.fetchConversationList(false, this.data.bot.botId);
-        if(res) {
-          const { data } = res
+        if (res) {
+          const { data } = res;
           if (data && !data.code) {
             const addConversations = [...this.data.conversations, ...data.data];
             // TODO: 临时倒序处理
@@ -788,8 +791,12 @@ Component({
                   return transformItem;
                 })
                 .filter((item) => item);
+              // 只有一条则一定是系统开头语，需要置前，否则则为真实对话，靠后
               this.setData({
-                chatRecords: [...freshChatRecords, ...this.data.chatRecords],
+                chatRecords:
+                  this.data.chatRecords.length === 1
+                    ? [...this.data.chatRecords, ...freshChatRecords]
+                    : [...freshChatRecords, ...this.data.chatRecords],
               });
               // console.log("totalChatRecords", this.data.chatRecords);
             }
@@ -800,6 +807,9 @@ Component({
           }
         }
       );
+    },
+    handleTapClear: function (e) {
+      this.clearChatRecords();
     },
     clearChatRecords: function () {
       console.log("执行清理");
