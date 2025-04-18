@@ -103,6 +103,8 @@ Page({
       allowUploadFile: true, // 允许上传文件
       allowPullRefresh: true, // 允许下拉刷新
       allowUploadImage: true, // 允许上传图片
+      allowMultiConversation: true, // 允许客户端界面展示会话列表及新建会话按钮
+      showToolCallDetail: true, // 允许展示 mcp server toolcall 细节
     },
     modelConfig: {
       modelProvider: "hunyuan-open", // 大模型服务厂商
@@ -154,6 +156,8 @@ Page({
 | `allowUploadFile`  | `Boolean` | 否   | 是否允许客户端界面展示文件上传                |
 | `allowPullRefresh` | `Boolean` | 否   | 是否允许客户端界面展示下拉获取历史记录        |
 | `allowUploadImage` | `Boolean` | 否   | 是否允许客户端界面展示图片上传及拍照上传        |
+| `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮        |
+| `showToolCallDetail` | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节        |
 
 #### ModelConfig
 
@@ -168,7 +172,7 @@ Page({
 > 大小限制：单文件不超过10M
 > 数量限制：单次最多支持 5 个文件
 > 文件类型：pdf、txt、doc、docx、ppt、pptx、xls、xlsx、csv
-> **request合法域名配置**：微信小程序上传文件需要添加“文件上传接口”到request合法域名列表，文件上传域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置request合法域名
+> **request合法域名配置**：微信小程序 上传文件&多会话 需要添加云开发域名到request合法域名列表，云开发域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置request合法域名
 
 配置示例
 
@@ -255,6 +259,8 @@ Page({
       allowUploadFile: true, // 允许上传文件
       allowPullRefresh: true, // 允许下拉刷新
       allowUploadImage: true, // 允许上传图片及拍照上传
+      allowMultiConversation: true, // 允许客户端界面展示会话列表及新建会话按钮
+      showToolCallDetail: true, // 允许展示 mcp server toolcall 细节
     }
   }
   //...
