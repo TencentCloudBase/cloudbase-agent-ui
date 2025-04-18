@@ -149,15 +149,15 @@ Page({
 
 #### AgentConfig
 
-| 参数                 | 类型        | 必填 | 说明                                          |
-| -------------------- | ----------- | ---- | --------------------------------------------- |
-| `botId`            | `String`  | 否   | Agent的唯一标识ID，当 chatMode = 'bot' 时必填 |
-| `allowWebSearch`   | `Boolean` | 否   | 是否允许客户端界面展示联网搜索                |
-| `allowUploadFile`  | `Boolean` | 否   | 是否允许客户端界面展示文件上传                |
-| `allowPullRefresh` | `Boolean` | 否   | 是否允许客户端界面展示下拉获取历史记录        |
-| `allowUploadImage` | `Boolean` | 否   | 是否允许客户端界面展示图片上传及拍照上传        |
-| `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮        |
-| `showToolCallDetail` | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节        |
+| 参数                       | 类型        | 必填 | 说明                                          |
+| -------------------------- | ----------- | ---- | --------------------------------------------- |
+| `botId`                  | `String`  | 否   | Agent的唯一标识ID，当 chatMode = 'bot' 时必填 |
+| `allowWebSearch`         | `Boolean` | 否   | 是否允许客户端界面展示联网搜索                |
+| `allowUploadFile`        | `Boolean` | 否   | 是否允许客户端界面展示文件上传                |
+| `allowPullRefresh`       | `Boolean` | 否   | 是否允许客户端界面展示下拉获取历史记录        |
+| `allowUploadImage`       | `Boolean` | 否   | 是否允许客户端界面展示图片上传及拍照上传      |
+| `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮  |
+| `showToolCallDetail`     | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节         |
 
 #### ModelConfig
 
@@ -168,11 +168,16 @@ Page({
 | `logo`               | `String` | 否   | 页面 logo，当 chatMode = 'model' 时生效，选填                                                                                                                                                                                                                                                                                                                   |
 | `welcomeMsg`         | `String` | 否   | 欢迎语，当 chatMode = 'model' 时生效，选填                                                                                                                                                                                                                                                                                                                      |
 
-> [!IMPORTANT]
+> **上传文件限制**
 > 大小限制：单文件不超过10M
 > 数量限制：单次最多支持 5 个文件
 > 文件类型：pdf、txt、doc、docx、ppt、pptx、xls、xlsx、csv
-> **request合法域名配置**：微信小程序 上传文件&多会话 需要添加云开发域名到request合法域名列表，云开发域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置request合法域名
+
+> **上传图片限制**
+> 大小限制：单文件不超过30M
+> 数量限制：单次最多支持 1 个文件
+
+> **request合法域名配置**：微信小程序 Agent-UI 组件支持 上传文件&多会话 需要添加云开发域名到request合法域名列表，云开发域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置request合法域名
 
 配置示例
 
@@ -276,16 +281,17 @@ Page({
 - ✅ 流式输出
 - ✅ 联网搜索 （Agent模式）
 - ✅ 文档解析 （Agent模式）
-- ✅ 图片上传解析（拍照/图片）
+- ✅ 图片上传解析（拍照/图片）（Agent模式）
+- ✅ 支持环境共享下使用
+- ✅ 历史会话管理，多轮对话上下文记忆（Agent模式）
+- ✅ 支持 MCP 调用（Agent模式）
 
 ### 🚧 进行中开发
 
 - 多模型（快速响应/深度推理）切换调用配置化
-- 历史会话管理，多轮对话上下文记忆
 - 支持文字转语音播放
 - 支持用户语音输入转文字
 - 支持语音音色配置
-- agent支持环境共享下使用
 
 ### 📅 未来计划
 
