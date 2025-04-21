@@ -9,10 +9,7 @@ Component({
     },
     envShareConfig: {
       type: Object,
-      value: {
-        resourceAppid: String,
-        resourceEnv: String,
-      },
+      value: {},
     },
     showBotAvatar: {
       type: Boolean,
