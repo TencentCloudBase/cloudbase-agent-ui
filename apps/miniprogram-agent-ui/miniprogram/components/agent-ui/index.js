@@ -1202,6 +1202,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
+          console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -1360,6 +1361,7 @@ Component({
               const callBody = {
                 id: tool_call.id,
                 name: this.transformToolName(tool_call.function.name),
+                rawParams: tool_call.function.arguments,
                 callParams: "```json\n" + JSON.stringify(tool_call.function.arguments, null, 2) + "\n```",
                 content: "",
               };
@@ -1376,9 +1378,11 @@ Component({
             // tool_call 场景，调用响应
             if (type === "tool-result") {
               const { toolCallId, result } = dataJson;
+              console.log("tool-result", result);
               if (lastValue.toolCallList && lastValue.toolCallList.length) {
                 const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
                 if (lastToolCallObj && !lastToolCallObj.callResult) {
+                  lastToolCallObj.rawResult = result;
                   lastToolCallObj.callResult = "```json\n" + JSON.stringify(result, null, 2) + "\n```";
                   this.setData({
                     [`chatRecords[${lastValueIndex}].toolCallList`]: lastValue.toolCallList,
@@ -1405,6 +1409,7 @@ Component({
             [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
           });
         }
+        console.log("this.data.chatRecords", this.data.chatRecords);
         this.setData({
           chatStatus: 0,
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
