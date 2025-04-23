@@ -23,4 +23,5 @@
   <view class="customCard" wx:if="{{name === 'placeSearchNearby'}}">
     <custom-business-list name="{{name}}" toolData="{{toolData}}"></custom-business-list>
   </view>
+  <!-- 用户可类似添加自定义组件 -->
 </block>
