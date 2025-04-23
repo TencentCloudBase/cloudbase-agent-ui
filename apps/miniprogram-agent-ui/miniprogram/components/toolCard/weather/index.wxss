@@ -1,0 +1,99 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+  border-radius: 32rpx;
+  padding: 16rpx;
+  /* max-width: 500rpx; */
+  /* width: 100%; */
+}
+
+.day {
+  background-color: #60a5fa;
+}
+
+.night {
+  background-color: #312e81;
+}
+
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.temp-container {
+  display: flex;
+  flex-direction: row;
+  gap: 8rpx;
+  align-items: center;
+}
+
+.temp-circle {
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+}
+
+.day-circle {
+  background-color: #facc15;
+}
+
+.night-circle {
+  background-color: #c7d2fe;
+}
+
+.temp-text {
+  font-size: 48rpx;
+  font-weight: 500;
+  color: #f0f9ff;
+}
+
+.city-text {
+  font-size: 38rpx;
+  font-weight: 500;
+  color: #f0f9ff;
+}
+
+.high-low-text {
+  color: #f0f9ff;
+  font-size: 14px;
+}
+
+.hourly-container {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.hourly-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.hour-text {
+  color: #dbeafe;
+  font-size: 24rpx;
+}
+
+.hour-circle {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+}
+
+.hour-day-circle {
+  background-color: #facc15;
+}
+
+.hour-night-circle {
+  background-color: #e0e7ff;
+}
+
+.hour-temp {
+  color: #f0f9ff;
+  font-size: 28rpx;
+}

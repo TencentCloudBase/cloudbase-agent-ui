@@ -1,0 +1,41 @@
+<!-- filepath: /components/restaurant-list/index.wxml -->
+<view class="restaurant-list" wx:if="{{isFoodCategory}}">
+  <scroll-view class="restaurant-content" scroll-y="true">
+    <block wx:for="{{restaurants}}" wx:key="id">
+      <view class="restaurant-box" data-id="{{item.uid}}">
+        <view class="restaurant-card" bindtap="onCardTap">
+          <!-- 左侧图片 -->
+          <image class="restaurant-image" src="{{item.image}}" mode="aspectFill"></image>
+          <!-- 右侧内容 -->
+          <view class="restaurant-info">
+            <!-- 餐厅名称和评分 -->
+            <view class="restaurant-header">
+              <text class="restaurant-name">{{item.name}}</text>
+              <view class="rating">
+                <text class="score">{{item.rating}} 分</text>
+                <text class="reviews">{{item.reviews}} 评论</text>
+                
+                <!-- <image src="./assets/eye.svg" style="width: 20rpx;height: 20rpx" mode=""/> -->
+              </view>
+            </view>
+            <!-- 餐厅描述 -->
+            <text class="description">{{item.description}}  <text style="color: #ff9900;font-size: 12px">{{item.distance}}米</text></text>
+          </view>
+        </view>
+        <view style="padding: 10px">
+          <!-- 餐厅地址和电话 -->
+          <view class="contact-info">
+            <text class="phone">电话: {{item.telephone}}</text>
+            <text class="address">地址: {{item.address}}</text>
+          </view>
+          <!-- 底部按钮 -->
+          <button style="width: 100%" class="call-button" bindtap="onCallTap" data-phone="{{item.telephone}}">
+            <image class="call-icon" src="./assets/phone-call.svg"></image>
+            电话预订
+          </button>
+        </view>
+      </view>
+    </block>
+  </scroll-view>
+  <custom-food-list></custom-food-list>
+</view>

@@ -1,0 +1,68 @@
+<!--components/agent-ui-new/chatFIle/chatFile.wxml-->
+<!-- <text>components/agent-ui-new/chatFIle/chatFile.wxml</text> -->
+<view>
+  <map
+    wx:if="{{name === 'geocoder'}}"
+    id="myMap"
+    style="width: 100%; height: 300px;"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+  >
+  </map>
+  <map
+    wx:if="{{name === 'placeSearchNearby'}}"
+    id="myMap"
+    style="width: 100%; height: 300px;"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+  >
+  </map>
+  <map
+    wx:if="{{name === 'directionDriving'}}"
+    id="myMap"
+    style="width: 100%; height: 300px;"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+    polyline="{{polyline}}"
+  >
+  </map>
+  <view  wx:if="{{name === 'directionDriving'}}" class="route-list">
+    <!-- 标题 -->
+    <view class="route-header">
+      <!-- <image class="back-icon" src="/assets/icons/back.png" bindtap="onBack"></image> -->
+      <text class="route-title">路线详情</text>
+    </view>
+
+    <!-- 路线详情 -->
+    <scroll-view class="route-content" scroll-y="true">
+      <view class="route-item start">
+        <view class="icon">起</view>
+        <view class="details">
+          <text class="instruction">从我的位置出发</text>
+        </view>
+      </view>
+
+      <block wx:for="{{routeSteps}}" wx:key="index">
+        <view class="route-item">
+          <image class="icon" src="{{ './assets/' + item.icon + '.svg'}}"></image>
+          <view class="details">
+            <text class="instruction">{{item.instruction}}</text>
+            <text class="direction">长度 {{item.distance}} 米</text>
+          </view>
+        </view>
+      </block>
+      <view class="route-item end">
+        <view class="icon">终</view>
+        <view class="details">
+          <text class="instruction">终点</text>
+        </view>
+      </view>
+    </scroll-view>
+  </view>
+</view>

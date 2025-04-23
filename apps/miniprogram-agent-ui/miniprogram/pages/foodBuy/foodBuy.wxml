@@ -1,0 +1,131 @@
+<!-- filepath: /Users/lukejyhuang/Workspace/tencent/cloudbase-agent-ui/apps/miniprogram-agent-ui/miniprogram/pages/food-detail/index.wxml -->
+<view class="food-detail">
+  <!-- 顶部背景图 -->
+  <view class="header">
+    <image class="header-bg" src="{{foodDetail.image}}" mode="aspectFill"></image>
+    <view class="header-nav">
+      <view class="nav-left" bindtap="navigateBack">
+        <image class="icon-back" src="/imgs/back.svg"></image>
+      </view>
+      <view class="nav-right">
+        <!-- <image class="icon-search" src="/assets/icons/search.png"></image> -->
+        <!-- <image class="icon-star" src="/assets/icons/star.png"></image> -->
+        <!-- <image class="icon-share" src="/assets/icons/share.png"></image> -->
+      </view>
+    </view>
+  </view>
+
+  <!-- 商品选项区 -->
+  <view class="product-options">
+    <view class="option-item {{selectedOption === 1 ? 'selected' : ''}}" bindtap="selectOption" data-id="1">
+      <image class="option-image" src="{{foodDetail.image}}" mode="aspectFill"></image>
+      <view class="option-price">¥{{foodDetail.price}}</view>
+      <view class="option-original-price" wx:if="{{foodDetail.originalPrice}}">¥{{foodDetail.originalPrice}}</view>
+    </view>
+    <view class="option-item {{selectedOption === 2 ? 'selected' : ''}}" bindtap="selectOption" data-id="2">
+      <image class="option-image" src="{{foodDetail.image}}" mode="aspectFill"></image>
+      <view style="display: flex;flex-direction: column;">
+      <view class="option-name">{{foodDetail.name}}</view>
+      <view>
+      <view class="option-price">¥{{foodDetail.price * 2}}</view>
+      <view class="option-original-price" wx:if="{{foodDetail.originalPrice}}">¥{{foodDetail.originalPrice * 2}}</view>
+      </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 价格区 -->
+  <view class="price-section">
+    <view class="price-tag">券后价 · 已售{{foodDetail.sold}}</view>
+    <view class="price-display">
+      <view class="current-price">¥{{foodDetail.price}}</view>
+      <view class="discount-info">{{foodDetail.discount}} 共减{{(foodDetail.originalPrice - foodDetail.price)}}元</view>
+      <view class="original-price">¥{{foodDetail.originalPrice}}</view>
+    </view>
+    <view class="special-tag">特价团<text>限量·低价</text></view>
+  </view>
+
+  <!-- 服务信息区 -->
+  <view class="service-section">
+    <view class="gift-support">
+      <!-- <image class="gift-icon" src="/assets/icons/gift.png"></image> -->
+      <text>支持送礼物</text>
+      <view class="send-gift">
+        <text>赠送好友</text>
+        <!-- <image class="arrow-right" src="/assets/icons/arrow-right.png"></image> -->
+      </view>
+    </view>
+
+    <!-- 商品信息 -->
+    <view class="product-info">
+      <view class="product-name">{{foodDetail.name}}</view>
+      <view class="product-desc">{{foodDetail.description}}</view>
+
+      <!-- 消费须知 -->
+      <view class="info-section">
+        <view class="info-header">
+          <text>消费须知</text>
+          <view class="info-more">周一至周日可用 
+          <!-- <image class="arrow-right" src="/assets/icons/arrow-right.png"></image> -->
+          </view>
+        </view>
+      </view>
+
+      <!-- 服务保障 -->
+      <view class="service-guarantee">
+        <text>服务保障</text>
+        <text class="guarantee-details">免预约 · 随时退 · 过期自动退</text>
+      </view>
+
+      <!-- 有效期限 -->
+      <view class="validity-period">
+        <text>有效期限</text>
+        <text class="period-details">{{foodDetail.validPeriod}}</text>
+      </view>
+
+      <!-- 适用门店 -->
+      <view class="applicable-stores">
+        <view class="store-header">
+          <text>适用门店</text>
+          <text class="store-count">40家门店适用 
+          <!-- <image class="arrow-right" src="/assets/icons/arrow-right.png"></image> -->
+          </text>
+        </view>
+      </view>
+
+      <!-- 店铺信息 -->
+      <view class="shop-card">
+        <!-- <image class="shop-image" src="/assets/images/shop.jpg"></image> -->
+        <view class="shop-info">
+          <view class="shop-name-row">
+            <!-- <image class="shop-icon" src="/assets/icons/shop.png"></image> -->
+            <text class="shop-name">{{foodDetail.shopName}}</text>
+            <view class="shop-rating">{{foodDetail.rating}}</view>
+          </view>
+          <view class="shop-location">小龙虾 光谷/东湖高新区 ¥120/人</view>
+          <!-- <view class="shop-popular">光谷/东湖高新区夜宵人气榜第1名 <image class="crown-icon" src="/assets/icons/crown.png"></image> 金冠好店</view> -->
+          <view class="shop-address">
+            <!-- <image class="location-icon" src="/assets/icons/location.png"></image> -->
+            <text>{{foodDetail.shopInfo.address}}</text>
+            <!-- <image class="arrow-right" src="/assets/icons/arrow-right.png"></image> -->
+          </view>
+          <view class="shop-hours">
+            <!-- <image class="clock-icon" src="/assets/icons/clock.png"></image> -->
+            <text>营业中 {{foodDetail.shopInfo.businessHours}}</text>
+          </view>
+        </view>
+      </view>
+    </view>
+  </view>
+
+  <!-- 底部购买按钮 -->
+  <view class="bottom-button">
+    <button class="buy-now-btn">立即抢购</button>
+  </view>
+
+  <!-- 红包悬浮按钮 -->
+  <view class="floating-coupon">
+    <view class="coupon-amount">¥5</view>
+    <view class="coupon-text">领现金</view>
+  </view>
+</view>

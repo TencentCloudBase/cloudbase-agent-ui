@@ -1,0 +1,403 @@
+page {
+  background-color: #f5f5f5;
+}
+
+.food-detail {
+  position: relative;
+  width: 100%;
+}
+
+/* 顶部背景和导航 */
+.header {
+  position: relative;
+  width: 100%;
+  height: 400rpx;
+}
+
+.header-bg {
+  width: 100%;
+  height: 100%;
+}
+
+.header-nav {
+  position: absolute;
+  top: 80rpx;
+  left: 0;
+  right: 0;
+  display: flex;
+  justify-content: space-between;
+  padding: 0 30rpx;
+}
+
+.nav-left {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-back {
+  width: 30rpx;
+  height: 30rpx;
+}
+
+.nav-right {
+  display: flex;
+  gap: 20rpx;
+}
+
+.nav-right image {
+  width: 60rpx;
+  height: 60rpx;
+  border-radius: 50%;
+  background-color: rgba(0, 0, 0, 0.5);
+  padding: 10rpx;
+}
+
+/* 商品选项区 */
+.product-options {
+  margin-top: -30rpx;
+  display: flex;
+  padding: 0 30rpx;
+  gap: 20rpx;
+}
+
+.option-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: row;
+  background-color: white;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  box-shadow: 0 2rpx 10rpx rgba(0, 0, 0, 0.1);
+  position: relative;
+}
+
+.option-item.selected {
+  border: 2rpx solid #ff5000;
+}
+
+.option-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 10rpx;
+}
+
+.option-price {
+  font-size: 32rpx;
+  color: #ff5000;
+  font-weight: bold;
+  /* margin-top: 10rpx; */
+}
+
+.option-original-price {
+  font-size: 24rpx;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.option-name {
+  font-size: 26rpx;
+  margin-top: 10rpx;
+}
+
+/* 价格区 */
+.price-section {
+  margin-top: 20rpx;
+  background-color: white;
+  padding: 30rpx;
+  position: relative;
+}
+
+.price-tag {
+  font-size: 28rpx;
+  color: #666;
+}
+
+.price-display {
+  display: flex;
+  align-items: baseline;
+  margin-top: 10rpx;
+}
+
+.current-price {
+  font-size: 48rpx;
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.discount-info {
+  margin-left: 20rpx;
+  font-size: 24rpx;
+  color: white;
+  background-color: #ff5000;
+  padding: 4rpx 10rpx;
+  border-radius: 6rpx;
+}
+
+.original-price {
+  margin-left: 20rpx;
+  font-size: 28rpx;
+  color: #999;
+  text-decoration: line-through;
+}
+
+.special-tag {
+  position: absolute;
+  right: 30rpx;
+  top: 40rpx;
+  background-color: #ffe8d9;
+  color: #ff5000;
+  font-size: 28rpx;
+  padding: 4rpx 10rpx;
+  border-radius: 6rpx;
+  font-weight: bold;
+}
+
+.special-tag text {
+  font-size: 24rpx;
+  font-weight: normal;
+  margin-left: 10rpx;
+}
+
+/* 服务信息区 */
+.service-section {
+  margin-top: 20rpx;
+  background-color: white;
+}
+
+.gift-support {
+  display: flex;
+  align-items: center;
+  padding: 30rpx;
+  border-bottom: 1rpx solid #eee;
+}
+
+.gift-icon {
+  width: 40rpx;
+  height: 40rpx;
+  margin-right: 10rpx;
+}
+
+.send-gift {
+  margin-left: auto;
+  color: #999;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+}
+
+.arrow-right {
+  width: 30rpx;
+  height: 30rpx;
+  margin-left: 6rpx;
+}
+
+/* 商品信息 */
+.product-info {
+  padding: 30rpx;
+}
+
+.product-name {
+  font-size: 36rpx;
+  font-weight: bold;
+  margin-bottom: 20rpx;
+}
+
+.product-desc {
+  font-size: 28rpx;
+  color: #666;
+  margin-bottom: 30rpx;
+  padding: 10rpx 0;
+  border-bottom: 1rpx solid #eee;
+}
+
+.info-section {
+  margin-bottom: 20rpx;
+}
+
+.info-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20rpx;
+}
+
+.info-header text {
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.info-more {
+  color: #999;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+}
+
+.service-guarantee, .validity-period {
+  display: flex;
+  justify-content: space-between;
+  padding: 20rpx 0;
+  font-size: 30rpx;
+}
+
+.guarantee-details, .period-details {
+  color: #999;
+  font-size: 28rpx;
+}
+
+.applicable-stores {
+  margin-top: 20rpx;
+  padding-top: 20rpx;
+  border-top: 1rpx solid #eee;
+}
+
+.store-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20rpx;
+}
+
+.store-header text:first-child {
+  font-size: 30rpx;
+  font-weight: bold;
+}
+
+.store-count {
+  color: #999;
+  font-size: 28rpx;
+  display: flex;
+  align-items: center;
+}
+
+/* 店铺卡片 */
+.shop-card {
+  background-color: #f9f9f9;
+  border-radius: 16rpx;
+  padding: 20rpx;
+  display: flex;
+  margin-top: 20rpx;
+  margin-bottom: 100rpx;
+}
+
+.shop-image {
+  width: 120rpx;
+  height: 120rpx;
+  border-radius: 10rpx;
+  margin-right: 20rpx;
+}
+
+.shop-info {
+  flex: 1;
+}
+
+.shop-name-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10rpx;
+}
+
+.shop-icon {
+  width: 30rpx;
+  height: 30rpx;
+  margin-right: 6rpx;
+}
+
+.shop-name {
+  font-size: 28rpx;
+  font-weight: bold;
+  flex: 1;
+}
+
+.shop-rating {
+  font-size: 28rpx;
+  color: #ff5000;
+  font-weight: bold;
+}
+
+.shop-location {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.shop-popular {
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 20rpx;
+  display: flex;
+  align-items: center;
+}
+
+.crown-icon {
+  width: 30rpx;
+  height: 30rpx;
+  margin-left: 6rpx;
+  margin-right: 6rpx;
+}
+
+.shop-address, .shop-hours {
+  display: flex;
+  align-items: center;
+  font-size: 26rpx;
+  color: #666;
+  margin-bottom: 10rpx;
+}
+
+.location-icon, .clock-icon {
+  width: 30rpx;
+  height: 30rpx;
+  margin-right: 6rpx;
+}
+
+/* 底部购买按钮 */
+.bottom-button {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  padding: 20rpx;
+  background-color: white;
+  box-shadow: 0 -2rpx 10rpx rgba(0, 0, 0, 0.1);
+}
+
+.buy-now-btn {
+  background-color: #ff5000;
+  color: white;
+  border-radius: 40rpx;
+  font-size: 32rpx;
+  font-weight: bold;
+  padding: 20rpx 0;
+}
+
+/* 红包悬浮按钮 */
+.floating-coupon {
+  position: fixed;
+  right: 30rpx;
+  bottom: 180rpx;
+  background-color: #ff5000;
+  width: 80rpx;
+  height: 80rpx;
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4rpx 10rpx rgba(255, 80, 0, 0.3);
+}
+
+.coupon-amount {
+  color: white;
+  font-size: 32rpx;
+  font-weight: bold;
+}
+
+.coupon-text {
+  color: white;
+  font-size: 20rpx;
+}

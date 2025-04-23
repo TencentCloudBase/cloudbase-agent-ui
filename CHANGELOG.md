@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.9.1...v1.10.0) (2025-04-23)
+
+
+### Features
+
+* support tencentmap card ([5c4437b](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/5c4437b3be43aca84433d2ae75ccfb21f6912cf3))
+
+
+### Bug Fixes
+
+* fix readme ([cee725d](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/cee725d566199b1865164e4687b5d45f8e6344c2))
+
 ### [1.9.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.9.0...v1.9.1) (2025-04-21)
 
 
