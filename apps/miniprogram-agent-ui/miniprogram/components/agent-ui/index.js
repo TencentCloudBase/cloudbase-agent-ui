@@ -265,18 +265,28 @@ Component({
           const res = await this.fetchConversationList(true, this.data.bot.botId);
           if (res) {
             const { data } = res;
-            console.log("data default", data.code);
+            console.log("default conversation", data);
             if (data && !data.code) {
-              console.log("data", data);
-              this.setData({
-                defaultConversation: data,
-                conversations: [data],
-                transformConversations: this.transformConversationList([data]),
-                // conversationPageOptions: {
-                //   ...this.data.conversationPageOptions,
-                //   total: data.total,
-                // },
-              });
+              // 区分旧的默认会话结构与新的默认会话结构
+              if (data.data) {
+                if (data.data.length) {
+                  this.setData({
+                    defaultConversation: data.data[0],
+                    conversations: data.data,
+                    transformConversations: this.transformConversationList(data.data),
+                  });
+                }
+              } else {
+                this.setData({
+                  defaultConversation: data,
+                  conversations: [data],
+                  transformConversations: this.transformConversationList([data]),
+                  // conversationPageOptions: {
+                  //   ...this.data.conversationPageOptions,
+                  //   total: data.total,
+                  // },
+                });
+              }
             }
           }
         }
