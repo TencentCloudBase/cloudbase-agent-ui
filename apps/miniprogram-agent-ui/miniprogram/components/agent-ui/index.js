@@ -1202,7 +1202,7 @@ Component({
         let endTime = null; // 记录结束思考时间
         let index = 0;
         for await (let event of res.eventStream) {
-          console.log("event", event);
+          // console.log("event", event);
           const { chatStatus } = this.data;
           if (chatStatus === 0) {
             isManuallyPaused = true;
@@ -1378,7 +1378,7 @@ Component({
             // tool_call 场景，调用响应
             if (type === "tool-result") {
               const { toolCallId, result } = dataJson;
-              console.log("tool-result", result);
+              // console.log("tool-result", result);
               if (lastValue.toolCallList && lastValue.toolCallList.length) {
                 const lastToolCallObj = lastValue.toolCallList.find((item) => item.id === toolCallId);
                 if (lastToolCallObj && !lastToolCallObj.callResult) {
@@ -1409,7 +1409,7 @@ Component({
             [`chatRecords[${lastValueIndex}].content`]: lastValue.content,
           });
         }
-        console.log("this.data.chatRecords", this.data.chatRecords);
+        // console.log("this.data.chatRecords", this.data.chatRecords);
         this.setData({
           chatStatus: 0,
           [`chatRecords[${lastValueIndex}].hiddenBtnGround`]: isManuallyPaused,
