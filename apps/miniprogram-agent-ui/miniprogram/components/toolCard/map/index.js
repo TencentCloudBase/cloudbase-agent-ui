@@ -158,6 +158,29 @@ Component({
           // });
         }
       }
+      // 沿途搜
+      if (name === "placeAlongby") {
+        console.log("toolData", toolData);
+        const { content } = toolData;
+        if (content[0].type === "text") {
+          const contentData = JSON.parse(content[0].text);
+          console.log("placeAlongby data", contentData);
+          const { result } = contentData;
+          const midLoc = result[Math.floor(result.length / 2)].location;
+          this.setData({
+            latitude: midLoc.lat,
+            longitude: midLoc.lng,
+            markers: result.map((item, index) => ({
+              id: index,
+              latitude: item.location.lat,
+              longitude: item.location.lng,
+              width: 20,
+              height: 30,
+              title: item.title,
+            })),
+          });
+        }
+      }
     },
   },
   methods: {

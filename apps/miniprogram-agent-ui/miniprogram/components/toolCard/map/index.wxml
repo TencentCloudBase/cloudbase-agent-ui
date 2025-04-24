@@ -32,6 +32,16 @@
     polyline="{{polyline}}"
   >
   </map>
+  <map
+    wx:if="{{name === 'placeAlongby'}}"
+    id="myMap"
+    style="width: 100%; height: 300px;"
+    latitude="{{latitude}}"
+    longitude="{{longitude}}"
+    scale="{{scale}}"
+    markers="{{markers}}"
+  >
+  </map>
   <view  wx:if="{{name === 'directionDriving'}}" class="route-list">
     <!-- 标题 -->
     <view class="route-header">
