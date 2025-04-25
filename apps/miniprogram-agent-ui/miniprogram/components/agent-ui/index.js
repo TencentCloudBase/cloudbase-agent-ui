@@ -1,5 +1,5 @@
 // components/agent-ui/index.js
-import { checkConfig, randomSelectInitquestion, getCloudInstance, commonRequest } from "./tools";
+import { checkConfig, randomSelectInitquestion, getCloudInstance, commonRequest, sleep } from "./tools";
 import md5 from "./md5.js";
 Component({
   properties: {
@@ -28,6 +28,7 @@ Component({
         allowPullRefresh: Boolean,
         allowUploadImage: Boolean,
         allowMultiConversation: Boolean,
+        allowVoice: Boolean,
         showToolCallDetail: Boolean,
       },
     },
@@ -79,6 +80,7 @@ Component({
     showPullRefresh: true,
     showToolCallDetail: true,
     showMultiConversation: true,
+    showVoice: true,
     useWebSearch: false,
     showFeatureList: false,
     chatStatus: 0, // 页面状态： 0-正常状态，可输入，可发送， 1-发送中 2-思考中 3-输出content中
@@ -87,7 +89,6 @@ Component({
     size: 10,
     total: 0,
     refreshText: "下拉加载历史记录",
-    contentHeightInScrollViewTop: 0, // scroll区域顶部固定区域高度
     shouldAddScrollTop: false,
     isShowFeedback: false,
     feedbackRecordId: "",
@@ -106,6 +107,24 @@ Component({
     conversation: null,
     defaultConversation: null, // 旧结构默认会话
     fetchConversationLoading: false,
+    audioContext: {}, // 只存储当前正在使用的音频context playStatus 状态 0 默认待播放 1 解析中 2 播放中
+    audioSrcMap: {}, // 下载过的音频 src 缓存
+    useVoice: false,
+    startY: 0, // 触摸起点Y坐标
+    longPressTriggered: false, // 长按是否触发
+    sendStatus: 0, // 0 默认态 （还未触发长按） 1 待发送态 （触发长按，待发送） 2 待取消态 （触发长按，但超出阈值）3 发送 4 取消
+    moveThreshold: 50, // 滑动阈值（单位：px）
+    longPressTimer: null, // 长按定时器
+    recorderManager: null,
+    recordOptions: {
+      duration: 60000, // 最长60s
+      sampleRate: 44100,
+      numberOfChannels: 1,
+      encodeBitRate: 192000,
+      format: "aac",
+      frameSize: 50,
+    },
+    voiceRecognizing: false,
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -150,6 +169,7 @@ Component({
         allowUploadImage,
         showToolCallDetail,
         allowMultiConversation,
+        allowVoice,
       } = this.data.agentConfig;
       console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
@@ -158,6 +178,7 @@ Component({
       allowUploadImage = allowUploadImage === undefined ? true : allowUploadImage;
       showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
       allowMultiConversation = allowMultiConversation === undefined ? true : allowMultiConversation;
+      allowVoice = allowVoice === undefined ? true : allowVoice;
       this.setData({
         bot,
         questions,
@@ -168,6 +189,7 @@ Component({
         showPullRefresh: allowPullRefresh,
         showToolCallDetail: showToolCallDetail,
         showMultiConversation: allowMultiConversation,
+        showVoice: allowVoice,
       });
       console.log("bot", this.data.bot);
       if (chatMode === "bot" && this.data.bot.multiConversationEnable) {
@@ -176,14 +198,165 @@ Component({
         // 拉一遍新会话列表
         await this.resetFetchConversationList();
       }
+      // this.setData({
+      //   bot: {
+      //     ...this.data.bot,
+      //     voiceSettings: {
+      //       enable: true,
+      //     },
+      //   },
+      // });
+      if (chatMode === "bot" && this.data.bot.voiceSettings?.enable) {
+        // 初始化录音管理器
+        await this.initRecordManager();
+        // 提前获取语音权限
+        wx.getSetting({
+          success(res) {
+            console.log("auth settings", res);
+            if (!res.authSetting["scope.record"]) {
+              wx.authorize({
+                scope: "scope.record",
+                success() {},
+                fail() {
+                  // 用户拒绝授权，可以引导用户到设置页面手动开启权限
+                  wx.openSetting({
+                    success(res) {
+                      if (res.authSetting["scope.record"]) {
+                        // 用户手动开启权限，可以进行录音操作
+                      }
+                    },
+                  });
+                },
+              });
+            }
+          },
+        });
+      }
     }
-    const topHeight = await this.calculateContentInTop();
-    // console.log('topHeight', topHeight)
-    this.setData({
-      contentHeightInScrollViewTop: topHeight,
-    });
+  },
+  detached: function () {
+    // 在组件实例被从页面节点树移除时执行，释放当前的音频资源
+    const context = this.data.audioContext.context;
+    if (context) {
+      context.stop();
+      context.destroy();
+    }
   },
   methods: {
+    initRecordManager: async function () {
+      const cloudInstance = await getCloudInstance();
+      const recorderManager = wx.getRecorderManager();
+      recorderManager.onStart(() => {
+        console.log("recorder start");
+      });
+      recorderManager.onPause(() => {
+        console.log("recorder pause");
+      });
+      recorderManager.onStop((res) => {
+        console.log("停止录音");
+        console.log("this.data.sendStatus", this.data.sendStatus);
+        if (this.data.sendStatus === 3) {
+          console.log("确认发送");
+          console.log("recorder stop", res);
+          const { tempFilePath } = res;
+          console.log("tempFilePath", tempFilePath);
+          // const tempFileInfo = tempFilePath.split(".")
+          const fileName = md5(tempFilePath) + ".aac";
+          console.log("fileName", fileName);
+          if (fileName) {
+            new Promise((resolve, reject) => {
+              // 上传至云存储换取 cloudId
+              cloudInstance.uploadFile({
+                cloudPath: `agent_file/${this.data.bot.botId}/${fileName}`, // 云上文件路径
+                filePath: tempFilePath,
+                success: async (res) => {
+                  console.log("uploadFile res", res);
+                  const fileId = res.fileID;
+                  cloudInstance.getTempFileURL({
+                    fileList: [fileId], // 文件唯一标识符 cloudID, 可通过上传文件接口获取
+                    success: (res) => {
+                      console.log("getTempFileURL", res);
+                      const { fileList } = res;
+                      if (fileList && fileList.length) {
+                        // 调用语音转文本接口获取文本
+                        console.log("开始转文字");
+                        commonRequest({
+                          path: `bots/${this.data.bot.botId}/speech-to-text`,
+                          data: {
+                            url: fileList[0].tempFileURL,
+                            engSerViceType: this.data.bot.voiceSettings?.inputType,
+                            voiceFormat: "aac",
+                          }, //
+                          method: "POST",
+                          timeout: 60000,
+                          success: (res) => {
+                            console.log("speech-to-text res", res);
+                            const { data } = res;
+                            if (data && data.Result) {
+                              this.sendMessage(data.Result);
+                              resolve(data.Result);
+                            } else {
+                              resolve();
+                            }
+                          },
+                          fail: (e) => {
+                            console.log("e", e);
+                            reject(e);
+                          },
+                          complete: () => {},
+                          header: {},
+                        });
+                      }
+                    },
+                    fail: (e) => {
+                      reject(e);
+                    },
+                  });
+                },
+                fail: (err) => {
+                  console.error("上传失败：", err);
+                  reject(err);
+                },
+              });
+            }).finally(() => {
+              this.setData({
+                sendStatus: 0,
+                voiceRecognizing: false,
+                longPressTriggered: false,
+              });
+            });
+          }
+        } else {
+          this.setData({
+            sendStatus: 0,
+            longPressTriggered: false,
+          });
+        }
+        // console.log('this.data.sendStatus', this.data.sendStatus)
+      });
+      recorderManager.onError((err) => {
+        console.log("recorder err", err);
+        this.setData({
+          sendStatus: 0,
+        });
+      });
+      this.setData({
+        recorderManager: recorderManager,
+      });
+    },
+    handleChangeInputType(e) {
+      // 检查当前语音能力权限
+      if (!this.data.bot.voiceSettings?.enable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用语音输入输出能力",
+        });
+        return;
+      }
+      this.setData({
+        useVoice: !this.data.useVoice,
+      });
+    },
     handleCopyAll(e) {
       const { content } = e.currentTarget.dataset;
       wx.setClipboardData({
@@ -1099,9 +1272,9 @@ Component({
         });
         return;
       }
-      await this.sendMessage(event);
+      await this.sendMessage(event.currentTarget.dataset.message);
     },
-    sendMessage: async function (event) {
+    sendMessage: async function (message) {
       if (this.data.showFileList) {
         this.setData({
           showFileList: !this.data.showFileList,
@@ -1112,7 +1285,7 @@ Component({
           showTools: !this.data.showTools,
         });
       }
-      const { message } = event.currentTarget.dataset;
+      // const { message } = event.currentTarget.dataset;
       let { inputValue, bot, agentConfig, chatRecords, chatStatus, modelConfig } = this.data;
       // 如果正在进行对话，不让发送消息
       if (chatStatus !== 0) {
@@ -1564,7 +1737,6 @@ Component({
       }
     },
     copyChatRecord: function (e) {
-      // console.log(e)
       const { content } = e.currentTarget.dataset;
       wx.setClipboardData({
         data: content,
@@ -1657,6 +1829,288 @@ Component({
       this.setData({
         useWebSearch: !this.data.useWebSearch,
       });
+    },
+    fetchAudioUrlByContent: async function (recordId, content) {
+      // 缓存有读缓存
+      if (this.data.audioSrcMap[recordId]) {
+        return this.data.audioSrcMap[recordId];
+      }
+      // 发起文本转语音请求
+      const res = await new Promise((resolve, reject) => {
+        commonRequest({
+          path: `bots/${this.data.bot.botId}/text-to-speech`,
+          header: {},
+          data: {
+            text: content,
+            voiceType: this.data.bot.voiceSettings?.outputType,
+          },
+          method: "POST",
+          success: (res) => {
+            console.log("create text-to-speech task res", res);
+            resolve(res);
+          },
+          fail(e) {
+            console.log("create text-to-speech task e", e);
+            reject(e);
+          },
+        });
+      });
+      console.log("text-to-speech", res);
+      const { data } = res;
+      if (data && data.TaskId) {
+        const taskId = data.TaskId;
+        // 轮训获取音频url
+        let loopQueryStatus = true;
+        let audioUrl = "";
+        while (loopQueryStatus) {
+          const res = await new Promise((resolve, reject) => {
+            commonRequest({
+              path: `bots/${this.data.bot.botId}/text-to-speech`,
+              header: {},
+              data: {
+                taskId,
+              },
+              method: "GET",
+              success: (res) => {
+                console.log("create text-to-speech task res", res);
+                resolve(res);
+              },
+              fail(e) {
+                console.log("create text-to-speech task e", e);
+                reject(e);
+              },
+            });
+          });
+          console.log("query task res", res);
+          const { data } = res;
+          if (data.code || data.Status === 2) {
+            loopQueryStatus = false;
+          }
+          if (data.Status === 2) {
+            audioUrl = data.ResultUrl;
+            this.setData({
+              audioSrcMap: {
+                ...this.data.audioSrcMap,
+                [recordId]: audioUrl,
+              },
+            });
+          }
+          if (loopQueryStatus) {
+            await sleep(1000);
+          }
+        }
+        return audioUrl;
+      }
+      return "";
+    },
+    handlePlayAudio: async function (e) {
+      console.log("handlePlayAudio e", e);
+      const { recordid: botRecordId, content } = e.target.dataset;
+      const audioContext = this.data.audioContext;
+      if (audioContext.context) {
+        // 判断当前管理的 audioContext 所属 chatRecord 是否与点击播放的 chatRecord 一致
+        if (audioContext.recordId === botRecordId) {
+          // 是则直接播放
+          audioContext.playStatus = 2;
+          this.setData({
+            audioContext: audioContext,
+          });
+          audioContext.context.play();
+        } else {
+          // 需销毁当前的 audioContext TODO:, 先测试复用content, 直接更换src
+          audioContext.context.stop(); // 旧的停止
+          audioContext.recordId = botRecordId;
+          audioContext.playStatus = 1;
+          this.setData({
+            audioContext: {
+              ...audioContext,
+            },
+          });
+          const audioUrl = await this.fetchAudioUrlByContent(botRecordId, content);
+          if (audioUrl) {
+            audioContext.context.src = audioUrl;
+            audioContext.context.seek(0); // 播放进度拉回到0
+            audioContext.context.play();
+            this.setData({
+              audioContext: {
+                ...audioContext,
+                playStatus: 2,
+              },
+            });
+          } else {
+            console.log("文本转语音失败");
+            this.setData({
+              audioContext: {
+                ...audioContext,
+                playStatus: 0,
+              },
+            });
+          }
+        }
+      } else {
+        // 创建audioContext
+        const audioContext = {
+          recordId: botRecordId,
+          playStatus: 1,
+        };
+        const innerAudioContent = wx.createInnerAudioContext({
+          useWebAudioImplement: false, // 是否使用 WebAudio 作为底层音频驱动，默认关闭。对于短音频、播放频繁的音频建议开启此选项，开启后将获得更优的性能表现。由于开启此选项后也会带来一定的内存增长，因此对于长音频建议关闭此选项
+        });
+        innerAudioContent.onEnded(() => {
+          // 音频自然播放至结束触发
+          this.setData({
+            audioContext: {
+              ...this.data.audioContext,
+              playStatus: 0,
+            },
+          });
+        });
+        audioContext.context = innerAudioContent;
+        this.setData({
+          audioContext: audioContext,
+        });
+        const audioUrl = await this.fetchAudioUrlByContent(botRecordId, content);
+        if (audioUrl) {
+          audioContext.context.src = audioUrl;
+          audioContext.context.play();
+          this.setData({
+            audioContext: {
+              ...audioContext,
+              playStatus: 2,
+            },
+          });
+        } else {
+          console.log("文本转语音失败");
+          this.setData({
+            audioContext: {
+              ...audioContext,
+              playStatus: 0,
+            },
+          });
+        }
+      }
+    },
+    handlePauseAudio: function (e) {
+      console.log("handlePauseAudio e", e);
+      const { recordid: botRecordId } = e.target.dataset;
+      const audioContext = this.data.audioContext;
+      if (botRecordId === audioContext.recordId && audioContext.context) {
+        audioContext.context.pause();
+        audioContext.playStatus = 0;
+        this.setData({
+          audioContext: {
+            ...audioContext,
+          },
+        });
+      } else {
+        console.log("暂停异常");
+      }
+    },
+    // 触摸开始
+    handleTouchStart(e) {
+      if(this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
+        wx.showToast({
+          title: "请等待对话完成",
+          icon: "error",
+        });
+        return
+      }
+      console.log("touchstart e", e);
+      const { clientY } = e.touches[0];
+      this.setData({
+        startY: clientY,
+        longPressTriggered: false,
+      });
+
+      // 设置长按定时器（500ms）
+      this.data.longPressTimer = setTimeout(() => {
+        // 触发长按，同时进入待发送态
+        this.setData({ longPressTriggered: true, sendStatus: 1 });
+        // 这里可添加长按反馈（如震动）
+        wx.vibrateShort();
+        this.startRecord();
+      }, 300);
+    },
+    // 触摸移动
+    handleTouchMove(e) {
+      if(this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
+        wx.showToast({
+          title: "请等待对话完成",
+          icon: "error",
+        });
+        return
+      }
+      console.log("touchMove");
+      if (!this.data.longPressTriggered) return;
+      const { clientY } = e.touches[0];
+      const deltaY = clientY - this.data.startY;
+      // 计算垂直滑动距离
+      if (Math.abs(deltaY) > this.data.moveThreshold) {
+        // 滑动超过阈值时置为待取消态
+        // clearTimeout(this.data.longPressTimer);
+        console.log("touchMove 待取消");
+        if (this.data.sendStatus !== 2) {
+          this.setData({ sendStatus: 2 });
+        }
+      } else {
+        console.log("touchMove 待发送");
+        if (this.data.sendStatus !== 1) {
+          this.setData({ sendStatus: 1 });
+        }
+      }
+    },
+    // 触摸结束
+    handleTouchEnd(e) {
+      if(this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
+        wx.showToast({
+          title: "请等待对话完成",
+          icon: "error",
+        });
+        return
+      }
+      console.log("touchEnd e", e);
+      clearTimeout(this.data.longPressTimer);
+      if (this.data.longPressTriggered) {
+        const { clientY } = e.changedTouches[0];
+        const deltaY = clientY - this.data.startY;
+        // 判断是否向上滑动超过阈值
+        if (deltaY < -this.data.moveThreshold) {
+          this.cancelSendVoice(); // 执行滑动后的逻辑
+        } else {
+          this.sendVoice(); // 执行普通松开逻辑
+        }
+      }
+      this.setData({ longPressTriggered: false });
+    },
+    sendVoice() {
+      // 发送语音消息
+      console.log("发送语音");
+      if (this.data.recorderManager) {
+        this.setData({
+          sendStatus: 3,
+          voiceRecognizing: true,
+        });
+        this.data.recorderManager.stop();
+      }
+    },
+    cancelSendVoice() {
+      // 取消语音发送
+      console.log("取消发送");
+      if (this.data.recorderManager) {
+        this.setData({
+          sendStatus: 4,
+        });
+        console.log("停止录音");
+        this.data.recorderManager.stop();
+      }
+    },
+    startRecord() {
+      console.log("startRecord sendStatus", this.data.sendStatus);
+      console.log("recorderManager", this.data.recorderManager);
+      if (this.data.recorderManager && this.data.sendStatus === 1) {
+        console.log("开始录音");
+        this.data.recorderManager.start(this.data.recordOptions);
+      }
     },
   },
 });
