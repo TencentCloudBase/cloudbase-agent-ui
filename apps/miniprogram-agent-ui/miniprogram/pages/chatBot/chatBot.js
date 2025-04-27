@@ -14,13 +14,14 @@ Page({
     //   resourceEnv: "chriscc-demo-7ghlpjf846d46d2d",
     // },
     agentConfig: {
-      botId: "bot-c5167aab", // agent id,
+      botId: "bot-db3cab4a", // agent id,
       allowWebSearch: true, // 允许客户端选择启用联网搜索
       allowUploadFile: true, // 允许上传文件
       allowPullRefresh: true, // 允许下拉刷新
       allowUploadImage: true, // 允许上传图片
       showToolCallDetail: true, // 展示 toolCall 细节
       allowMultiConversation: true,
+      allowVoice: true
     },
     modelConfig: {
       modelProvider: "deepseek", // 大模型服务厂商

@@ -108,6 +108,7 @@ Page({
       allowUploadImage: true, // 允许上传图片
       allowMultiConversation: true, // 允许客户端界面展示会话列表及新建会话按钮
       showToolCallDetail: true, // 允许展示 mcp server toolcall 细节
+      allowVoice: true, // 允许展示语音按钮
     },
     modelConfig: {
       modelProvider: "hunyuan-open", // 大模型服务厂商
@@ -209,6 +210,7 @@ Page({
 | `allowUploadImage`       | `Boolean` | 否   | 是否允许客户端界面展示图片上传及拍照上传      |
 | `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮  |
 | `showToolCallDetail`     | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节         |
+| `allowVoice`     | `Boolean` | 否   | 是否允许客户端界面展示语音按钮         |
 
 #### ModelConfig
 
@@ -229,6 +231,12 @@ Page({
 > 数量限制：单次最多支持 1 个文件
 
 > **request合法域名配置**：微信小程序 Agent-UI 组件支持 上传文件&多会话 需要添加云开发域名到request合法域名列表，云开发域名为：https://{your-envid}.api.tcloudbasegateway.com, 可前往[微信公众平台](https://mp.weixin.qq.com)配置request合法域名
+
+
+> **语音**
+> 若未授予小程序使用麦克风权限，组件会进行权限申请，请同意授予
+
+<img src="https://qcloudimg.tencent-cloud.cn/raw/55ce1f6862922bb1997720a51a84caab.png" width="375px">
 
 配置示例
 
@@ -317,6 +325,7 @@ Page({
       allowUploadImage: true, // 允许上传图片及拍照上传
       allowMultiConversation: true, // 允许客户端界面展示会话列表及新建会话按钮
       showToolCallDetail: true, // 允许展示 mcp server toolcall 细节
+      allowVoice: true // 允许展示语音按钮
     }
   }
   //...

@@ -100,17 +100,15 @@ export const commonRequest = async (options) => {
   console.log("当前版本", appBaseInfo.SDKVersion);
   const { path } = options;
   if (compareVersions(appBaseInfo.SDKVersion, "3.8.1") < 0) {
-    console.log('走wx request')
+    console.log("走wx request");
     const cloudInstance = await getCloudInstance();
     const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
-    const envId = cloudInstance.env || cloudInstance.extend.AI.bot.context.env
-    console.log('envId', envId)
+    const envId = cloudInstance.env || cloudInstance.extend.AI.bot.context.env;
+    console.log("envId", envId);
     return wx.request({
       ...options,
       path: undefined,
-      url: `https://${
-        envId
-      }.api.tcloudbasegateway.com/v1/aibot/${path}`,
+      url: `https://${envId}.api.tcloudbasegateway.com/v1/aibot/${path}`,
       header: {
         ...options.header,
         Authorization: `Bearer ${token}`,
@@ -144,8 +142,16 @@ export const commonRequest = async (options) => {
       },
     });
   } else {
-    console.log('走内部request')
+    console.log("走内部request");
     const ai = cloudInstance.extend.AI;
     return ai.request(options);
   }
+};
+
+export const sleep = (timeout) => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve();
+    }, timeout);
+  });
 };

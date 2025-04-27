@@ -31,6 +31,7 @@ Page({
     allowPullRefresh: true, // 允许下拉刷新
     allowUploadImage: true, // 允许上传图片
     allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
+    allowVoice: true, // 允许语音
     showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
   }
 }`,
@@ -118,6 +119,11 @@ Page({
         desc: "允许展示上传图片按钮",
       },
       {
+        name: "agentConfig.allowVoice",
+        type: "boolean",
+        desc: "允许展示语音按钮",
+      },
+      {
         name: "envShareConfig.resourceAppid",
         type: "boolean",
         desc: "环境共享资源方 AppID",
@@ -146,6 +152,7 @@ Page({
     allowUploadImage: true, // 允许客户端展示上传图片按钮
     allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
     showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
+    allowVoice: true, // 允许客户端展示语音按钮
   },
   modelConfig: {
     modelProvider: "hunyuan-open", // 大模型服务厂商
