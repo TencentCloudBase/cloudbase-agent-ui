@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.10.1...v1.11.0) (2025-04-27)
+
+
+### Features
+
+* 语音支持 ([463b5eb](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/463b5ebfbe6511761d31b2036f50034a162b4918))
+
 ### [1.10.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.10.0...v1.10.1) (2025-04-23)
 
 
