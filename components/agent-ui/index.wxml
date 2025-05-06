@@ -148,18 +148,33 @@
                 <markdownPreview markdown="{{item.content||''}}"></markdownPreview>
                 <!-- 下面的按钮 -->
                 <view style="display: flex; gap: 10px;justify-content: flex;" wx:if="{{!item.hiddenBtnGround}}">
-                  <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.error}}" data-reqid="{{item.reqId}}"/>
-                  <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' style="width: 36rpx; height: 36rpx;" data-content="{{item.content}}" />
+                  <image wx:if="{{item.error}}" mode="widthFix" bind:tap="showErrorMsg" src='./imgs/error-circle.svg' class="tool_btn" data-content="{{item.error}}" data-reqid="{{item.reqId}}"/>
+                  <image mode="widthFix" bind:tap="copyChatRecord" src='./imgs/copy.svg' class="tool_btn" data-content="{{item.content}}" />
                   <block wx:if="{{!item.error}}">                
                     <button class="share_btn" open-type="share">
-                      <image mode="widthFix" src='./imgs/share.svg' style="width: 36rpx; height: 36rpx;vertical-align: top;" bind:tap="share" />
+                    <image mode="widthFix" src='./imgs/share.svg' class="tool_btn" style="vertical-align: top;" bind:tap="share" />
                     </button>
                     <block wx:if="{{chatMode=== 'bot'}}">
-                      <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' style="width: 36rpx; height: 36rpx;" />
-                      <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' style="width: 36rpx; height: 36rpx;" />
-                      <image wx:if="{{audioContext.recordId !== item.record_id || audioContext.playStatus === 0}}" mode="widthFix" bind:tap="handlePlayAudio" data-content="{{item.content}}" data-recordId="{{item.record_id}}" src='./imgs/play.svg' style="width: 36rpx; height: 36rpx;" />
-                      <image wx:elif="{{audioContext.playStatus === 1}}" mode="widthFix"  src='./imgs/loading.svg' style="width: 36rpx; height: 36rpx;" />
-                      <image wx:else mode="widthFix" bind:tap="handlePauseAudio" data-recordId="{{item.record_id}}" src='./imgs/pause.svg' style="width: 36rpx; height: 36rpx;" />
+                      <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' class="tool_btn" />
+                      <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' class="tool_btn" />
+                      <image wx:if="{{audioContext.recordId !== item.record_id || audioContext.playStatus === 0}}" mode="widthFix" bind:tap="handlePlayAudio" data-content="{{item.content}}" data-recordId="{{item.record_id}}" src='./imgs/sound.svg' class="tool_btn" />
+                      <image wx:elif="{{audioContext.playStatus === 1}}" mode="widthFix"  src='./imgs/loading.svg' class="tool_btn" />
+                      <view wx:else class="playing_btn">
+                        <image style="width: 36rpx;height: 36rpx;"  mode="widthFix" bind:tap="handlePauseAudio" data-recordId="{{item.record_id}}" src='./imgs/pause.svg' />
+                        <image style="width: 30rpx;height: 30rpx" src="./imgs/playing.svg" mode="widthFix"/>
+                          <!-- 倍速切换按钮 -->
+                          <view class="speed-switch" bindtap="toggleSpeedList" data-recordId="{{item.record_id}}">
+                            
+                            <text class="speed-label">{{audioContext.currentSpeed || '1'}}</text>X
+                          </view>
+                          <!-- 倍速弹窗 -->
+                          <view wx:if="{{audioContext.showSpeedList && audioContext.recordId === item.record_id}}" class="speed-popup">
+                            <view wx:for="{{speedList}}" wx:key="item" class="speed-option" bindtap="chooseSpeed" data-speed="{{item}}" data-recordId="{{item.record_id}}">
+                              <text>{{item}}X</text>
+                              <image wx:if="{{audioContext.currentSpeed === item}}" src="./imgs/check.svg" style="width: 24rpx;height: 24rpx;margin-left:8rpx;" />
+                            </view>
+                          </view>
+                      </view>
                     </block>
                   </block>
                 </view>

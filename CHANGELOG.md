@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.12.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.11.0...v1.12.0) (2025-05-06)
+
+
+### Features
+
+* 增加倍速控制 ([99690d9](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/99690d97673423ba99e28b772962e300ce450dea))
+
+
+### Bug Fixes
+
+* fix doc ([72c6a53](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/72c6a53d226cf6426da4569be21d4bc77bba0827))
+
 ## [1.11.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.10.1...v1.11.0) (2025-04-27)
 
 

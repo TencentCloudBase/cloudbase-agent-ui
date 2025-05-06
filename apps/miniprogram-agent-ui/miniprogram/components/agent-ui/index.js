@@ -125,6 +125,7 @@ Component({
       frameSize: 50,
     },
     voiceRecognizing: false,
+    speedList: [2, 1.5, 1.25, 1, 0.75],
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -1912,15 +1913,20 @@ Component({
         if (audioContext.recordId === botRecordId) {
           // 是则直接播放
           audioContext.playStatus = 2;
+          audioContext.showSpeedList = false;
+          // audioContext.currentSpeed = 1.25;
           this.setData({
             audioContext: audioContext,
           });
+          audioContext.context.playbackRate = audioContext.currentSpeed;
           audioContext.context.play();
         } else {
           // 需销毁当前的 audioContext TODO:, 先测试复用content, 直接更换src
           audioContext.context.stop(); // 旧的停止
           audioContext.recordId = botRecordId;
           audioContext.playStatus = 1;
+          audioContext.showSpeedList = false;
+          audioContext.currentSpeed = 1.25;
           this.setData({
             audioContext: {
               ...audioContext,
@@ -1930,6 +1936,7 @@ Component({
           if (audioUrl) {
             audioContext.context.src = audioUrl;
             audioContext.context.seek(0); // 播放进度拉回到0
+            audioContext.context.playbackRate = audioContext.currentSpeed;
             audioContext.context.play();
             this.setData({
               audioContext: {
@@ -1952,11 +1959,20 @@ Component({
         const audioContext = {
           recordId: botRecordId,
           playStatus: 1,
+          showSpeedList: false,
+          currentSpeed: 1.25,
         };
-        const innerAudioContent = wx.createInnerAudioContext({
+        const innerAudioContext = wx.createInnerAudioContext({
           useWebAudioImplement: false, // 是否使用 WebAudio 作为底层音频驱动，默认关闭。对于短音频、播放频繁的音频建议开启此选项，开启后将获得更优的性能表现。由于开启此选项后也会带来一定的内存增长，因此对于长音频建议关闭此选项
         });
-        innerAudioContent.onEnded(() => {
+        try {
+          await wx.setInnerAudioOption({
+            obeyMuteSwitch: false, // 是否遵循系统静音开关，默认遵循
+          });
+        } catch (e) {
+          console.log("不遵循静音模式控制", e);
+        }
+        innerAudioContext.onEnded(() => {
           // 音频自然播放至结束触发
           this.setData({
             audioContext: {
@@ -1965,13 +1981,14 @@ Component({
             },
           });
         });
-        audioContext.context = innerAudioContent;
+        audioContext.context = innerAudioContext;
         this.setData({
           audioContext: audioContext,
         });
         const audioUrl = await this.fetchAudioUrlByContent(botRecordId, content);
         if (audioUrl) {
           audioContext.context.src = audioUrl;
+          audioContext.context.playbackRate = audioContext.currentSpeed; // 播放速率，范围 0.5~2.0，默认 1.0
           audioContext.context.play();
           this.setData({
             audioContext: {
@@ -2006,14 +2023,38 @@ Component({
         console.log("暂停异常");
       }
     },
+    toggleSpeedList(e) {
+      this.setData({
+        audioContext: {
+          ...this.data.audioContext,
+          showSpeedList: !this.data.audioContext.showSpeedList,
+        },
+      });
+    },
+    chooseSpeed(e) {
+      const speed = e.currentTarget.dataset.speed;
+      console.log("choose speed", speed);
+      const audioContext = this.data.audioContext;
+      audioContext.showSpeedList = !this.data.audioContext.showSpeedList;
+      audioContext.currentSpeed = Number(speed);
+      audioContext.context.pause();
+      audioContext.context.playbackRate = audioContext.currentSpeed;
+      audioContext.context.play();
+      this.setData({
+        audioContext: {
+          ...this.data.audioContext,
+          ...audioContext,
+        },
+      });
+    },
     // 触摸开始
     handleTouchStart(e) {
-      if(this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
+      if (this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
         wx.showToast({
           title: "请等待对话完成",
           icon: "error",
         });
-        return
+        return;
       }
       console.log("touchstart e", e);
       const { clientY } = e.touches[0];
@@ -2033,12 +2074,12 @@ Component({
     },
     // 触摸移动
     handleTouchMove(e) {
-      if(this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
+      if (this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
         wx.showToast({
           title: "请等待对话完成",
           icon: "error",
         });
-        return
+        return;
       }
       console.log("touchMove");
       if (!this.data.longPressTriggered) return;
@@ -2061,12 +2102,12 @@ Component({
     },
     // 触摸结束
     handleTouchEnd(e) {
-      if(this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
+      if (this.data.chatStatus !== 0 || this.data.voiceRecognizing === true) {
         wx.showToast({
           title: "请等待对话完成",
           icon: "error",
         });
-        return
+        return;
       }
       console.log("touchEnd e", e);
       clearTimeout(this.data.longPressTimer);
