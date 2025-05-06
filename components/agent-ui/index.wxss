@@ -104,9 +104,9 @@
 .share_btn {
   background-color: #fff;
   margin: 0px !important;
-  padding: 0px !important;
-  width: 36rpx !important;
-  height: 36rpx;
+  padding: 0rpx !important;
+  width: 64rpx !important;
+  height: 64rpx;
 }
 
 .avatar {
@@ -671,4 +671,65 @@
   background-color: rgb(249, 251, 255);
   filter: brightness(95%);
   transition: filter 0.4s;
+}
+
+.tool_btn {
+  width: 36rpx; 
+  height: 36rpx;
+  padding: 10rpx;
+  border: 1rpx solid #cfcdcd;
+  border-radius: 14rpx;
+  /* box-sizing: content-box; */
+}
+
+.playing_btn {
+  height: 36rpx; 
+  padding: 10rpx;
+  border: 1rpx solid #cfcdcd;
+  border-radius: 14rpx;
+  display: flex;
+  align-items: center;
+  gap: 10rpx;
+  position: relative;
+}
+
+.speed-switch {
+  display: flex;
+  align-items: center;
+  margin-left: 0rpx;
+  padding: 4rpx 12rpx;
+  border-radius: 20rpx;
+  /* background: #f5f5f7; */
+  font-size: 26rpx;
+  color: #222;
+  cursor: pointer;
+}
+
+.speed-label {
+  margin-left: 6rpx;
+}
+
+.speed-popup {
+  position: absolute;
+  bottom: 48rpx;
+  right: 0;
+  background: #fff;
+  border-radius: 12rpx;
+  box-shadow: 0 4rpx 16rpx rgba(0,0,0,0.08);
+  z-index: 99;
+  padding: 8rpx 0;
+  min-width: 80rpx;
+}
+
+.speed-option {
+  padding: 16rpx 32rpx;
+  font-size: 28rpx;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.speed-option:active {
+  background: #f0f0f0;
 }
