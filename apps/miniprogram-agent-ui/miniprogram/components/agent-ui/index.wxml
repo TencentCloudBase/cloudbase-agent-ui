@@ -164,7 +164,7 @@
                         <image style="width: 30rpx;height: 30rpx" src="./imgs/playing.svg" mode="widthFix"/>
                           <!-- 倍速切换按钮 -->
                           <view class="speed-switch" bindtap="toggleSpeedList" data-recordId="{{item.record_id}}">
-                            倍速
+                            
                             <text class="speed-label">{{audioContext.currentSpeed || '1'}}</text>X
                           </view>
                           <!-- 倍速弹窗 -->

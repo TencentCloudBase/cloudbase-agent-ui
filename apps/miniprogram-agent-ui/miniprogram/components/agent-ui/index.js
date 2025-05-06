@@ -1914,7 +1914,7 @@ Component({
           // 是则直接播放
           audioContext.playStatus = 2;
           audioContext.showSpeedList = false;
-          audioContext.currentSpeed = 1.25;
+          // audioContext.currentSpeed = 1.25;
           this.setData({
             audioContext: audioContext,
           });
