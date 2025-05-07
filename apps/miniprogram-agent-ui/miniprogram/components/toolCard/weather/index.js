@@ -34,14 +34,12 @@ Component({
       // 根据 name 区分处理不同 tool 调用情况
       const { name, toolData } = this.data;
       if (name === "weather") {
-        console.log("toolData", toolData);
         const { content } = toolData;
         if (content[0].type === "text") {
           const contentData = JSON.parse(content[0].text);
           const {
             result: { forecast },
           } = contentData;
-          console.log("forecast", forecast);
           const isDay = this.checkIsDay();
           if (forecast.length) {
             const todayForecast = forecast[0];
@@ -118,11 +116,13 @@ Component({
         雨: "rainy",
         雪: "snowy",
         雷阵雨: "thunderstorm",
+        阵雨: "rainy",
         大雨: "rainy",
         中雨: "rainy",
         小雨: "rainy",
         晴间多云: "sunnyovercast",
       };
+
       return weatherMap[weather] || "sunny";
     },
   },

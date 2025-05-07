@@ -43,12 +43,10 @@ Component({
       const { name, toolData } = this.data;
       // 将详细的结构化地址转换为经纬度坐标
       if (name === "placeSearchNearby") {
-        console.log("toolData", toolData);
         const { content } = toolData;
         if (content[0].type === "text") {
           const contentData = JSON.parse(content[0].text);
           const { data } = contentData;
-          console.log("placeSearchNearby data", data);
           this.setData({
             restaurants: data.map((item, index) => ({
               // ...item,

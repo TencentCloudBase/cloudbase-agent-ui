@@ -172,7 +172,6 @@ Component({
         allowMultiConversation,
         allowVoice,
       } = this.data.agentConfig;
-      console.log("allowWebSearch", allowWebSearch);
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
       allowPullRefresh = allowPullRefresh === undefined ? true : allowPullRefresh;
@@ -439,7 +438,6 @@ Component({
           const res = await this.fetchConversationList(true, this.data.bot.botId);
           if (res) {
             const { data } = res;
-            console.log("default conversation", data);
             if (data && !data.code) {
               // 区分旧的默认会话结构与新的默认会话结构
               if (data.data) {
@@ -487,7 +485,6 @@ Component({
           method: "GET",
           header: {},
           success: (res) => {
-            console.log("conversation list res", res);
             resolve(res);
           },
           fail(e) {
@@ -517,7 +514,6 @@ Component({
           },
           method: "POST",
           success: (res) => {
-            console.log("create conversation res", res);
             resolve(res);
           },
           fail(e) {
@@ -567,7 +563,6 @@ Component({
           page: this.data.conversationPageOptions.page + 1,
         },
       });
-      console.log("conversationPageOptions", this.data.conversationPageOptions);
       // 调用分页接口查询更多
       if (this.data.bot.botId) {
         const res = await this.fetchConversationList(false, this.data.bot.botId);
@@ -598,7 +593,6 @@ Component({
       try {
         if (this.data.bot.botId) {
           const res = await this.fetchConversationList(false, this.data.bot.botId);
-          console.log("res", res);
           if (res) {
             const { data } = res;
             if (data && !data.code) {
@@ -606,11 +600,9 @@ Component({
               const sortData = data.data.sort(
                 (a, b) => new Date(b.createTime).getTime() - new Date(a.createTime).getTime()
               );
-              console.log("sortData", sortData);
               const finalConData = this.data.defaultConversation
                 ? sortData.concat(this.data.defaultConversation)
                 : sortData;
-              console.log("finalConData", finalConData);
               this.setData({
                 conversations: finalConData,
                 transformConversations: this.transformConversationList(finalConData),
@@ -644,7 +636,6 @@ Component({
           earlyCon.push(item);
         }
       }
-      console.log("todayCon curMonthCon earlyCon", todayCon, curMonthCon, earlyCon);
       return {
         todayCon,
         curMonthCon,
@@ -718,10 +709,12 @@ Component({
         const transformToolCallObj = {
           id: curParam.tool_call.id,
           name: this.transformToolName(curParam.tool_call.function.name),
+          rawParams: curParam.tool_call.function.arguments,
           callParams: "```json\n\n" + JSON.stringify(curParam.tool_call.function.arguments, null, 2) + "\n```",
           content: ((curContent && curContent.content) || "").replaceAll("\t", "").replaceAll("\n", "\n\n"),
         };
         if (curResult) {
+          transformToolCallObj.rawResult = curResult.result;
           transformToolCallObj.callResult = "```json\n\n" + JSON.stringify(curResult.result, null, 2) + "\n```";
         }
         if (curError) {
@@ -1847,7 +1840,6 @@ Component({
           },
           method: "POST",
           success: (res) => {
-            console.log("create text-to-speech task res", res);
             resolve(res);
           },
           fail(e) {
@@ -1856,7 +1848,6 @@ Component({
           },
         });
       });
-      console.log("text-to-speech", res);
       const { data } = res;
       if (data && data.TaskId) {
         const taskId = data.TaskId;
@@ -1873,7 +1864,6 @@ Component({
               },
               method: "GET",
               success: (res) => {
-                console.log("create text-to-speech task res", res);
                 resolve(res);
               },
               fail(e) {
@@ -1882,7 +1872,6 @@ Component({
               },
             });
           });
-          console.log("query task res", res);
           const { data } = res;
           if (data.code || data.Status === 2) {
             loopQueryStatus = false;
@@ -2033,7 +2022,6 @@ Component({
     },
     chooseSpeed(e) {
       const speed = e.currentTarget.dataset.speed;
-      console.log("choose speed", speed);
       const audioContext = this.data.audioContext;
       audioContext.showSpeedList = !this.data.audioContext.showSpeedList;
       audioContext.currentSpeed = Number(speed);
@@ -2081,7 +2069,6 @@ Component({
         });
         return;
       }
-      console.log("touchMove");
       if (!this.data.longPressTriggered) return;
       const { clientY } = e.touches[0];
       const deltaY = clientY - this.data.startY;
@@ -2147,7 +2134,6 @@ Component({
     },
     startRecord() {
       console.log("startRecord sendStatus", this.data.sendStatus);
-      console.log("recorderManager", this.data.recorderManager);
       if (this.data.recorderManager && this.data.sendStatus === 1) {
         console.log("开始录音");
         this.data.recorderManager.start(this.data.recordOptions);

@@ -39,11 +39,9 @@ Component({
       const { name, toolData } = this.data;
       // 将详细的结构化地址转换为经纬度坐标
       if (name === "geocoder") {
-        console.log("toolData", toolData);
         const { content } = toolData;
         if (content[0].type === "text") {
           const contentData = JSON.parse(content[0].text);
-          console.log("geocoder data", contentData);
           const {
             result: {
               location: { lat, lng },
@@ -72,7 +70,6 @@ Component({
           const { location } = this.data.toolParams;
           const locationInfo = location.split(",");
           const contentData = JSON.parse(content[0].text);
-          console.log("placeSearchNearby data", contentData);
           const { data } = contentData;
           this.setData({
             latitude: locationInfo[0],
@@ -91,14 +88,12 @@ Component({
       }
       // 路线规划
       if (name === "directionDriving") {
-        console.log("toolData", toolData);
         const { content } = toolData;
         if (content[0].type === "text") {
           const { from, to } = this.data.toolParams;
           const fromInfo = from.split(",");
           const toInfo = to.split(",");
           const contentData = JSON.parse(content[0].text);
-          console.log("directionDriving data", contentData);
           const {
             result: { routes },
           } = contentData;
@@ -107,7 +102,6 @@ Component({
             const firstRoute = routes[0];
             const { polyline, steps } = firstRoute; //TODO: 需解压转化为经纬度坐标对数组
             const transformPolyline = this.transformRawPolyline(polyline);
-            console.log("transformPolyline", transformPolyline);
             const startAndEndPair = [
               {
                 id: 1,
