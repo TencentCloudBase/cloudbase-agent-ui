@@ -236,9 +236,9 @@
           <textarea  class="input" value="{{inputValue}}" maxlength="1024" bindfocus="bindInputFocus" bindinput="bindKeyInput" placeholder="说点什么吧" bindconfirm="handleSendMessage" confirm-type="send" adjust-position cursor-spacing="40" auto-height="{{true}}" show-confirm-bar="{{false}}" bindlinechange="handleLineChange" />
         </view>
         <text style="position: absolute;top: -50%;left: 50%;transform: translateX(-50%);font-size: 12px;color: {{sendStatus === 2 ? '#e84f50;' : ''}}">{{sendStatus === 1 ? "松开发送，上滑取消" : (sendStatus === 2 ? "松开取消" : "")}}</text>
-        <view bindtouchstart="handleTouchStart"  bindtouchmove="handleTouchMove" bindtouchend="handleTouchEnd" class="input_inner_box" style="position: absolute;width: calc(100% - 136rpx);left: 50%;transform: translateX(-50%);opacity: 0;">
+        <view hidden="{{!useVoice}}" bindtouchstart="handleTouchStart"  bindtouchmove="handleTouchMove" bindtouchend="handleTouchEnd" class="input_inner_box" style="position: absolute;width: calc(100% - 136rpx);left: 50%;transform: translateX(-50%);opacity: 0;">
         </view>
-        <view hidden="{{!useVoice}}"   class="input_inner_box say_box" style="background-color: {{sendStatus === 1 ? '#e9f6ef' : (sendStatus === 2 ? '#f8ecea' : '')}};"><text wx:if="{{!longPressTriggered}}">{{voiceRecognizing ? '识别中' : '按住 说话'}}</text>
+        <view hidden="{{!useVoice}}" class="input_inner_box say_box" style="background-color: {{sendStatus === 1 ? '#e9f6ef' : (sendStatus === 2 ? '#f8ecea' : '')}};"><text wx:if="{{!longPressTriggered}}">{{voiceRecognizing ? '识别中' : '按住 说话'}}</text>
           <image wx:else src="{{ sendStatus === 1 ? './imgs/sendSaying.svg' : (sendStatus === 2 ? './imgs/cancelSaying.svg' : '')}}" class="set" mode="widthFix" />
         </view>
         <view class="right_btns">
