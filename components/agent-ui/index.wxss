@@ -107,6 +107,7 @@
   padding: 0rpx !important;
   width: 64rpx !important;
   height: 64rpx;
+  border: none !important;
 }
 
 .avatar {
