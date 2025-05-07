@@ -88,7 +88,7 @@ App({
 
 ```wxml
 <view>
-  <agent-ui agentConfig="{{agentConfig}}" showBotAvatar="{{showBotAvatar}}" chatMode="{{chatMode}}" modelConfig="{{modelConfig}}></agent-ui>
+  <agent-ui agentConfig="{{agentConfig}}" showBotAvatar="{{showBotAvatar}}" chatMode="{{chatMode}}" modelConfig="{{modelConfig}}"></agent-ui>
 </view>
 ```
 
