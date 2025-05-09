@@ -41,7 +41,6 @@ Component({
   methods: {
     // 添加点击事件处理函数
     onFoodItemTap: function (e) {
-      console.log("tofood e", e);
       const foodId = e.currentTarget.dataset.id;
       const foodItem = this.data.foodList.find((item) => item.id === foodId);
 

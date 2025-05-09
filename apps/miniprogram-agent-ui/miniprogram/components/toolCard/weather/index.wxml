@@ -3,7 +3,7 @@
     <view class="temp-container">
       <!-- <view class="temp-circle {{isDay ? 'day-circle' : 'night-circle'}}"></view> -->
       <view style="display: flex;align-items: center;flex-direction: row;">      
-        <image class="temp-circle" src="{{'./assets/' + (isDay ? today.dayweatherIcon : today.nightweatherIcon) + '.svg'}}" mode="aspectFit"></image>
+        <image wx:if="{{today.dayweatherIcon}}" class="temp-circle" src="{{'./assets/' + (isDay ? today.dayweatherIcon : today.nightweatherIcon) + '.svg'}}" mode="aspectFit"></image>
         <text class="high-low-text">{{isDay ? today.dayweather : today.nightweather}}</text>
       </view>
     </view>

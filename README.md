@@ -147,24 +147,25 @@ Page({
 
 ![](https://qcloudimg.tencent-cloud.cn/raw/b45a95e06ec0df8dab5c9d9ec7707faa.png)
 
+#### 4. agent-ui 组件工具卡片组件中配置自定义组件映射
 
-#### 4. 开发自定义卡片组件
+![](https://qcloudimg.tencent-cloud.cn/raw/b4cd35ccaa3e72189934ed59d35f7ae5.png)
 
-- 参照本工程中 apps/miniprogram-agent-ui/miniprogram/components/toolCard 目录内自定义工具卡片组件实现
+如图所示，示例中添加了腾讯地图自定义卡片组件引用
+
+#### 5. 自定义卡片组件开发
+
+- 参照本工程中 apps/miniprogram-agent-ui/miniprogram/components/toolCard 目录内自定义腾讯地图卡片组件实现
 
 ![](https://qcloudimg.tencent-cloud.cn/raw/14a4a82810f0b45bde0c124cc8f3ed1c.png)
 
-#### 5. 卡片组件引用配置
+#### 6. 自定义卡片组件引用配置
 
 - 自定义卡片组件引用声明配置（可在用户小程序项目全局app.json中配置 或 agent-ui组件index.json中配置）
 
 ![](https://qcloudimg.tencent-cloud.cn/raw/cd1dc376a1e238f3186a2209e5875698.png)
 
-- agent-ui 组件内 customCard/index.wxml 中添加自定义组件
-
-![](https://qcloudimg.tencent-cloud.cn/raw/b4cd35ccaa3e72189934ed59d35f7ae5.png)
-
-#### 6. 卡片效果
+#### 7. 卡片效果
 
 <img src="https://qcloudimg.tencent-cloud.cn/raw/82adcd08eec9443f8b8a336342a4fa23.png" width="375px"> 
 
