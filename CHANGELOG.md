@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.12.3](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.12.2...v1.12.3) (2025-05-12)
+
+
+### Bug Fixes
+
+* fix toolname parse ([ee872c8](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/ee872c8b9eb1e01e970e0b13ea2f9ecbad30bcac))
+
 ### [1.12.2](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.12.1...v1.12.2) (2025-05-09)
 
 
