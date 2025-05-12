@@ -147,7 +147,9 @@ Page({
 
 ![](https://qcloudimg.tencent-cloud.cn/raw/b45a95e06ec0df8dab5c9d9ec7707faa.png)
 
-#### 4. agent-ui 组件工具卡片组件中配置自定义组件映射
+#### 4. 实现 Agent UI customCard 组件
+
+- 在agent-ui customCard 组件(agent-ui/customCard/index.wxml) 中添加自定义逻辑，可根据不同 tool 类型渲染不同自定义组件
 
 ![](https://qcloudimg.tencent-cloud.cn/raw/b4cd35ccaa3e72189934ed59d35f7ae5.png)
 
