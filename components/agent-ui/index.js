@@ -398,12 +398,8 @@ Component({
     },
     transformToolName: function (str) {
       if (str) {
-        const strArr = str.split("/");
-        if (strArr[1]) {
-          return strArr[1];
-        } else if (strArr[0]) {
-          return strArr[0];
-        }
+        const strArr = str.split(/\/+/);
+        return strArr[strArr.length - 1];
       }
       return "";
     },
