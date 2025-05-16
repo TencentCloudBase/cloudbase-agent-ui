@@ -21,7 +21,8 @@ Page({
       allowUploadImage: true, // 允许上传图片
       showToolCallDetail: true, // 展示 toolCall 细节
       allowMultiConversation: true,
-      allowVoice: true
+      allowVoice: true,
+      showBotName: true
     },
     modelConfig: {
       modelProvider: "deepseek", // 大模型服务厂商

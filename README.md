@@ -214,6 +214,7 @@ Page({
 | `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮  |
 | `showToolCallDetail`     | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节         |
 | `allowVoice`     | `Boolean` | 否   | 是否允许客户端界面展示语音按钮         |
+| `showBotName`     | `Boolean` | 否   | 是否允许客户端界面展示 Bot 名称         |
 
 #### ModelConfig
 
@@ -351,11 +352,11 @@ Page({
 - ✅ 支持文字转语音播放
 - ✅ 支持用户语音输入转文字
 - ✅ 支持语音音色配置
+- ✅ UI 双标题优化
 
 ### 🚧 进行中开发
 
 - 多模型（快速响应/深度推理）切换调用配置化
-- UI 双标题优化
 
 ### 📅 未来计划
 
