@@ -124,6 +124,11 @@ Page({
         desc: "允许展示语音按钮",
       },
       {
+        name: "agentConfig.showBotName",
+        type: "boolean",
+        desc: "允许展示bot名称",
+      },
+      {
         name: "envShareConfig.resourceAppid",
         type: "boolean",
         desc: "环境共享资源方 AppID",
@@ -153,6 +158,7 @@ Page({
     allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
     showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
     allowVoice: true, // 允许客户端展示语音按钮
+    showBotName: true, // 允许展示bot名称
   },
   modelConfig: {
     modelProvider: "hunyuan-open", // 大模型服务厂商

@@ -1,6 +1,6 @@
 {
   "name": "cloudbase-agent-ui",
-  "version": "1.12.3",
+  "version": "1.12.5",
   "description": "微信小程序 Agent UI组件",
   "main": "index.js",
   "directories": {

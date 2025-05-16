@@ -119,6 +119,11 @@
 .wd-markdown ._table ._td > ._p {
   min-height: 1em;
 }
+
+.wd-markdown image {
+  width: 480rpx !important;
+  height: 480rpx !important;
+}
 /*!
     Theme: GitHub
     Description: Light theme as seen on github.com
