@@ -1,0 +1,31 @@
+{
+  "name": "react",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "lint": "eslint .",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@cloudbase/agent-ui-react": "1.0.0-beta.4",
+    "@cloudbase/js-sdk": "^2.13.0",
+    "@react-three/drei": "^9.88.6",
+    "@react-three/fiber": "^8.13.7",
+    "jszip": "^3.10.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "three": "^0.152.2",
+    "tlbs-map-react": "^1.1.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "@vitejs/plugin-react": "^4.3.4",
+    "sass": "^1.89.0",
+    "typescript": "^5.0.2",
+    "vite": "4.5.3"
+  }
+}
