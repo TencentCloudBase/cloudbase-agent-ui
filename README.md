@@ -214,7 +214,7 @@ Page({
 | `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮  |
 | `showToolCallDetail`     | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节         |
 | `allowVoice`     | `Boolean` | 否   | 是否允许客户端界面展示语音按钮         |
-| `showBotName`     | `Boolean` | 否   | 是否允许客户端界面展示 Bot 名称         |
+| `showBotName`     | `Boolean` | 否   | 是否允许客户端界面展示 Bot 名称 (当设置为false时，用户可手动在组件所属 page中自定义 navigationBarTitleText 为 Bot 名称)         |
 
 #### ModelConfig
 
