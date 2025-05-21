@@ -30,7 +30,7 @@ Component({
         allowMultiConversation: Boolean,
         allowVoice: Boolean,
         showToolCallDetail: Boolean,
-        showBotName: Boolean 
+        showBotName: Boolean,
       },
     },
     modelConfig: {
@@ -173,7 +173,7 @@ Component({
         showToolCallDetail,
         allowMultiConversation,
         allowVoice,
-        showBotName
+        showBotName,
       } = this.data.agentConfig;
       allowWebSearch = allowWebSearch === undefined ? true : allowWebSearch;
       allowUploadFile = allowUploadFile === undefined ? true : allowUploadFile;
@@ -182,7 +182,7 @@ Component({
       showToolCallDetail = showToolCallDetail === undefined ? true : showToolCallDetail;
       allowMultiConversation = allowMultiConversation === undefined ? true : allowMultiConversation;
       allowVoice = allowVoice === undefined ? true : allowVoice;
-      showBotName = showBotName === undefined ? true: showBotName;
+      showBotName = showBotName === undefined ? true : showBotName;
       this.setData({
         bot,
         questions,
@@ -194,7 +194,7 @@ Component({
         showToolCallDetail: showToolCallDetail,
         showMultiConversation: allowMultiConversation,
         showVoice: allowVoice,
-        showBotName: showBotName
+        showBotName: showBotName,
       });
       console.log("bot", this.data.bot);
       if (chatMode === "bot" && this.data.bot.multiConversationEnable) {
