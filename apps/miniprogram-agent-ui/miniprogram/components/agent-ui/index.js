@@ -1416,7 +1416,7 @@ Component({
             lastValue.role = role || "assistant";
             lastValue.record_id = record_id;
             // 优先处理错误,直接中断
-            if (finish_reason === "error" || finish_reason === "content_filter") {
+            if (finish_reason === "error" || finish_reason === "content_filter" || error) {
               lastValue.search_info = null;
               lastValue.reasoning_content = "";
               lastValue.knowledge_meta = [];
