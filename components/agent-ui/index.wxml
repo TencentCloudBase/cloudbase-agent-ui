@@ -86,7 +86,7 @@
                   已匹配 {{item.db_len}} 张数据表
                 </view>
                 <!-- 联网搜索 -->
-                <FoldedCard wx:if="{{item.search_info}}" initStatus="{{false}}" showBgColor="{{true}}">
+                <FoldedCard wx:if="{{item.search_info && item.search_info.search_results}}" initStatus="{{false}}" showBgColor="{{true}}">
                   <view slot="title" style="opacity: 0.7;font-size: 14px;display: flex; align-items: center; gap: 8px;">
                     <image src="./imgs/search.svg" mode="aspectFill" style="width: 36rpx;height: 36rpx;" />
                     <text>已参考 {{item.search_info.search_results.length}} 个网页</text>

@@ -1408,6 +1408,7 @@ Component({
               finish_reason,
               search_results,
               error,
+              usage,
             } = dataJson;
             const newValue = [...this.data.chatRecords];
             // 取最后一条消息更新
@@ -1416,7 +1417,7 @@ Component({
             lastValue.role = role || "assistant";
             lastValue.record_id = record_id;
             // 优先处理错误,直接中断
-            if (finish_reason === "error" || finish_reason === "content_filter") {
+            if (finish_reason === "error" || finish_reason === "content_filter" || error) {
               lastValue.search_info = null;
               lastValue.reasoning_content = "";
               lastValue.knowledge_meta = [];
@@ -1568,6 +1569,16 @@ Component({
                   this.autoToBottom();
                 }
               }
+            }
+            // 超出token数限制
+            if (type === "finish" && finish_reason === "length") {
+              const completionTokens = usage?.completionTokens || 0;
+              lastValue.error = completionTokens
+                ? `当前输出token长度为 ${completionTokens}，已超过最大限制，请重新提问`
+                : "已超过最大限制，请重新提问";
+              this.setData({
+                [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
+              });
             }
           } catch (e) {
             console.log("err", event, e);
