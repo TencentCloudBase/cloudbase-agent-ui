@@ -1572,7 +1572,7 @@ Component({
             }
             // 超出token数限制
             if (type === "finish" && finish_reason === "length") {
-              const completionTokens = usage?.completion_tokens || 0;
+              const completionTokens = usage?.completionTokens || 0;
               lastValue.error = completionTokens
                 ? `当前输出token长度为 ${completionTokens}，已超过最大限制，请重新提问`
                 : "已超过最大限制，请重新提问";
