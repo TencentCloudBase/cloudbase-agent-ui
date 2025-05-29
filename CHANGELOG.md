@@ -2,6 +2,16 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.2](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.13.1...v1.13.2) (2025-05-29)
+
+
+### Bug Fixes
+
+* 添加输出token超限报错 ([26e7d47](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/26e7d47aef38a1d59aec7b729e2844995e947d96))
+* 修复agent-ui 联网查询无结果展示问题 ([5bb2958](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/5bb2958578d498d3095b4c848d3b04f8e5b77816))
+* 修复token数超限问题 ([20d40bb](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/20d40bbf5a6399c7866cd67e695ca0e5c5a7584e))
+* fix error handle logic ([189b9fe](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/189b9fe059eb58a2b30fad71e280d5e65b85c850))
+
 ### [1.13.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.13.0...v1.13.1) (2025-05-21)
 
 
