@@ -1,0 +1,80 @@
+/* Artifact styling */
+.cloudbase-artifact {
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  margin: 16px 0;
+  overflow: hidden;
+}
+
+.artifact-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background-color: #f8f9fa;
+  border-bottom: 1px solid #ddd;
+}
+
+.artifact-header h3 {
+  margin: 0;
+  font-size: 16px;
+}
+
+.code-container {
+  position: relative;
+  background-color: #f8f9fa;
+  padding: 16px;
+  overflow: auto;
+}
+
+.code-artifact {
+  width: 600px;
+}
+
+.code-container pre {
+  margin: 0;
+  white-space: pre-wrap;
+}
+
+.preview-container {
+  width: 100%;
+  border-top: 1px solid #ddd;
+  // overflow: auto;
+}
+
+.copy-button {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  padding: 4px 8px;
+  font-size: 12px;
+  background-color: #eee;
+  color: #333;
+}
+
+.diagram-container {
+  padding: 16px;
+  display: flex;
+  justify-content: center;
+  background-color: white;
+}
+
+.unknown-artifact {
+  border: 1px solid #ffcc00;
+  border-radius: 8px;
+  margin: 16px 0;
+  padding: 16px;
+  background-color: #fffbea;
+}
+
+.unknown-artifact h3 {
+  margin-top: 0;
+  color: #996600;
+}
+
+.unknown-artifact pre {
+  background-color: #fff;
+  padding: 12px;
+  border-radius: 4px;
+  overflow: auto;
+}

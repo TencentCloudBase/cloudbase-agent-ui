@@ -2,6 +2,8 @@ import { AgentUI } from "@cloudbase/agent-ui-react";
 import cloudbase from "@cloudbase/js-sdk";
 import { useEffect, useState } from "react";
 import { ToolCard } from "./components/ToolCard";
+import { CodeArtifactComponent } from "./components/artifacts/CodeArtifactComponent";
+import { MermaidArtifactComponent } from "./components/artifacts/MermaidArtifactComponent";
 
 const tcb = cloudbase.init({
   env: import.meta.env.VITE_ENV_ID,
@@ -42,6 +44,12 @@ export function App() {
           deepReasoningModel: "deepseek-r1",
         }}
         toolCardComponent={ToolCard}
+        extra={{
+          artifactMap: {
+            code: CodeArtifactComponent,
+            mermaid: MermaidArtifactComponent,
+          },
+        }}
       />
     </div>
   );
