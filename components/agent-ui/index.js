@@ -1335,7 +1335,7 @@ Component({
             data: {
               botId: bot.botId,
               msg: inputValue,
-              files: this.data.showUploadFile ? userRecord.fileList.map((item) => item.fileId) : undefined,
+              files: userRecord.fileList.length ? userRecord.fileList.map((item) => item.fileId) : undefined,
               searchEnable: this.data.useWebSearch,
             },
           });
@@ -1359,7 +1359,7 @@ Component({
           const sendReq = {
             botId: bot.botId,
             msg: inputValue,
-            files: this.data.showUploadFile ? userRecord.fileList.map((item) => item.fileId) : undefined,
+            files: userRecord.fileList.length ? userRecord.fileList.map((item) => item.fileId) : undefined,
             searchEnable: this.data.useWebSearch,
           };
 
@@ -1415,7 +1415,9 @@ Component({
             const lastValueIndex = newValue.length - 1;
             const lastValue = newValue[lastValueIndex];
             lastValue.role = role || "assistant";
-            lastValue.record_id = record_id;
+            if (record_id) {
+              lastValue.record_id = record_id;
+            }
             // 优先处理错误,直接中断
             if (finish_reason === "error" || finish_reason === "content_filter" || error) {
               lastValue.search_info = null;
@@ -1907,6 +1909,15 @@ Component({
     },
     handlePlayAudio: async function (e) {
       console.log("handlePlayAudio e", e);
+      // 判断是否打开语音能力
+      if (!this.data.bot.voiceSettings?.enable) {
+        wx.showModal({
+          title: "提示",
+          content: "请前往腾讯云开发平台启用语音输入输出能力",
+        });
+        return;
+      }
+
       const { recordid: botRecordId, content } = e.target.dataset;
       const audioContext = this.data.audioContext;
       if (audioContext.context) {

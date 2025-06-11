@@ -157,24 +157,26 @@
                     <block wx:if="{{chatMode=== 'bot'}}">
                       <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="upvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-up.svg' class="tool_btn" />
                       <image mode="widthFix" bind:tap="openFeedback" data-feedbackType="downvote" data-feedbackRecordId="{{item.record_id}}" src='./imgs/thumb-down.svg' class="tool_btn" />
-                      <image wx:if="{{audioContext.recordId !== item.record_id || audioContext.playStatus === 0}}" mode="widthFix" bind:tap="handlePlayAudio" data-content="{{item.content}}" data-recordId="{{item.record_id}}" src='./imgs/sound.svg' class="tool_btn" />
-                      <image wx:elif="{{audioContext.playStatus === 1}}" mode="widthFix"  src='./imgs/loading.svg' class="tool_btn" />
-                      <view wx:else class="playing_btn">
-                        <image style="width: 36rpx;height: 36rpx;"  mode="widthFix" bind:tap="handlePauseAudio" data-recordId="{{item.record_id}}" src='./imgs/pause.svg' />
-                        <image style="width: 30rpx;height: 30rpx" src="./imgs/playing.svg" mode="widthFix"/>
-                          <!-- 倍速切换按钮 -->
-                          <view class="speed-switch" bindtap="toggleSpeedList" data-recordId="{{item.record_id}}">
-                            
-                            <text class="speed-label">{{audioContext.currentSpeed || '1'}}</text>X
-                          </view>
-                          <!-- 倍速弹窗 -->
-                          <view wx:if="{{audioContext.showSpeedList && audioContext.recordId === item.record_id}}" class="speed-popup">
-                            <view wx:for="{{speedList}}" wx:key="item" class="speed-option" bindtap="chooseSpeed" data-speed="{{item}}" data-recordId="{{item.record_id}}">
-                              <text>{{item}}X</text>
-                              <image wx:if="{{audioContext.currentSpeed === item}}" src="./imgs/check.svg" style="width: 24rpx;height: 24rpx;margin-left:8rpx;" />
+                      <block wx:if="{{item.record_id}}">
+                        <image wx:if="{{audioContext.recordId !== item.record_id || audioContext.playStatus === 0}}" mode="widthFix" bind:tap="handlePlayAudio" data-content="{{item.content}}" data-recordId="{{item.record_id}}" src='./imgs/sound.svg' class="tool_btn" />
+                        <image wx:elif="{{audioContext.playStatus === 1}}" mode="widthFix"  src='./imgs/loading.svg' class="tool_btn" />
+                        <view wx:else class="playing_btn">
+                          <image style="width: 36rpx;height: 36rpx;"  mode="widthFix" bind:tap="handlePauseAudio" data-recordId="{{item.record_id}}" src='./imgs/pause.svg' />
+                          <image style="width: 30rpx;height: 30rpx" src="./imgs/playing.svg" mode="widthFix"/>
+                            <!-- 倍速切换按钮 -->
+                            <view class="speed-switch" bindtap="toggleSpeedList" data-recordId="{{item.record_id}}">
+                              
+                              <text class="speed-label">{{audioContext.currentSpeed || '1'}}</text>X
                             </view>
-                          </view>
-                      </view>
+                            <!-- 倍速弹窗 -->
+                            <view wx:if="{{audioContext.showSpeedList && audioContext.recordId === item.record_id}}" class="speed-popup">
+                              <view wx:for="{{speedList}}" wx:key="item" class="speed-option" bindtap="chooseSpeed" data-speed="{{item}}" data-recordId="{{item.record_id}}">
+                                <text>{{item}}X</text>
+                                <image wx:if="{{audioContext.currentSpeed === item}}" src="./imgs/check.svg" style="width: 24rpx;height: 24rpx;margin-left:8rpx;" />
+                              </view>
+                            </view>
+                        </view>
+                      </block>
                     </block>
                   </block>
                 </view>
