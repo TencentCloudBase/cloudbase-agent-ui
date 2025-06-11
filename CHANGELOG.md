@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.13.2...v1.14.0) (2025-06-11)
+
+
+### Features
+
+* 增加 react 组件 artifact 示例 ([a78c8d9](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/a78c8d93997a94371b837b4f5b5dd60de0ebf183))
+
+
+### Bug Fixes
+
+* 修复图片上传配置问题&函数型agent 语音播放按钮状态问题 ([74a584f](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/74a584f53ececefbfb4aadd420a3d372d26e4332))
+
 ### [1.13.2](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.13.1...v1.13.2) (2025-05-29)
 
 
