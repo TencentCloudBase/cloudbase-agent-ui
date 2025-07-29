@@ -1425,7 +1425,12 @@ Component({
               lastValue.knowledge_meta = [];
               lastValue.content = this.data.defaultErrorMsg;
               if (error && error.message) {
-                lastValue.error = error.message;
+                if (error.code === "EXCEED_TOKEN_QUOTA_LIMIT") {
+                  lastValue.content = "大模型 Token 已耗尽，请通知开发者前往云开发平台进行处理";
+                  lastValue.error = lastValue.content;
+                } else {
+                  lastValue.content = error.message;
+                }
                 this.setData({
                   [`chatRecords[${lastValueIndex}].error`]: lastValue.error,
                 });
