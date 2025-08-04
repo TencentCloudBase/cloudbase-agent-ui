@@ -743,3 +743,71 @@
 .speed-option:active {
   background: #f0f0f0;
 }
+
+/* 底部操作菜单弹窗 */
+.action-menu-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  animation: fadeIn 0.3s ease-out;
+}
+
+.action-menu {
+  background: #ffffff;
+  border-radius: 24rpx 24rpx 0 0;
+  overflow: hidden;
+  animation: slideUp 0.3s ease-out;
+  margin: 0 20rpx 20rpx 20rpx;
+  box-shadow: 0 -4rpx 20rpx rgba(0, 0, 0, 0.1);
+}
+
+.action-item {
+  padding: 32rpx 0;
+  text-align: center;
+  font-size: 32rpx;
+  color: #333333;
+  background: #ffffff;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+}
+
+.action-item:last-child {
+  border-bottom: none;
+}
+
+.action-item:active {
+  background: #f8f8f8;
+}
+
+.cancel-item {
+  margin-top: 20rpx;
+  border-radius: 24rpx;
+  border-bottom: none;
+  color: #666666;
+}
+
+/* 动画效果 */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}

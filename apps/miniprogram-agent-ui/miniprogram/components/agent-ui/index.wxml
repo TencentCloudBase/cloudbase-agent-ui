@@ -20,19 +20,40 @@
         <view class="con-block" wx:if="{{transformConversations.todayCon.length}}">
           <text class="date-title">今天</text>
           <view class="con-container">
-            <view class="con-item" bind:tap="handleClickConversation" data-conversation="{{item}}" wx:for="{{transformConversations.todayCon}}" wx:key="index">{{item.title}}</view>
+            <view class="con-item {{item.conversationId === conversation.conversationId ? 'selected-con' : ''}}" 
+                bind:tap="handleClickConversation" 
+                bind:longpress="handleLongPressConversation"
+                data-conversation="{{item}}"
+                wx:for="{{transformConversations.todayCon}}" 
+                wx:key="index">
+              {{item.title}}
+            </view>
           </view>
         </view>
         <view class="con-block" wx:if="{{transformConversations.curMonthCon.length}}">
           <text class="date-title">本月</text>
           <view class="con-container">
-            <view class="con-item {{item.conversationId === conversation.conversationId ? 'selected-con' : ''}}" bind:tap="handleClickConversation" data-conversation="{{item}}" wx:for="{{transformConversations.curMonthCon}}"  wx:key="index">{{item.title}}</view>
+            <view class="con-item {{item.conversationId === conversation.conversationId ? 'selected-con' : ''}}" 
+                bind:tap="handleClickConversation" 
+                bind:longpress="handleLongPressConversation"
+                data-conversation="{{item}}"
+                wx:for="{{transformConversations.curMonthCon}}" 
+                wx:key="index">
+              {{item.title}}
+            </view>
           </view>
         </view>
         <view class="con-block" wx:if="{{transformConversations.earlyCon.length}}">
           <text class="date-title">更早</text>
           <view class="con-container">
-            <view class="con-item" bind:tap="handleClickConversation" data-conversation="{{item}}" wx:for="{{transformConversations.earlyCon}}" wx:key="index">{{item.title}}</view>
+            <view class="con-item" 
+                bind:tap="handleClickConversation" 
+                bind:longpress="handleLongPressConversation"
+                data-conversation="{{item}}"
+                wx:for="{{transformConversations.earlyCon}}" 
+                wx:key="index">
+              {{item.title}}
+            </view>
           </view>
         </view>
       </block>
@@ -277,4 +298,15 @@
     </view>
   </view>
   <feedback input="{{input}}" aiAnswer="{{aiAnswer}}" isShowFeedback="{{isShowFeedback}}" bind:close="closefeedback" feedbackRecordId="{{feedbackRecordId}}" feedbackType="{{feedbackType}}" botId="{{bot.botId}}"></feedback>
+  <!-- 底部操作菜单弹窗 -->
+  <view class="action-menu-modal" wx:if="{{showActionMenu}}" bind:tap="hideActionMenu">
+    <view class="action-menu" catchtap="">
+      <view class="action-item" bind:tap="handleDeleteConversation" data-conversation="{{selectedConversation}}">
+        删除
+      </view>
+      <view class="action-item cancel-item" bind:tap="hideActionMenu">
+        取消
+      </view>
+    </view>
+  </view>
 </view>
