@@ -590,7 +590,6 @@ Component({
                   title: "删除成功",
                   icon: "success",
                 });
-                await that.resetFetchConversationList();
               } else {
                 wx.showToast({
                   title: "删除失败，请稍后重试",
