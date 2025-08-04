@@ -128,6 +128,9 @@ Component({
     },
     voiceRecognizing: false,
     speedList: [2, 1.5, 1.25, 1, 0.75],
+
+    showActionMenu: false, // 是否显示操作菜单
+    selectedConversation: null, // 当前选中的会话
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -482,7 +485,7 @@ Component({
         });
 
         commonRequest({
-          path: `conversation/?botId=${botId}&limit=${limit}&offset=${offset}&isDefault=${isDefault}`,
+          path: `bots/${botId}/conversation/?limit=${limit}&offset=${offset}&isDefault=${isDefault}`,
           method: "GET",
           header: {},
           success: (res) => {
@@ -506,7 +509,7 @@ Component({
       // const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
       return new Promise((resolve, reject) => {
         commonRequest({
-          path: `conversation`,
+          path: `bots/${this.data.agentConfig.botId}/conversation`,
           header: {
             // Authorization: `Bearer ${token}`,
           },
@@ -524,6 +527,101 @@ Component({
         });
       });
     },
+    deleteConversation: async function (conversationId) {
+      return new Promise((resolve, reject) => {
+        commonRequest({
+          path: `bots/${this.data.agentConfig.botId}/conversation/${conversationId}`,
+          method: "DELETE",
+          success: (res) => {
+            resolve(res);
+          },
+          fail(e) {
+            console.log("delete conversation e", e);
+            reject(e);
+          },
+        });
+      });
+    },
+    handleDeleteConversation: async function (e) {
+      const { conversation } = e.currentTarget.dataset;
+      const that = this;
+
+      this.hideActionMenu();
+
+      wx.showModal({
+        title: "提示",
+        content: "确认删除当前会话？",
+        confirmText: "删除",
+        confirmColor: "#ff303b",
+        success: async function(res){
+          if (res.confirm) {
+            // 删除会话
+            try{
+              const deleteRes = await that.deleteConversation(conversation.conversationId);
+              
+              if (deleteRes && !deleteRes.code) {
+                // 删除成功后更新本地数据
+                const updatedConversations = that.data.conversations.filter(
+                  item => item.conversationId !== conversation.conversationId
+                );
+                that.setData({
+                  conversations: updatedConversations,
+                  transformConversations: that.transformConversationList(updatedConversations),
+                });
+
+                if (that.data.conversation?.conversationId === conversation.conversationId) {
+                  that.clearChatRecords();
+                  if (updatedConversations.length > 0) {
+                    that.handleClickConversation({
+                      currentTarget: {
+                        dataset: {
+                          conversation: updatedConversations[0],
+                        },
+                      },
+                    });
+                  } else {
+                    that.setData({
+                      conversation: null,
+                    });
+                  }
+                }
+
+                wx.showToast({
+                  title: "删除成功",
+                  icon: "success",
+                });
+              } else {
+                wx.showToast({
+                  title: "删除失败，请稍后重试",
+                  icon: "error",
+                });
+              }
+            } catch (error) {
+              console.error("删除会话失败", error);
+              wx.showToast({
+                title: "删除失败，请稍后重试",
+                icon: "error",
+              });
+            }
+          } 
+        },
+      });
+    },
+    handleLongPressConversation: function (e) {
+      // 长按会话，显示操作菜单
+      const { conversation } = e.currentTarget.dataset;
+      this.setData({
+        showActionMenu: true,
+        selectedConversation: conversation,
+      });
+    },
+    hideActionMenu: function () {
+      // 隐藏操作菜单
+      this.setData({
+        showActionMenu: false,
+        selectedConversation: null,
+      });
+    },    
     clickCreateInDrawer: function () {
       this.setData({
         isDrawerShow: false,
