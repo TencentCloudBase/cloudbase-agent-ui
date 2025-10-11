@@ -2,6 +2,15 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.14.3](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.14.1...v1.14.3) (2025-10-11)
+
+
+### Bug Fixes
+
+* 改造对话接口 ([2795b5a](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/2795b5a1e0d8a920c1733a9dfb268edd53cd719f))
+* 修改对话接口 ([f6ebe9d](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/f6ebe9dfe20327ba3ea9afab172e199a9f31847a))
+* fix bug ([40e4412](https://github.com/TencentCloudBase/cloudbase-agent-ui/commit/40e441257b040126ffb3763945bfa01f0d05be9b))
+
 ### [1.14.1](https://github.com/TencentCloudBase/cloudbase-agent-ui/compare/v1.14.0...v1.14.1) (2025-07-30)
 
 

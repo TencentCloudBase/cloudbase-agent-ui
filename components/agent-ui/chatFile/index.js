@@ -34,32 +34,36 @@ Component({
         success: async (res) => {
           const appBaseInfo = wx.getAppBaseInfo();
           const fileId = res.fileID;
-          this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, status: "parsing" });
           console.log("当前版本", appBaseInfo.SDKVersion);
-          commonRequest({
-            path: `bots/${botId}/files`,
-            data: {
-              fileList: [
-                {
-                  fileName: rawFileName || tempFileName,
-                  fileId,
-                  type: rawType,
-                },
-              ],
-            }, // any
-            method: "POST",
-            timeout: 60000,
-            success: (res) => {
-              console.log("resolve agent file res", res);
-              this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
-            },
-            fail: (e) => {
-              console.log("e", e);
-              this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
-            },
-            complete: () => {},
-            header: {},
-          })
+          if (botId.startsWith("ibot")) {
+            this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
+          } else {
+            this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, status: "parsing" });
+            commonRequest({
+              path: `bots/${botId}/files`,
+              data: {
+                fileList: [
+                  {
+                    fileName: rawFileName || tempFileName,
+                    fileId,
+                    type: rawType,
+                  },
+                ],
+              }, // any
+              method: "POST",
+              timeout: 60000,
+              success: (res) => {
+                console.log("resolve agent file res", res);
+                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parsed" });
+              },
+              fail: (e) => {
+                console.log("e", e);
+                this.triggerEvent("changeChild", { tempId: this.data.fileData.tempId, fileId, status: "parseFailed" });
+              },
+              complete: () => {},
+              header: {},
+            });
+          }
         },
         fail: (err) => {
           console.error("上传失败：", err);
