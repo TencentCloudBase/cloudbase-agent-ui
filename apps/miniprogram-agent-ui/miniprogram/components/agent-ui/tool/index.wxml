@@ -1,0 +1,17 @@
+<view class="tool">
+  <view class="header" bind:tap="toggleExpand">
+    <image wx:if="{{toolStatus==='running'}}" class="icon" src="../imgs/loading.svg" mode="aspectFill" />
+    <image wx:if="{{toolStatus==='success'}}" class="icon" src="../imgs/check.svg" mode="aspectFill" />
+    <image wx:if="{{toolStatus==='failed'}}" class="icon" src="../imgs/close-red.svg" mode="aspectFill" />
+    <view class="title">调用工具：{{toolName}}</view>
+    <image class="arrow" style="transform: rotate({{isExpanded?0:-90}}deg);" src="../imgs/arrow.svg"
+      mode="aspectFill" />
+  </view>
+  <view class="content" style='display: {{isExpanded?"block":"none"}}'>
+    <view class="content-title">参数:</view>
+    <view>{{parsedParams}}</view>
+    <view class="divider"></view>
+    <view class="content-title">调用结果:</view>
+    <view>{{parsedResult}}</view>
+  </view>
+</view>

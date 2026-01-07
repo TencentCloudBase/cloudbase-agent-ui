@@ -5,14 +5,10 @@ export const checkConfig = (chatMode, agentConfig, modelConfig) => {
   const appBaseInfo = wx.getAppBaseInfo();
   try {
     const systemInfo = wx.getSystemInfoSync();
-    // console.log('systemInfo', systemInfo)
     if (systemInfo.environment === "wxwork") {
       return [false, "请前往微信客户端扫码打开小程序"];
     }
   } catch (e) {
-    // console.log('getSystemInfoSync 接口废弃')
-    // 使用 getAppBaseInfo 兜底
-    // console.log('appBaseInfo', appBaseInfo)
     if (appBaseInfo.host.env === "SDK") {
       return [false, "请前往微信客户端扫码打开小程序"];
     }
@@ -22,7 +18,7 @@ export const checkConfig = (chatMode, agentConfig, modelConfig) => {
   if (compareVersions(appBaseInfo.SDKVersion, "3.7.7") < 0) {
     return [false, "使用AI能力需基础库为3.7.7及以上，请升级基础库版本或微信客户端"];
   }
-  if (!["bot", "model"].includes(chatMode)) {
+  if (!["bot",  "model"].includes(chatMode)) {
     return [false, "chatMode 不正确，值应为“bot”或“model”"];
   }
   if (chatMode === "bot" && !botId) {
@@ -97,14 +93,12 @@ export const commonRequest = async (options) => {
   const self = this;
   // 判断 当前sdk 版本是否 小于 3.8.1
   const appBaseInfo = wx.getAppBaseInfo();
-  console.log("当前版本", appBaseInfo.SDKVersion);
   const { path } = options;
   if (compareVersions(appBaseInfo.SDKVersion, "3.8.1") < 0) {
     console.log("走wx request");
     const cloudInstance = await getCloudInstance();
     const { token } = await cloudInstance.extend.AI.bot.tokenManager.getToken();
     const envId = cloudInstance.env || cloudInstance.extend.AI.bot.context.env;
-    console.log("envId", envId);
     return wx.request({
       ...options,
       path: undefined,
@@ -117,16 +111,7 @@ export const commonRequest = async (options) => {
         if (options.fail) {
           options.fail.bind(self)(e);
           if (e.errno === 600002 || e.errMsg.includes("url not in domain list")) {
-            // const { url } = options;
             let msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 https://${envId}.api.tcloudbasegateway.com`;
-            // if (url) {
-            //   const regex = /^(https?:\/\/[^/?#]+)/i;
-            //   const matches = url.match(regex);
-            //   console.log("matches", matches);
-            //   if (matches[1]) {
-            //     msg = `请前往微信公众平台 request 合法域名配置中添加云开发域名 ${matches[1]}`;
-            //   }
-            // }
             if (!isDomainWarn) {
               isDomainWarn = true;
               wx.showModal({
@@ -142,7 +127,6 @@ export const commonRequest = async (options) => {
       },
     });
   } else {
-    console.log("走内部request");
     const ai = cloudInstance.extend.AI;
     return ai.request(options);
   }
