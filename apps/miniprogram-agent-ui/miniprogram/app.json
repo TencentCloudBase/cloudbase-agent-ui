@@ -1,5 +1,9 @@
 {
-  "pages": ["pages/index/index", "pages/chatBot/chatBot", "pages/foodBuy/foodBuy"],
+  "pages": [
+    "pages/index/index",
+    "pages/chatBot/chatBot",
+    "pages/foodBuy/foodBuy"
+  ],
   "usingComponents": {
     "custom-map": "/components/toolCard/map/index",
     "custom-weather": "/components/toolCard/weather/index",

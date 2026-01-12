@@ -22,25 +22,25 @@ Component({
     agentConfig: {
       type: Object,
       value: {
-        botId: String,
-        allowUploadFile: Boolean,
-        allowWebSearch: Boolean,
-        allowPullRefresh: Boolean,
-        allowUploadImage: Boolean,
-        allowMultiConversation: Boolean,
-        allowVoice: Boolean,
-        showToolCallDetail: Boolean,
-        showBotName: Boolean,
+        botId: "",
+        allowUploadFile: true,
+        allowWebSearch: true,
+        allowPullRefresh: true,
+        allowUploadImage: true,
+        allowMultiConversation: true,
+        allowVoice: true,
+        showToolCallDetail: true,
+        showBotName: true,
+        tools: [],
       },
     },
     modelConfig: {
       type: Object,
       value: {
-        modelProvider: String,
-        quickResponseModel: String,
-        // deepReasoningModel: String, // 待支持
-        logo: String,
-        welcomeMsg: String,
+        modelProvider: "",
+        quickResponseModel: "",
+        logo: "",
+        welcomeMsg: "",
       },
     },
   },
@@ -51,9 +51,28 @@ Component({
         showFeatureList: showWebSearchSwitch,
       });
     },
+    // 监听agentConfig变化，判断是否是agent-开头的
+    agentConfig: function (agentConfig) {
+      console.log('mode',this.properties.chatMode)
+      // 如果是agent-开头的，从agentConfig中提取agentID和tools,组成新的agentV2Config，对用户不可见
+      if (this.properties.chatMode==="bot"&&agentConfig.botId.startsWith("agent")) {
+        this.setData({
+          isAgent: true,
+          agentV2Config: {
+            agentID: agentConfig.botId,
+            tools: agentConfig.tools,
+          },
+        });
+      }
+    },
   },
 
   data: {
+    isAgent: false,
+    agentV2Config: {
+      agentID: "",
+      tools: [],
+    },
     showMenu: false,
     tapMenuRecordId: "",
     isLoading: true, // 判断是否尚在加载中
@@ -131,6 +150,9 @@ Component({
 
     showActionMenu: false, // 是否显示操作菜单
     selectedConversation: null, // 当前选中的会话
+
+    messages: [], // 消息列表
+    threadId: "",
   },
   attached: async function () {
     const chatMode = this.data.chatMode;
@@ -145,9 +167,14 @@ Component({
     }
     // 初始化一次cloudInstance，它是单例的，后面不传参数也可以获取到
     const cloudInstance = await getCloudInstance(this.data.envShareConfig);
+    // 配置型 Agent 初始化
     if (chatMode === "bot") {
       const { botId } = this.data.agentConfig;
+      if (botId.startsWith("agent")) {
+        return;
+      }
       const ai = cloudInstance.extend.AI;
+      // 查询 agent 相关配置
       const bot = await ai.bot.get({ botId });
       // 新增错误提示
       if (bot.code) {
@@ -199,28 +226,19 @@ Component({
         showVoice: allowVoice,
         showBotName: showBotName,
       });
-      console.log("bot", this.data.bot);
-      if (chatMode === "bot" && this.data.bot.multiConversationEnable) {
+      // 如果多会话开启，拉一次会话
+      if (this.data.bot.multiConversationEnable) {
         // 拉一次默认旧会话
         await this.fetchDefaultConversationList();
         // 拉一遍新会话列表
         await this.resetFetchConversationList();
       }
-      // this.setData({
-      //   bot: {
-      //     ...this.data.bot,
-      //     voiceSettings: {
-      //       enable: true,
-      //     },
-      //   },
-      // });
-      if (chatMode === "bot" && this.data.bot.voiceSettings?.enable) {
+      if (this.data.bot.voiceSettings?.enable) {
         // 初始化录音管理器
         await this.initRecordManager();
         // 提前获取语音权限
         wx.getSetting({
           success(res) {
-            console.log("auth settings", res);
             if (!res.authSetting["scope.record"]) {
               wx.authorize({
                 scope: "scope.record",
@@ -240,6 +258,11 @@ Component({
           },
         });
       }
+    }
+    if (this.data.isAgent) {
+      this.setData({
+        threadId: "threadId_" + Date.now(),
+      });
     }
   },
   detached: function () {
@@ -457,10 +480,6 @@ Component({
                   defaultConversation: data,
                   conversations: [data],
                   transformConversations: this.transformConversationList([data]),
-                  // conversationPageOptions: {
-                  //   ...this.data.conversationPageOptions,
-                  //   total: data.total,
-                  // },
                 });
               }
             }
@@ -553,16 +572,16 @@ Component({
         content: "确认删除当前会话？",
         confirmText: "删除",
         confirmColor: "#ff303b",
-        success: async function(res){
+        success: async function (res) {
           if (res.confirm) {
             // 删除会话
-            try{
+            try {
               const deleteRes = await that.deleteConversation(conversation.conversationId);
-              
+
               if (deleteRes && !deleteRes.code) {
                 // 删除成功后更新本地数据
                 const updatedConversations = that.data.conversations.filter(
-                  item => item.conversationId !== conversation.conversationId
+                  (item) => item.conversationId !== conversation.conversationId
                 );
                 that.setData({
                   conversations: updatedConversations,
@@ -603,7 +622,7 @@ Component({
                 icon: "error",
               });
             }
-          } 
+          }
         },
       });
     },
@@ -621,7 +640,7 @@ Component({
         showActionMenu: false,
         selectedConversation: null,
       });
-    },    
+    },
     clickCreateInDrawer: function () {
       this.setData({
         isDrawerShow: false,
@@ -1085,7 +1104,6 @@ Component({
       this.clearChatRecords();
     },
     clearChatRecords: function () {
-      console.log("执行清理");
       const chatMode = this.data.chatMode;
       const { bot } = this.data;
       this.setData({ showTools: false });
@@ -1096,10 +1114,14 @@ Component({
         });
         return;
       }
-      // 只有一条不需要清
-      // if (this.data.chatRecords.length === 1) {
-      //   return;
-      // }
+      if (this.data.isAgent) {
+        this.setData({
+          messages: [],
+          chatStatus: 0,
+          threadId: "threadId_" + String(+new Date()),
+        });
+        return;
+      }
       const record = {
         content: bot.welcomeMessage || "你好，有什么我可以帮到你？",
         record_id: "record_id" + String(+new Date() + 10),
@@ -1334,21 +1356,27 @@ Component({
     },
     stop: function () {
       this.autoToBottom();
-      const { chatRecords, chatStatus } = this.data;
-      const newChatRecords = [...chatRecords];
-      const record = newChatRecords[newChatRecords.length - 1];
-      if (chatStatus === 1) {
-        record.content = "已暂停生成";
+      if (this.data.isAgent) {
+        this.setData({
+          chatStatus: 0, // 暂停之后切回正常状态
+        });
+      } else {
+        const { chatRecords, chatStatus } = this.data;
+        const newChatRecords = [...chatRecords];
+        const record = newChatRecords[newChatRecords.length - 1];
+        if (chatStatus === 1) {
+          record.content = "已暂停生成";
+        }
+        // 暂停思考
+        if (chatStatus === 2) {
+          record.pauseThinking = true;
+        }
+        this.setData({
+          chatRecords: newChatRecords,
+          manualScroll: false,
+          chatStatus: 0, // 暂停之后切回正常状态
+        });
       }
-      // 暂停思考
-      if (chatStatus === 2) {
-        record.pauseThinking = true;
-      }
-      this.setData({
-        chatRecords: newChatRecords,
-        manualScroll: false,
-        chatStatus: 0, // 暂停之后切回正常状态
-      });
     },
     openSetPanel: function () {
       this.setData({ setPanelVisibility: true });
@@ -1365,7 +1393,11 @@ Component({
         });
         return;
       }
-      await this.sendMessage(event.currentTarget.dataset.message);
+      if (this.data.isAgent) {
+        await this.handleSendMessageV2(event.currentTarget.dataset.message);
+      } else {
+        await this.sendMessage(event.currentTarget.dataset.message);
+      }
     },
     sendMessage: async function (message) {
       if (this.data.showFileList) {
@@ -1778,6 +1810,7 @@ Component({
             if (finish_reason === "stop") {
               break;
             }
+            console.log('ryan',delta);
             const { content, reasoning_content, role } = delta;
             reasoningText += reasoning_content || "";
             contentText += content || "";
@@ -2263,6 +2296,217 @@ Component({
       if (this.data.recorderManager && this.data.sendStatus === 1) {
         console.log("开始录音");
         this.data.recorderManager.start(this.data.recordOptions);
+      }
+    },
+    handleUserMessage: function (message) {
+      const { inputValue } = this.data;
+      const content = message || inputValue;
+      const userMsg = { id: "user_message_" + Date.now(), role: "user", content };
+      // 为了保证格式统一，返回数组
+      return [userMsg];
+    },
+    handleFrontendToolCallMessage: function (frontendToolsResult) {
+      const toolCallMessages = frontendToolsResult.map((item) => ({
+        id: item.toolCallId,
+        role: "tool",
+        toolCallId: item.toolCallId,
+        content: item.result,
+      }));
+      return toolCallMessages;
+    },
+    handleSendMessageV2: async function (message) {
+      const userMessages = this.handleUserMessage(message);
+      this.setData({
+        chatStatus: 1, // 状态：生成中
+        inputValue: "",
+      });
+      await this.sendMessageV2(userMessages);
+      this.setData({
+        chatStatus: 0,
+      });
+    },
+    // 传进来的消息有三种，用户输入，前端工具调用结果，人机交互中断，目前不支持人机交互中断
+    sendMessageV2: async function (message) {
+      const {
+        agentV2Config: { agentID },
+        messages,
+        threadId,
+      } = this.data;
+      // 1. UI 预处理,如果是用户消息,则添加一个 AI 占位消息
+      const newMessages = [...messages];
+      if (message?.[0].role === "user") {
+        const aiMsg = { id: "assistant_message_" + Date.now(), role: "assistant", parts: [] };
+        newMessages.push(message?.[0], aiMsg);
+        this.setData({
+          messages: newMessages,
+        });
+      }
+      // 记录当前 AI 消息的索引，后续只更新这一条
+      const currentAiMsgIndex = newMessages.length - 1;
+      const cloudInstance = await getCloudInstance();
+      const ai = cloudInstance.extend.AI;
+      // 2.发起初始请求
+      try {
+        const res = await ai.bot.sendMessage({
+          data: {
+            botId: agentID,
+            threadId: threadId,
+            runId: "run_id_" + Date.now(),
+            messages: message,
+            tools: this.data.agentV2Config.tools.map((item) => ({
+              name: item.name,
+              description: item.description,
+              parameters: item.parameters,
+            })),
+            context: [],
+            state: {},
+          },
+        });
+        // 3.进入流处理循环
+        await this.handleStream(res.eventStream, ai, agentID, currentAiMsgIndex);
+      } catch (e) {
+        this.setData({
+          [`messages[${currentAiMsgIndex}].parts`]: [{ type: "error", content: "网络出错了，请稍后再试，(｡ì _ í｡)" }],
+        });
+      }
+    },
+    handleStream: async function (stream, ai, agentID, currentAiMsgIndex) {
+      let fullContent = "";
+      const currentParts = this.data.messages[currentAiMsgIndex].parts;
+      for await (let event of stream) {
+        // 被中断直接返回
+        if (this.data.chatStatus === 0) {
+          return;
+        }
+        this.toBottom();
+        const data = event.json;
+        // console.log(data);
+        switch (data.type) {
+          // 普通文本输出开始，push 一个 text 类型的 part
+          case "TEXT_MESSAGE_START":
+            fullContent = "";
+            const textPart = { type: "text", content: fullContent, id: data.messageId };
+            currentParts.push(textPart);
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts`]: currentParts,
+            });
+            break;
+
+          // 文本内容累加
+          case "TEXT_MESSAGE_CONTENT":
+            fullContent += data.delta || "";
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts[${currentParts.length - 1}].content`]: fullContent,
+            });
+            break; // 必须添加 break！
+          // 工具调用开始，push 一个 tool_call 类型的 part
+          case "TOOL_CALL_START":
+            fullContent = "";
+            const toolCallPart = {
+              type: "tool_call",
+              toolCallName: data.toolCallName,
+              id: data.toolCallId,
+              arguments: fullContent,
+              status: "running",
+            };
+            currentParts.push(toolCallPart);
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts`]: currentParts,
+            });
+            break;
+          // 工具调用参数累加
+          case "TOOL_CALL_ARGS":
+            fullContent += data.delta || "";
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts[${currentParts.length - 1}].arguments`]: fullContent,
+            });
+            break;
+          // 更新服务端工具调用结果
+          case "TOOL_CALL_RESULT":
+            const toolCallId = data.toolCallId;
+            // 收到服务端工具调用的结果，更新工具调用状态，并且要求工具调用必须是 running 状态
+            const toolCallIndex = currentParts.findIndex(
+              (item) => item.id === toolCallId && item.type === "tool_call" && item.status === "running"
+            );
+            if (toolCallIndex === -1) {
+              continue;
+            }
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts[${toolCallIndex}].status`]: "success",
+            });
+            break;
+          case "RUN_ERROR":
+            const agentErrorPart = {
+              type: "error",
+              content: "agent 出错了，请稍后再试，(｡ì _ í｡)",
+            };
+            currentParts.push(agentErrorPart);
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts`]: currentParts,
+            });
+            // agent 运行错误直接返回
+            return;
+          default:
+            break;
+        }
+      }
+      // 4. 处理工具调用
+      // 过滤出状态为 running 的工具调用，这里会同时收集到前端和后端工具调用
+      const toolCalls = currentParts.filter((part) => part.type === "tool_call" && part.status === "running");
+      // 如果有工具调用，处理工具调用
+      if (toolCalls.length > 0) {
+        // 收集所有工具调用的结果，未找到工具或者调用失败都应该发回服务端
+        const frontendToolsResult = [];
+        for (const toolCall of toolCalls) {
+          const { toolCallName, arguments: args, id: toolCallId } = toolCall;
+          // 根据工具调用名称找到对应的前端工具
+          const tool = this.data.agentV2Config.tools.find((item) => item.name === toolCallName);
+          // 只处理前端工具调用
+          if (tool) {
+             try {
+               // 调用工具处理函数
+               const toolResult = await tool.handler(JSON.parse(args));
+               // 处理成字符串
+               const toolResultStr = JSON.stringify(toolResult);
+               // 调用成功，将结果添加到前端工具调用结果数组
+               frontendToolsResult.push({
+                 toolCallId,
+                 result: toolResultStr,
+               });
+               // 更新工具调用状态为 success
+               this.setData({
+                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                   (item) => item.id === toolCallId
+                 )}].status`]: "success",
+               });
+               this.setData({
+                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                   (item) => item.id === toolCallId
+                 )}].result`]: toolResultStr,
+               });
+             } catch (e) {
+               frontendToolsResult.push({
+                 toolCallId,
+                 result: `工具${toolCallName}调用失败：${e.message}`,
+               });
+               // 更新工具调用状态为 failed
+               this.setData({
+                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                   (item) => item.id === toolCallId
+                 )}].status`]: "failed",
+               });
+               this.setData({
+                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                   (item) => item.id === toolCallId
+                 )}].result`]: e.message,
+               });
+             }
+          }
+        }
+        // 处理工具调用结果，发送给服务端
+        const toolCallMessages = this.handleFrontendToolCallMessage(frontendToolsResult);
+        // 递归调用 sendMessageV2，直至本轮会话结束
+        await this.sendMessageV2(toolCallMessages);
       }
     },
   },
