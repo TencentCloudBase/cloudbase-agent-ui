@@ -26,13 +26,49 @@ Page({
   showBotAvatar: true, // 是否在对话框左侧显示头像
   agentConfig: {
     botId: "bot-e7d1e736", // agent id,
-    allowWebSearch: true, // 允许客户端选择启用联网搜索
-    allowUploadFile: true, // 允许上传文件
-    allowPullRefresh: true, // 允许下拉刷新
-    allowUploadImage: true, // 允许上传图片
-    allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
-    allowVoice: true, // 允许语音
-    showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
+    allowWebSearch: true, // 允许客户端选择启用联网搜索（仅对配置型 agent 生效）
+    allowUploadFile: true, // 允许上传文件（仅对配置型 agent 生效）
+    allowPullRefresh: true, // 允许下拉刷新（仅对配置型 agent 生效）
+    allowUploadImage: true, // 允许上传图片（仅对配置型 agent 生效）
+    allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮（仅对配置型 agent 生效）
+    allowVoice: true, // 允许语音（仅对配置型 agent 生效）
+    showToolCallDetail: true, // 是否展示 mcp server toolCall 细节（仅对配置型 agent 生效）
+    // 前端工具列表（仅对云托管或者云函数 agent 生效）
+       tools: [
+        {
+          name: "get_weather",
+          description: "获取指定城市的天气",
+          parameters: {
+            type: "object",
+            properties: { city: { type: "string" } },
+            required: ["city"],
+          },
+          // 同步函数示例
+          handler: async (params) => {
+            const { city } = params;
+            return \`城市$\{city\}的天气是晴朗的，温度是25摄氏度，无风\`;
+          }
+        },
+        {
+          name: "get_location",
+          description: "获取指定城市的经纬度",
+          parameters: {
+            type: "object",
+            properties: { city: { type: "string" } },
+            required: ["city"],
+          },
+          // 异步函数示例
+          handler: async (params) => {
+            const { city } = params;
+            // 模拟网络延迟
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(\`城市$\{city\}的位置是东经114.305556度，北纬22.543056度\`);
+              }, 2000);
+            });
+          },
+        },
+      ],
   }
 }`,
       modelConfig1: `data: {
@@ -151,14 +187,50 @@ Page({
   showBotAvatar: true, // 是否在对话框左侧显示头像
   agentConfig: {
     botId: "bot-e7d1e736", // agent id,
-    allowWebSearch: true, // 允许客户端选择展示联网搜索按钮
-    allowUploadFile: true, // 允许客户端展示上传文件按钮
-    allowPullRefresh: true, // 允许客户端展示下拉刷新
-    allowUploadImage: true, // 允许客户端展示上传图片按钮
-    allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮
-    showToolCallDetail: true, // 是否展示 mcp server toolCall 细节
-    allowVoice: true, // 允许客户端展示语音按钮
-    showBotName: true, // 允许展示bot名称
+    allowWebSearch: true, // 允许客户端选择展示联网搜索按钮（仅对配置型 agent 生效）
+    allowUploadFile: true, // 允许客户端展示上传文件按钮（仅对配置型 agent 生效）
+    allowPullRefresh: true, // 允许客户端展示下拉刷新（仅对配置型 agent 生效）
+    allowUploadImage: true, // 允许客户端展示上传图片按钮（仅对配置型 agent 生效）
+    allowMultiConversation: true, // 允许客户端展示查看会话列表/新建会话按钮（仅对配置型 agent 生效）
+    showToolCallDetail: true, // 是否展示 mcp server toolCall 细节（仅对配置型 agent 生效）
+    allowVoice: true, // 允许客户端展示语音按钮（仅对配置型 agent 生效）
+    showBotName: true, // 允许展示bot名称（仅对配置型 agent 生效）
+    // 前端工具列表（仅对云托管或者云函数 agent 生效）
+       tools: [
+        {
+          name: "get_weather",
+          description: "获取指定城市的天气",
+          parameters: {
+            type: "object",
+            properties: { city: { type: "string" } },
+            required: ["city"],
+          },
+          // 同步函数示例
+          handler: async (params) => {
+            const { city } = params;
+            return \`城市$\{city\}的天气是晴朗的，温度是25摄氏度，无风\`;
+          }
+        },
+        {
+          name: "get_location",
+          description: "获取指定城市的经纬度",
+          parameters: {
+            type: "object",
+            properties: { city: { type: "string" } },
+            required: ["city"],
+          },
+          // 异步函数示例
+          handler: async (params) => {
+            const { city } = params;
+            // 模拟网络延迟
+            return new Promise((resolve) => {
+              setTimeout(() => {
+                resolve(\`城市$\{city\}的位置是东经114.305556度，北纬22.543056度\`);
+              }, 2000);
+            });
+          },
+        },
+      ],
   },
   modelConfig: {
     modelProvider: "hunyuan-open", // 大模型服务厂商
