@@ -1,0 +1,45 @@
+.tool {
+  background-color: #f5f5f5;
+  border-radius: 10rpx;
+  overflow: hidden;
+  margin-bottom: 10rpx;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  padding: 20rpx;
+}
+
+.title {
+  flex: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.icon {
+  width: 48rpx;
+  height: 48rpx;
+  margin-right: 10px;
+}
+
+.arrow {
+  width: 48rpx;
+  height: 48rpx;
+  margin-left: 10rpx;
+}
+
+.content {
+  background-color: #333333;
+  padding: 20rpx;
+  color: #f5f5f5;
+  white-space: pre-wrap;
+  font-family: monospace;
+}
+.content-title{
+  margin-bottom: 10rpx;
+}
+.divider{
+  height: 20px;
+}
