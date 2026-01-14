@@ -100,17 +100,8 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
     Page({
       data: {
         chatMode: "bot", // bot 表示使用agent，model 表示使用大模型，两种选一种配置即可
-        showBotAvatar: true, // 是否在对话框左侧显示头像
         agentConfig: {
           botId: "bot-e7d1e736", // agent id
-          allowWebSearch: true, // 允许客户端选择启用联网搜索（仅对配置型 agent 生效）
-          allowUploadFile: true, // 允许上传文件（仅对配置型 agent 生效）
-          allowPullRefresh: true, // 允许下拉刷新（仅对配置型 agent 生效）
-          allowUploadImage: true, // 允许上传图片（仅对配置型 agent 生效）
-          allowMultiConversation: true, // 允许客户端界面展示会话列表及新建会话按钮（仅对配置型 agent 生效）
-          showToolCallDetail: true, // 允许展示 mcp server toolcall 细节（仅对配置型 agent 生效）
-          allowVoice: true, // 允许展示语音按钮（仅对配置型 agent 生效）
-          // 前端工具列表（仅对云托管或者云函数 agent 生效）
           tools: [
             {
               name: "get_weather",
@@ -183,7 +174,7 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
 | 参数              | 类型                     | 必填 | 说明                                                                                                   |
 | ----------------- | ------------------------ | ---- | ------------------------------------------------------------------------------------------------------ |
 | `chatMode`      | `String`               | 是   | 组件对接的AI类型，值为 'bot' 或者 'model'，为 'bot' 时，对接 agent 能力；为 'model' 时，对接大模型能力 |
-| `showBotAvatar` | `Boolean`              | 否   | 是否展示Bot的logo头像                                                                                  |
+
 | `agentConfig`   | [AgentConfig](#Agentconfig) | 是   | Agent 调用配置                                                                                         |
 | `modelConfig`   | [ModelConfig](#Modelconfig) | 是   | Model 调用配置                                                                                         |
 
@@ -192,14 +183,6 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
 | 参数                       | 类型        | 必填 | 说明                                          |
 | -------------------------- | ----------- | ---- | --------------------------------------------- |
 | `botId`                  | `String`  | 否   | Agent的唯一标识ID，当 chatMode = 'bot' 时必填 |
-| `allowWebSearch`         | `Boolean` | 否   | 是否允许客户端界面展示联网搜索（仅对配置型 agent 生效）                |
-| `allowUploadFile`        | `Boolean` | 否   | 是否允许客户端界面展示文件上传（仅对配置型 agent 生效）                |
-| `allowPullRefresh`       | `Boolean` | 否   | 是否允许客户端界面展示下拉获取历史记录（仅对配置型 agent 生效）        |
-| `allowUploadImage`       | `Boolean` | 否   | 是否允许客户端界面展示图片上传及拍照上传（仅对配置型 agent 生效）      |
-| `allowMultiConversation` | `Boolean` | 否   | 是否允许客户端界面展示会话列表及新建会话按钮（仅对配置型 agent 生效）  |
-| `showToolCallDetail`     | `Boolean` | 否   | 是否允许展示 mcp server toolcall 细节（仅对配置型 agent 生效）         |
-| `allowVoice`     | `Boolean` | 否   | 是否允许客户端界面展示语音按钮（仅对配置型 agent 生效）         |
-| `showBotName`     | `Boolean` | 否   | 是否允许客户端界面展示 Bot 名称 (当设置为false时，用户可手动在组件所属 page中自定义 navigationBarTitleText 为 Bot 名称)（仅对配置型 agent 生效）         |
 | `tools`     | `Array` | 否   | 自定义工具列表（框架型 agent 生效）         |
 
 #### ModelConfig
@@ -309,13 +292,6 @@ Agent UI 微信小程序组件依赖**微信云开发**服务，需先开通云�
         showBotAvatar: true, // 是否在对话框左侧显示头像
         agentConfig: {
           botId: "agent-xxx-xxx", // agent id
-          allowWebSearch: true, // 允许客户端选择启用联网搜索（仅对配置型 agent 生效）
-          allowUploadFile: true, // 允许上传文件（仅对配置型 agent 生效）
-          allowPullRefresh: true, // 允许下拉刷新（仅对配置型 agent 生效）
-          allowUploadImage: true, // 允许上传图片及拍照上传（仅对配置型 agent 生效）
-          allowMultiConversation: true, // 允许客户端界面展示会话列表及新建会话按钮（仅对配置型 agent 生效）
-          showToolCallDetail: true, // 允许展示 mcp server toolcall 细节（仅对配置型 agent 生效）
-          allowVoice: true, // 允许展示语音按钮（仅对配置型 agent 生效）
           tools: [
             {
               name: "get_weather",
