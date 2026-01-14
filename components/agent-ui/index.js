@@ -53,9 +53,9 @@ Component({
     },
     // 监听agentConfig变化，判断是否是agent-开头的
     agentConfig: function (agentConfig) {
-      console.log('mode',this.properties.chatMode)
+      // console.log('mode', this.properties.chatMode)
       // 如果是agent-开头的，从agentConfig中提取agentID和tools,组成新的agentV2Config，对用户不可见
-      if (this.properties.chatMode==="bot"&&agentConfig.botId.startsWith("agent")) {
+      if (this.properties.chatMode === "bot" && agentConfig.botId.startsWith("agent")) {
         this.setData({
           isAgent: true,
           agentV2Config: {
@@ -242,7 +242,7 @@ Component({
             if (!res.authSetting["scope.record"]) {
               wx.authorize({
                 scope: "scope.record",
-                success() {},
+                success() { },
                 fail() {
                   // 用户拒绝授权，可以引导用户到设置页面手动开启权限
                   wx.openSetting({
@@ -334,7 +334,7 @@ Component({
                             console.log("e", e);
                             reject(e);
                           },
-                          complete: () => {},
+                          complete: () => { },
                           header: {},
                         });
                       }
@@ -1810,7 +1810,7 @@ Component({
             if (finish_reason === "stop") {
               break;
             }
-            console.log('ryan',delta);
+            // console.log('ryan', delta);
             const { content, reasoning_content, role } = delta;
             reasoningText += reasoning_content || "";
             contentText += content || "";
@@ -1896,7 +1896,7 @@ Component({
       // 顶部文件行展现时，隐藏底部工具栏
       this.setData({});
     },
-    subFileList: function () {},
+    subFileList: function () { },
     copyUrl: function (e) {
       const { url } = e.currentTarget.dataset;
       console.log(url);
@@ -2334,7 +2334,7 @@ Component({
       } = this.data;
       // 1. UI 预处理,如果是用户消息,则添加一个 AI 占位消息
       const newMessages = [...messages];
-      if (message?.[0].role === "user") {
+      if (message?.[0]?.role === "user") {
         const aiMsg = { id: "assistant_message_" + Date.now(), role: "assistant", parts: [] };
         newMessages.push(message?.[0], aiMsg);
         this.setData({
@@ -2365,6 +2365,7 @@ Component({
         // 3.进入流处理循环
         await this.handleStream(res.eventStream, ai, agentID, currentAiMsgIndex);
       } catch (e) {
+        console.error(e);
         this.setData({
           [`messages[${currentAiMsgIndex}].parts`]: [{ type: "error", content: "网络出错了，请稍后再试，(｡ì _ í｡)" }],
         });
@@ -2398,7 +2399,7 @@ Component({
             this.setData({
               [`messages[${currentAiMsgIndex}].parts[${currentParts.length - 1}].content`]: fullContent,
             });
-            break; // 必须添加 break！
+            break;
           // 工具调用开始，push 一个 tool_call 类型的 part
           case "TOOL_CALL_START":
             fullContent = "";
@@ -2434,6 +2435,9 @@ Component({
             this.setData({
               [`messages[${currentAiMsgIndex}].parts[${toolCallIndex}].status`]: "success",
             });
+            this.setData({
+              [`messages[${currentAiMsgIndex}].parts[${toolCallIndex}].result`]: data.content,
+            });
             break;
           case "RUN_ERROR":
             const agentErrorPart = {
@@ -2463,44 +2467,44 @@ Component({
           const tool = this.data.agentV2Config.tools.find((item) => item.name === toolCallName);
           // 只处理前端工具调用
           if (tool) {
-             try {
-               // 调用工具处理函数
-               const toolResult = await tool.handler(JSON.parse(args));
-               // 处理成字符串
-               const toolResultStr = JSON.stringify(toolResult);
-               // 调用成功，将结果添加到前端工具调用结果数组
-               frontendToolsResult.push({
-                 toolCallId,
-                 result: toolResultStr,
-               });
-               // 更新工具调用状态为 success
-               this.setData({
-                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
-                   (item) => item.id === toolCallId
-                 )}].status`]: "success",
-               });
-               this.setData({
-                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
-                   (item) => item.id === toolCallId
-                 )}].result`]: toolResultStr,
-               });
-             } catch (e) {
-               frontendToolsResult.push({
-                 toolCallId,
-                 result: `工具${toolCallName}调用失败：${e.message}`,
-               });
-               // 更新工具调用状态为 failed
-               this.setData({
-                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
-                   (item) => item.id === toolCallId
-                 )}].status`]: "failed",
-               });
-               this.setData({
-                 [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
-                   (item) => item.id === toolCallId
-                 )}].result`]: e.message,
-               });
-             }
+            try {
+              // 调用工具处理函数
+              const toolResult = await tool.handler(JSON.parse(args));
+              // 处理成字符串
+              const toolResultStr = JSON.stringify(toolResult);
+              // 调用成功，将结果添加到前端工具调用结果数组
+              frontendToolsResult.push({
+                toolCallId,
+                result: toolResultStr,
+              });
+              // 更新工具调用状态为 success
+              this.setData({
+                [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                  (item) => item.id === toolCallId
+                )}].status`]: "success",
+              });
+              this.setData({
+                [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                  (item) => item.id === toolCallId
+                )}].result`]: toolResultStr,
+              });
+            } catch (e) {
+              frontendToolsResult.push({
+                toolCallId,
+                result: `工具${toolCallName}调用失败：${e.message}`,
+              });
+              // 更新工具调用状态为 failed
+              this.setData({
+                [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                  (item) => item.id === toolCallId
+                )}].status`]: "failed",
+              });
+              this.setData({
+                [`messages[${currentAiMsgIndex}].parts[${currentParts.findIndex(
+                  (item) => item.id === toolCallId
+                )}].result`]: e.message,
+              });
+            }
           }
         }
         // 处理工具调用结果，发送给服务端
