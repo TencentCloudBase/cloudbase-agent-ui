@@ -58,6 +58,7 @@ Component({
       if (this.properties.chatMode === "bot" && agentConfig.botId.startsWith("agent")) {
         this.setData({
           isAgent: true,
+          threadId: "threadId_" + Date.now(),
           agentV2Config: {
             agentID: agentConfig.botId,
             tools: agentConfig.tools,
@@ -169,6 +170,7 @@ Component({
     const cloudInstance = await getCloudInstance(this.data.envShareConfig);
     // 配置型 Agent 初始化
     if (chatMode === "bot") {
+      console.log("ryan bot")
       const { botId } = this.data.agentConfig;
       if (botId.startsWith("agent")) {
         return;
@@ -258,11 +260,6 @@ Component({
           },
         });
       }
-    }
-    if (this.data.isAgent) {
-      this.setData({
-        threadId: "threadId_" + Date.now(),
-      });
     }
   },
   detached: function () {
